@@ -1,11 +1,3 @@
-did you bump the plugin version number so it updates in the clients
-
----
-
-And they just update, right? There's nothing we need to do with the client once it's merged.
-
----
-
 when enabling the plugin i get this error in claude code
 
 1 error:
