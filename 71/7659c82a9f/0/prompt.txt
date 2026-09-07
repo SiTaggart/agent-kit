@@ -1,0 +1,29 @@
+Can we turn agent kit into a marketplace that we install in codex, claude and cursor, that houses multiple plugins that I can enable or diabled at will?
+
+---
+
+No, I was actually thiknking about porting pstack as a codex plugin to be installed along side agent kit,[https://github.com/cursor/plugins/tree/main/pstack](https://github.com/cursor/plugins/tree/main/pstack)
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_5ZvpbjgfeFmNcObO1YYwiAjw\",0]","question":"Should PStack appear in the Agent Kit marketplace as a second plugin, or only in your personal Codex marketplace?","answer":"Agent Kit marketplace, alongside agent-kit"}]
+</send_user_message_question_reply>
+
+---
+
+Did we bring across poteto-mode? This is the key thing I want. We should figure out the model choices for Poteto mode too so that we aren't relying on cursor provider library
+
+---
+
+<send_user_message_question_reply>
+[{"questionItemId":"[\"request_user_input_async\",\"call_9qDRJoOaWCcVQht8lsHOwh7v\",0]","question":"For Poteto Mode, should the default model routing favor quality or lower cost?","answer":"Quality first: Astra for hard work, Sol for routine work"}]
+</send_user_message_question_reply>
+
+---
+
+what else area we missing for this faithful recreation of pstack for codex?
+
+---
+
+perfect, that seems like the full faithful endpoint
