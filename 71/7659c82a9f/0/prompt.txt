@@ -27,3 +27,7 @@ what else area we missing for this faithful recreation of pstack for codex?
 ---
 
 perfect, that seems like the full faithful endpoint
+
+---
+
+pr to my agent kit marketplace repo pls
