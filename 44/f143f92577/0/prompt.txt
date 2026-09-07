@@ -1,18 +1,1 @@
-with the addition of my port of the pstack as a plugin for my marketplace I believe the the agent-kit plugin should be organised in the same way, rather than have root level skills and hooks, but foldered into a agent-kit plugin folder. and then the readme from the root be updated and a new readme in the agent kit plugin
-
----
-
-I actually quite liked this suggested split from anbother agent chat too:
-
-
-
-I’d start with a small split:
-
-- **Engineering** — planning, implementation, review, debugging, and code taste. Keep these together because they reference each other.
-- **Git** — commits, PRs, worktrees, and feedback.
-- **Knowledge** — Obsidian, QMD, session research, and retained learnings.
-- **Hooks** — independently switchable command safeguards.
-
----
-
-yeah I like the concept of beoing able too enable pstack and knowledge only, as an example
+pr then pls
