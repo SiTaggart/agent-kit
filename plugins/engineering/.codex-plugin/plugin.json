@@ -1,0 +1,23 @@
+{
+  "name": "engineering",
+  "version": "0.2.1",
+  "description": "Planning, implementation, code review, debugging, and code taste.",
+  "author": {
+    "name": "Simon Taggart",
+    "email": "me@simontaggart.com"
+  },
+  "homepage": "https://github.com/SiTaggart/agent-kit",
+  "repository": "https://github.com/SiTaggart/agent-kit",
+  "license": "MIT",
+  "keywords": [
+    "skills"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Engineering",
+    "shortDescription": "Planning, implementation, code review, debugging, and code taste.",
+    "developerName": "Simon Taggart",
+    "category": "Productivity",
+    "websiteURL": "https://github.com/SiTaggart/agent-kit"
+  }
+}

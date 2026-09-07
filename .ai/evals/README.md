@@ -2,11 +2,12 @@
 
 Three layers, from durable to disposable:
 
-1. **Definitions — `skills/<skill>/evals/`** (`evals.json`, `grader.md`,
+1. **Definitions — `plugins/<plugin>/skills/<skill>/evals/`** (`evals.json`, `grader.md`,
    `README.md`). The tests themselves: prompts, fixtures, rubrics, and a
    one-line run history appended after each campaign. They live inside each
    skill directory so they ship and sync with the skill they guard.
-   Suites exist for: ce-brainstorm, ce-plan, ce-ideate, ce-sessions.
+   Engineering owns ce-brainstorm, ce-plan, and ce-ideate. Knowledge owns
+   ce-sessions.
 
 2. **Campaign docs — `.ai/evals/`** (this directory).
    - `RUNBOOK.md` — how to execute a full campaign (runner protocol, fixture

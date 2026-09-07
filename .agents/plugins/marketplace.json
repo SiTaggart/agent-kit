@@ -5,10 +5,49 @@
   },
   "plugins": [
     {
-      "name": "agent-kit",
+      "name": "engineering",
       "source": {
         "source": "local",
-        "path": "./"
+        "path": "./plugins/engineering"
+      },
+      "version": "0.2.1",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "git",
+      "source": {
+        "source": "local",
+        "path": "./plugins/git"
+      },
+      "version": "0.2.1",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "knowledge",
+      "source": {
+        "source": "local",
+        "path": "./plugins/knowledge"
+      },
+      "version": "0.2.1",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "hooks",
+      "source": {
+        "source": "local",
+        "path": "./plugins/hooks"
       },
       "version": "0.2.1",
       "policy": {

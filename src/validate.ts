@@ -1,12 +1,6 @@
 import path from "path";
 import { pathExists, readText } from "./fs";
-import {
-  PLUGIN_BUNDLE,
-  PLUGIN_ID,
-  type HarnessAdapter,
-  type ManifestKind,
-  type PluginBundle,
-} from "./plugin-bundle";
+import { HARNESSES, MARKETPLACE_ID, PLUGIN_IDS, RETIRED_PATHS, type HarnessAdapter, type PluginId } from "./plugin-bundle";
 
 export interface ValidationFailure {
   path: string;
@@ -18,379 +12,196 @@ export interface ValidationReport {
   failures: readonly ValidationFailure[];
 }
 
-const FORBIDDEN_INSTRUCTION_BASENAMES = new Set(["agents.md", "claude.md"]);
 const COMPONENT_KEYS = new Set([
-  "skills",
-  "hooks",
-  "rules",
-  "agents",
-  "commands",
-  "mcpServers",
-  "apps",
-  "instructions",
+  "skills", "hooks", "rules", "agents", "commands", "mcpServers", "apps", "instructions",
 ]);
 
-const KIND_CHECKS: Record<ManifestKind, (ctx: KindCheckContext) => void> = {
-  "cursor-plugin": collectCursorManifestFailures,
-  "claude-plugin": collectNamedPluginManifestFailures,
-  "codex-plugin": collectNamedPluginManifestFailures,
-};
-
-interface KindCheckContext {
-  adapter: HarnessAdapter;
-  document: unknown;
-  relPath: string;
-  failures: ValidationFailure[];
-}
-
-export async function validatePluginBundle(
-  root: string,
-  bundle: PluginBundle = PLUGIN_BUNDLE,
-): Promise<ValidationReport> {
+export async function validatePluginBundle(root: string): Promise<ValidationReport> {
   const failures: ValidationFailure[] = [];
+  const adapters = [...new Set(Object.values(HARNESSES))];
 
-  await Promise.all([
-    collectMissingPathFailures(root, bundle.skillsDir, "Canonical skills directory is missing.", failures),
-    collectMissingPathFailures(root, bundle.hookFiles.script, "Hook script is missing.", failures),
-    collectMissingPathFailures(root, bundle.hookFiles.cursorWrapper, "Cursor hook wrapper is missing.", failures),
-    collectMissingPathFailures(root, bundle.hookFiles.claudeCodex, "Claude and Codex hook config is missing.", failures),
-    collectMissingPathFailures(root, bundle.hookFiles.cursor, "Cursor hook config is missing.", failures),
-    collectRetiredPathFailures(root, bundle, failures),
-    collectAdapterFailures(root, bundle, failures),
-  ]);
+  for (const relPath of RETIRED_PATHS) {
+    if (await pathExists(path.join(root, relPath))) {
+      failures.push({ path: relPath, message: "Retired path must be removed." });
+    }
+  }
 
-  collectGrokAliasFailures(bundle, failures);
+  for (const adapter of adapters) {
+    await inspectJson(root, adapter.marketplacePath, (document) => {
+      return inspectMarketplace(document, adapter);
+    }, failures);
 
-  return {
-    ok: failures.length === 0,
-    failures,
-  };
+    for (const id of PLUGIN_IDS) {
+      const pluginRoot = `plugins/${id}`;
+      const manifestPath = `${pluginRoot}/${adapter.manifestPath}`;
+      await inspectJson(root, manifestPath, (document) => {
+        return inspectPluginManifest(document, adapter, manifestPath, id);
+      }, failures);
+
+      if (id === "hooks") {
+        const configPath = `${pluginRoot}/${adapter.hooksPath}`;
+        await requirePath(root, configPath, failures);
+        if (await pathExists(path.join(root, configPath))) {
+          const script = adapter.kind === "cursor-plugin" ? "cursor-shell-hook.sh" : "prevent-main-commit.sh";
+          if (!(await readText(path.join(root, configPath))).includes(script)) {
+            failures.push({ path: configPath, message: `Hook config must name ${script}.` });
+          }
+        }
+      }
+    }
+  }
+
+  for (const id of PLUGIN_IDS) {
+    const pluginRoot = `plugins/${id}`;
+    await requirePath(root, `${pluginRoot}/README.md`, failures);
+    if (id === "hooks") {
+      if (await pathExists(path.join(root, pluginRoot, "skills"))) {
+        failures.push({ path: `${pluginRoot}/skills`, message: "Hooks must not bundle skills." });
+      }
+    } else {
+      await requirePath(root, `${pluginRoot}/skills`, failures);
+      if (await pathExists(path.join(root, pluginRoot, "hooks"))) {
+        failures.push({ path: `${pluginRoot}/hooks`, message: "Command safeguards belong only in the hooks plugin." });
+      }
+    }
+  }
+  for (const script of ["prevent-main-commit.sh", "cursor-shell-hook.sh"]) {
+    await requirePath(root, `plugins/hooks/hooks/scripts/${script}`, failures);
+  }
+  const wrapper = "plugins/hooks/hooks/scripts/cursor-shell-hook.sh";
+  if (await pathExists(path.join(root, wrapper)) && !(await readText(path.join(root, wrapper))).includes("prevent-main-commit.sh")) {
+    failures.push({ path: wrapper, message: "Cursor wrapper must call the shared policy script." });
+  }
+
+  return { ok: failures.length === 0, failures };
 }
 
 export function namesInstructionFile(value: string): boolean {
   const normalized = value.trim().replace(/\\/g, "/").toLowerCase();
-  const base = normalized.split("/").pop() ?? normalized;
-  return FORBIDDEN_INSTRUCTION_BASENAMES.has(base);
+  const base = normalized.split("/").pop();
+  return base === "agents.md" || base === "claude.md";
 }
 
 export function inspectPluginManifest(
   document: unknown,
   adapter: HarnessAdapter,
   relPath: string,
+  id: PluginId,
 ): readonly ValidationFailure[] {
   const failures: ValidationFailure[] = [];
-  KIND_CHECKS[adapter.kind]({ adapter, document, relPath, failures });
-  collectForbiddenComponentFailures(document, relPath, failures);
+  const record = asRecord(document);
+  if (!record) return [{ path: relPath, message: "Plugin manifest must be a JSON object." }];
+  if (record.name !== id) failures.push({ path: relPath, message: `Plugin name must be ${id}.` });
+
+  if (id === "hooks") {
+    if ("skills" in record) failures.push({ path: relPath, message: "Hooks must not declare skills." });
+    if (adapter.kind === "claude-plugin") {
+      if ("hooks" in record) {
+        failures.push({ path: relPath, message: "Claude loads hooks/hooks.json automatically; do not declare it again." });
+      }
+    } else {
+      checkPath(record.hooks, adapter.hooksPath, relPath, "hooks", failures);
+    }
+  } else {
+    checkPath(record.skills, "skills/", relPath, "skills", failures);
+    if ("hooks" in record) failures.push({ path: relPath, message: "Command safeguards belong only in the hooks plugin." });
+  }
+
+  if (adapter.kind === "cursor-plugin" && "rules" in record) {
+    failures.push({ path: relPath, message: "Cursor plugin must not declare rules." });
+  }
+  for (const value of componentStrings(record)) {
+    if (namesInstructionFile(value)) {
+      failures.push({ path: relPath, message: `Plugin components must not include ${path.basename(value)}.` });
+    }
+  }
   return failures;
 }
 
-async function collectAdapterFailures(
-  root: string,
-  bundle: PluginBundle,
-  failures: ValidationFailure[],
-): Promise<void> {
-  await Promise.all(
-    Object.values(bundle.manifests).map((adapter) => collectOneAdapterFailures(root, adapter, bundle, failures)),
-  );
-}
-
-async function collectOneAdapterFailures(
-  root: string,
-  adapter: HarnessAdapter,
-  bundle: PluginBundle,
-  failures: ValidationFailure[],
-): Promise<void> {
-  const hookCommandName = adapter.kind === "cursor-plugin"
-    ? path.basename(bundle.hookFiles.cursorWrapper)
-    : path.basename(bundle.hookFiles.script);
-
-  await collectMissingPathFailures(root, adapter.skillsPath, "Skills path named by the adapter is missing.", failures);
-  await collectMissingPathFailures(root, adapter.hooksPath, "Hook config named by the adapter is missing.", failures);
-  await collectHookScriptReferenceFailures(root, adapter.hooksPath, hookCommandName, failures);
-  if (adapter.kind === "cursor-plugin") {
-    await collectHookScriptReferenceFailures(
-      root,
-      bundle.hookFiles.cursorWrapper,
-      path.basename(bundle.hookFiles.script),
-      failures,
-    );
-  }
-
-  await collectJsonDocumentFailures(root, adapter.marketplacePath, (document, relPath) => {
-    collectMarketplaceFailures(adapter, document, relPath, failures);
-  }, failures);
-
-  await collectJsonDocumentFailures(root, adapter.manifestPath, (document, relPath) => {
-    failures.push(...inspectPluginManifest(document, adapter, relPath));
-  }, failures);
-}
-
-function collectNamedPluginManifestFailures(ctx: KindCheckContext): void {
-  const record = asRecord(ctx.document);
-  if (!record) {
-    ctx.failures.push({ path: ctx.relPath, message: "Plugin manifest must be a JSON object." });
-    return;
-  }
-
-  if (record.name !== PLUGIN_ID) {
-    ctx.failures.push({ path: ctx.relPath, message: `Plugin name must be ${PLUGIN_ID}.` });
-  }
-
-  collectNamedPathFailures(record.skills, ctx.adapter.skillsPath, ctx.relPath, "skills", ctx.failures);
-
-  if (ctx.adapter.kind === "claude-plugin") {
-    if (
-      typeof record.hooks === "string"
-      && normalizeRelPath(record.hooks) === normalizeRelPath(ctx.adapter.hooksPath)
-    ) {
-      ctx.failures.push({
-        path: ctx.relPath,
-        message: `Claude loads ${ctx.adapter.hooksPath} automatically; manifest.hooks must not declare it again.`,
-      });
-    }
-    return;
-  }
-
-  collectNamedPathFailures(record.hooks, ctx.adapter.hooksPath, ctx.relPath, "hooks", ctx.failures);
-}
-
-function collectCursorManifestFailures(ctx: KindCheckContext): void {
-  collectNamedPluginManifestFailures(ctx);
-  const record = asRecord(ctx.document);
-  if (record && "rules" in record) {
-    ctx.failures.push({ path: ctx.relPath, message: "Cursor plugin must not declare rules." });
-  }
-}
-
-function collectMarketplaceFailures(
-  adapter: HarnessAdapter,
-  document: unknown,
-  relPath: string,
-  failures: ValidationFailure[],
-): void {
+function inspectMarketplace(document: unknown, adapter: HarnessAdapter): readonly ValidationFailure[] {
+  const relPath = adapter.marketplacePath;
   const record = asRecord(document);
-  if (!record) {
-    failures.push({ path: relPath, message: "Marketplace catalog must be a JSON object." });
-    return;
-  }
-
-  if (record.name !== PLUGIN_ID) {
-    failures.push({ path: relPath, message: `Marketplace name must be ${PLUGIN_ID}.` });
-  }
-
-  const plugins = record.plugins;
-  if (!Array.isArray(plugins) || plugins.length === 0) {
-    failures.push({ path: relPath, message: "Marketplace must list at least one plugin." });
-    return;
-  }
-
-  const plugin = plugins.find((entry) => asRecord(entry)?.name === PLUGIN_ID);
-  if (!plugin) {
-    failures.push({ path: relPath, message: `Marketplace must list ${PLUGIN_ID}.` });
-    return;
-  }
-
-  if (adapter.kind === "claude-plugin") {
-    collectClaudeMarketplaceEntryFailures(record, plugin, relPath, failures);
-    return;
-  }
-
-  if (adapter.kind === "cursor-plugin") {
-    collectCursorMarketplaceEntryFailures(record, plugin, relPath, failures);
-    return;
-  }
-
-  if (adapter.kind === "codex-plugin") {
-    collectCodexMarketplaceEntryFailures(plugin, relPath, failures);
-  }
-}
-
-function collectClaudeMarketplaceEntryFailures(
-  marketplace: Record<string, unknown>,
-  plugin: unknown,
-  relPath: string,
-  failures: ValidationFailure[],
-): void {
-  const owner = asRecord(marketplace.owner);
-  if (typeof owner?.name !== "string" || owner.name.length === 0) {
-    failures.push({ path: relPath, message: "Claude marketplace must include owner.name." });
-  }
-
-  const entry = asRecord(plugin);
-  if (entry?.source !== "./") {
-    failures.push({ path: relPath, message: "Claude marketplace source must be \"./\"." });
-  }
-}
-
-function collectCursorMarketplaceEntryFailures(
-  marketplace: Record<string, unknown>,
-  plugin: unknown,
-  relPath: string,
-  failures: ValidationFailure[],
-): void {
-  const owner = asRecord(marketplace.owner);
-  if (typeof owner?.name !== "string" || owner.name.length === 0) {
-    failures.push({ path: relPath, message: "Cursor marketplace must include owner.name." });
-  }
-
-  const entry = asRecord(plugin);
-  if (entry?.source !== ".") {
-    failures.push({ path: relPath, message: "Cursor marketplace source must be \".\"." });
-  }
-}
-
-function collectCodexMarketplaceEntryFailures(
-  plugin: unknown,
-  relPath: string,
-  failures: ValidationFailure[],
-): void {
-  const entry = asRecord(plugin);
-  const source = asRecord(entry?.source);
-  if (source?.source !== "local" || source.path !== "./") {
-    failures.push({ path: relPath, message: "Codex marketplace source.path must be \"./\" relative to the repo root." });
-  }
-
-  const policy = asRecord(entry?.policy);
-  if (typeof policy?.installation !== "string" || typeof policy.authentication !== "string") {
-    failures.push({ path: relPath, message: "Codex marketplace entry must include policy.installation and policy.authentication." });
-  }
-
-  if (typeof entry?.category !== "string" || entry.category.length === 0) {
-    failures.push({ path: relPath, message: "Codex marketplace entry must include category." });
-  }
-}
-
-function collectForbiddenComponentFailures(
-  document: unknown,
-  relPath: string,
-  failures: ValidationFailure[],
-): void {
-  for (const value of collectComponentStrings(document)) {
-    if (namesInstructionFile(value)) {
-      failures.push({
-        path: relPath,
-        message: `Plugin components must not include ${path.basename(value)}.`,
-      });
+  if (!record) return [{ path: relPath, message: "Marketplace catalog must be a JSON object." }];
+  const failures: ValidationFailure[] = [];
+  if (record.name !== MARKETPLACE_ID) failures.push({ path: relPath, message: `Marketplace name must be ${MARKETPLACE_ID}.` });
+  if (adapter.kind !== "codex-plugin") {
+    const owner = asRecord(record.owner);
+    if (typeof owner?.name !== "string" || !owner.name) {
+      failures.push({ path: relPath, message: "Marketplace must include owner.name." });
     }
   }
+  if (!Array.isArray(record.plugins)) return [...failures, { path: relPath, message: "Marketplace must list plugins." }];
+  if (record.plugins.some((entry) => asRecord(entry)?.name === "agent-kit")) {
+    failures.push({ path: relPath, message: "Replace the retired agent-kit plugin with the four focused plugins." });
+  }
+  for (const id of PLUGIN_IDS) {
+    const entries = record.plugins.filter((entry) => asRecord(entry)?.name === id);
+    const entry = asRecord(entries[0]);
+    if (entries.length !== 1 || !entry) {
+      failures.push({ path: relPath, message: `Marketplace must list ${id} exactly once.` });
+      continue;
+    }
+    const expected = `./plugins/${id}`;
+    if (adapter.kind === "codex-plugin") {
+      const source = asRecord(entry.source);
+      if (source?.source !== "local" || source.path !== expected) {
+        failures.push({ path: relPath, message: `${id} source.path must be "${expected}" relative to the repo root.` });
+      }
+      const policy = asRecord(entry.policy);
+      if (typeof policy?.installation !== "string" || typeof policy.authentication !== "string") {
+        failures.push({ path: relPath, message: `${id} must include policy.installation and policy.authentication.` });
+      }
+      if (typeof entry.category !== "string" || !entry.category) {
+        failures.push({ path: relPath, message: `${id} must include category.` });
+      }
+    } else if (entry.source !== expected) {
+      failures.push({ path: relPath, message: `${id} source must be "${expected}".` });
+    }
+  }
+  return failures;
 }
 
-function collectComponentStrings(value: unknown, parentKey?: string): readonly string[] {
-  if (typeof value === "string") {
-    return parentKey && COMPONENT_KEYS.has(parentKey) ? [value] : [];
+function checkPath(value: unknown, expected: string, relPath: string, field: string, failures: ValidationFailure[]): void {
+  const normalize = (text: string) => text.replace(/^\.\//, "").replace(/\/$/, "");
+  if (typeof value !== "string" || normalize(value) !== normalize(expected)) {
+    failures.push({ path: relPath, message: `${field} must point at ${expected}.` });
   }
+}
 
-  if (Array.isArray(value)) {
-    return value.flatMap((entry) => collectComponentStrings(entry, parentKey));
-  }
-
+function componentStrings(value: unknown, parentKey?: string): readonly string[] {
+  if (typeof value === "string") return parentKey && COMPONENT_KEYS.has(parentKey) ? [value] : [];
+  if (Array.isArray(value)) return value.flatMap((entry) => componentStrings(entry, parentKey));
   const record = asRecord(value);
-  if (!record) {
-    return [];
-  }
-
-  return Object.entries(record).flatMap(([key, entry]) => collectComponentStrings(entry, key));
+  return record ? Object.entries(record).flatMap(([key, entry]) => componentStrings(entry, key)) : [];
 }
 
-function collectNamedPathFailures(
-  value: unknown,
-  expected: string,
-  relPath: string,
-  field: string,
-  failures: ValidationFailure[],
-): void {
-  if (typeof value !== "string") {
-    failures.push({
-      path: relPath,
-      message: `${field} must be a string path to ${expected}.`,
-    });
-    return;
-  }
-
-  if (normalizeRelPath(value) !== normalizeRelPath(expected)) {
-    failures.push({
-      path: relPath,
-      message: `${field} must point at ${expected}.`,
-    });
-  }
-}
-
-function collectGrokAliasFailures(bundle: PluginBundle, failures: ValidationFailure[]): void {
-  const { grok, cursor } = bundle.manifests;
-  if (grok.manifestPath !== cursor.manifestPath || grok.hooksPath !== cursor.hooksPath) {
-    failures.push({
-      path: grok.manifestPath,
-      message: "Grok must reuse the Cursor plugin files.",
-    });
-  }
-}
-
-async function collectRetiredPathFailures(
-  root: string,
-  bundle: PluginBundle,
-  failures: ValidationFailure[],
-): Promise<void> {
-  await Promise.all(bundle.retiredPaths.map(async (relPath) => {
-    if (await pathExists(path.join(root, relPath))) {
-      failures.push({ path: relPath, message: "Retired path must be removed." });
-    }
-  }));
-}
-
-async function collectHookScriptReferenceFailures(
-  root: string,
-  relPath: string,
-  scriptName: string,
-  failures: ValidationFailure[],
-): Promise<void> {
-  const absPath = path.join(root, relPath);
-  if (!(await pathExists(absPath))) {
-    return;
-  }
-
-  const text = await readText(absPath);
-  if (!text.includes(scriptName)) {
-    failures.push({ path: relPath, message: `Hook config must name ${scriptName}.` });
-  }
-}
-
-async function collectMissingPathFailures(
-  root: string,
-  relPath: string,
-  message: string,
-  failures: ValidationFailure[],
-): Promise<void> {
+async function requirePath(root: string, relPath: string, failures: ValidationFailure[]): Promise<void> {
   if (!(await pathExists(path.join(root, relPath)))) {
-    failures.push({ path: relPath, message });
+    failures.push({ path: relPath, message: "Required path is missing." });
   }
 }
 
-async function collectJsonDocumentFailures(
+async function inspectJson(
   root: string,
   relPath: string,
-  inspect: (document: unknown, relPath: string) => void,
+  inspect: (document: unknown) => readonly ValidationFailure[],
   failures: ValidationFailure[],
 ): Promise<void> {
-  const absPath = path.join(root, relPath);
-  if (!(await pathExists(absPath))) {
+  const file = path.join(root, relPath);
+  if (!(await pathExists(file))) {
     failures.push({ path: relPath, message: "Required JSON file is missing." });
     return;
   }
-
   try {
-    inspect(JSON.parse(await readText(absPath)), relPath);
+    failures.push(...inspect(JSON.parse(await readText(file))));
   } catch (error) {
-    const detail = error instanceof Error ? error.message : String(error);
-    failures.push({ path: relPath, message: `JSON did not parse. ${detail}` });
+    failures.push({ path: relPath, message: `JSON did not parse. ${error instanceof Error ? error.message : String(error)}` });
   }
 }
 
 function asRecord(value: unknown): Record<string, unknown> | undefined {
+  // SAFETY: The guard excludes null, arrays, and primitives; field values stay unknown.
   return typeof value === "object" && value !== null && !Array.isArray(value)
     ? value as Record<string, unknown>
     : undefined;
-}
-
-function normalizeRelPath(value: string): string {
-  return value.replace(/^\.\//, "").replace(/\/$/, "");
 }

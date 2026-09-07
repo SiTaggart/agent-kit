@@ -8,12 +8,12 @@ const repoRoot = path.resolve(import.meta.dir, "..");
 const pluginRoot = path.join(repoRoot, "plugins/pstack");
 const read = (file: string) => readFileSync(path.join(pluginRoot, file), "utf8");
 
-test("Codex exposes PStack separately without changing the Agent Kit source", () => {
+test("Codex exposes the four focused plugins and PStack separately", () => {
   const catalog = JSON.parse(readFileSync(path.join(repoRoot, ".agents/plugins/marketplace.json"), "utf8"));
-  expect(catalog.plugins.map((entry: { name: string }) => entry.name)).toEqual(["agent-kit", "pstack"]);
-  expect(catalog.plugins[0].source.path).toBe("./");
-  expect(catalog.plugins[1].source.path).toBe("./plugins/pstack");
-  expect(catalog.plugins[1].policy.installation).toBe("AVAILABLE");
+  expect(catalog.plugins.map((entry: { name: string }) => entry.name)).toEqual(["engineering", "git", "knowledge", "hooks", "pstack"]);
+  expect(catalog.plugins[0].source.path).toBe("./plugins/engineering");
+  expect(catalog.plugins[4].source.path).toBe("./plugins/pstack");
+  expect(catalog.plugins[4].policy.installation).toBe("AVAILABLE");
 
   const manifest = JSON.parse(read(".codex-plugin/plugin.json"));
   expect(manifest.name).toBe("pstack");

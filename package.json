@@ -10,7 +10,7 @@
     "agents": "bun src/cli.ts",
     "validate": "bun src/cli.ts validate",
     "lint": "bunx oxlint src tests",
-    "test": "bun test && python3 -B skills/ce-sessions/scripts/test_opencode_sessions.py",
+    "test": "bun test && python3 -B plugins/knowledge/skills/ce-sessions/scripts/test_opencode_sessions.py",
     "type-check": "tsc --noEmit",
     "doctor": "npx react-doctor@latest"
   },

@@ -1,0 +1,23 @@
+{
+  "name": "knowledge",
+  "version": "0.2.1",
+  "description": "Obsidian, QMD, session research, and retained learnings.",
+  "author": {
+    "name": "Simon Taggart",
+    "email": "me@simontaggart.com"
+  },
+  "homepage": "https://github.com/SiTaggart/agent-kit",
+  "repository": "https://github.com/SiTaggart/agent-kit",
+  "license": "MIT",
+  "keywords": [
+    "skills"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Knowledge",
+    "shortDescription": "Obsidian, QMD, session research, and retained learnings.",
+    "developerName": "Simon Taggart",
+    "category": "Productivity",
+    "websiteURL": "https://github.com/SiTaggart/agent-kit"
+  }
+}

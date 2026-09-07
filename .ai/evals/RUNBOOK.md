@@ -1,9 +1,9 @@
 # ce-* Skill Eval Campaign — Runbook
 
 Self-contained instructions for running the skill regression evals. Written
-for a headless agent (Codex or Claude Code) with no prior context. Repo:
-`/Users/staggart/orca/workspaces/.agents/bowhead` (canonical source for the
-ce-* skills; Codex loads these skills natively from `skills/`).
+for a headless agent (Codex or Claude Code) with no prior context. Run from the
+marketplace checkout. Engineering owns the planning and ideation suites;
+Knowledge owns the session research suite under `plugins/knowledge/skills/ce-sessions/`.
 
 ## What this campaign is
 
@@ -12,13 +12,13 @@ The ce-* skills were heavily trimmed on 2026-07-25 (see
 known past defects was deleted in favor of behavioral evals. This campaign
 runs those evals plus a smoke pass over the other trimmed skills.
 
-**Ground rules: never edit files under `skills/` except the two documented
+**Ground rules: never edit files under `plugins/<plugin>/skills/` except the two documented
 result-recording edits at the end. Never commit. All scratch work goes under
 `/tmp/ce-evals/`. Results go to `.ai/evals/results/<YYYY-MM-DD>/`.**
 
 ## Tier 1 — full suites (must run)
 
-Suites live at `skills/<skill>/evals/{evals.json,grader.md,README.md}`.
+Suites live at `plugins/<plugin>/skills/<skill>/evals/{evals.json,grader.md,README.md}`.
 Status: ce-brainstorm eval 1 already ran 2026-07-25 — PASS on the regression
 dimension, 12/12; see the run-history note in its evals.json. Still to run:
 ce-brainstorm evals 2–3, all of ce-plan (6 evals × 2 runs), all of ce-ideate
@@ -52,7 +52,7 @@ Runner prompt template (fill the <>):
 
 ### Fixture setup per suite
 
-- **ce-brainstorm** (`skills/ce-brainstorm/evals/evals.json`): scratch repo
+- **ce-brainstorm** (`plugins/engineering/skills/ce-brainstorm/evals/evals.json`): scratch repo
   must not contradict the pre-loaded decisions — see the `setup` field.
   A known-good fixture: README for a "Chatter" team-chat app plus
   `src/snooze.ts` with `export type Snooze = { userId: string; channelId:
@@ -62,14 +62,14 @@ Runner prompt template (fill the <>):
   grade that Path-B-via-question, inconclusive for the tier signal, not a
   fail. Eval 2 needs a trivial one-liner task; eval 3 needs an underspecified
   prompt plus a scripted user answer to whatever the skill asks.
-- **ce-plan** (`skills/ce-plan/evals/evals.json`): each eval declares
+- **ce-plan** (`plugins/engineering/skills/ce-plan/evals/evals.json`): each eval declares
   `setup_config` — write it to `<scratch-repo>/.compound-engineering/
   config.local.yaml` before the run (null = ensure the file is absent).
   Grading is programmatic: the plan file's extension under `.ai/plans/`,
   plus the ignored-value note for eval 4 and description integrity for
   eval 6. Eval 5 (pipeline-forces-md) may be marked inconclusive if a
   pipeline context cannot be staged — never pass it vacuously.
-- **ce-ideate** (`skills/ce-ideate/evals/evals.json`): evals 1/2/4 need a
+- **ce-ideate** (`plugins/engineering/skills/ce-ideate/evals/evals.json`): evals 1/2/4 need a
   repo CWD (reuse the Chatter fixture); eval 3 needs a non-repo CWD.
   Eval 1 stop: the scope question (runner then answers "Cancel"). Eval 2:
   runner answers "Surprise me" and lets the full run finish (this one is
@@ -79,7 +79,7 @@ Runner prompt template (fill the <>):
 
 ### Grading and aggregation
 
-After each suite's runs: apply `skills/<skill>/evals/grader.md` to the
+After each suite's runs: apply `plugins/<plugin>/skills/<skill>/evals/grader.md` to the
 captures (a fresh grader session per suite is cleaner than self-grading).
 Write per-suite results to `.ai/evals/results/<date>/<skill>.md`: table of
 eval × run × stage-1 shape × stage-2 verdict × pass/fail/inconclusive, with
