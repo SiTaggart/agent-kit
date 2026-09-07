@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle prove it works
+  short_description: 'PStack: Principle prove it works'
+policy:
+  allow_implicit_invocation: false

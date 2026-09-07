@@ -1,6 +1,17 @@
 # agent-kit
 
-Git-installable plugin for personal coding-agent skills and hooks.
+Git-installable marketplace for coding-agent plugins.
+
+The Codex marketplace contains two independently installable plugins:
+
+- `agent-kit`: the locally maintained skills and hooks described below.
+- `pstack`: [PStack for Codex](plugins/pstack/README.md), a pinned adaptation of
+  Lauren Tan's PStack. It includes all 45 upstream skills, four companion skills,
+  the complete guide, and the dormant automation pack. Native capability gates
+  identify the hosted features Codex cannot currently provide.
+
+Claude and Cursor continue to expose the original `agent-kit` plugin. PStack's
+adapted package is currently Codex-only.
 
 The plugin id is `agent-kit`.
 
@@ -62,6 +73,23 @@ Then install `agent-kit` from that marketplace. Codex caches the plugin under `~
 
 Turn it off in the Codex plugin directory, or run `codex plugin marketplace remove agent-kit`.
 
+After updating the marketplace to a revision containing PStack, install it separately:
+
+```bash
+codex plugin marketplace upgrade agent-kit
+codex plugin add pstack@agent-kit
+```
+
+Start a new Codex task and invoke `$poteto-mode`. `$setup-pstack` is optional;
+PStack includes [native Codex model roles](plugins/pstack/models.json).
+In Codex CLI, `/plugins` opens the
+plugin browser and Space toggles an installed plugin. Removing the marketplace
+is not needed to disable just one plugin.
+
+For local development, use the checkout's `.agents/plugins/marketplace.json`
+as the marketplace source. The remote catalog does not include unpublished
+working-tree changes.
+
 ### Cursor and Grok
 
 Grok Bot in Cursor uses the Cursor plugin. There is no second skills tree.
@@ -93,17 +121,22 @@ Cursor loads `hooks/cursor.json` (`beforeShellExecution`). That file points at `
 Reviewers can rerun this without installing a harness.
 
 ```bash
+bun install --frozen-lockfile
+bun install --cwd plugins/pstack/skills/poteto-mode/scripts --frozen-lockfile
 bun run validate
-bun test
+bun run test
 bun run lint
 bun run type-check
+bun run --cwd plugins/pstack/skills/poteto-mode/scripts typecheck
 ```
 
 The validator checks that manifests parse, required fields exist, `skills/` and named hook files exist, `AGENTS.md` is not a plugin component, and retired catalogs or third-party provenance lockfiles are gone.
 
 ## Third-party skills
 
-Agent Kit contains locally maintained skills only. Do not copy third-party skills into `skills/`.
+The `agent-kit` plugin contains locally maintained skills only. Do not copy
+third-party skills into the root `skills/` tree. Separately packaged adaptations
+live under `plugins/<name>/` with their license and pinned source attribution.
 
 Install provider plugins separately in each harness. Common companions include Cloudflare, Vercel or Build Web Apps, Remotion, Matt Pocock Skills, RepoPrompt, GitHub, Linear, and Anthropic's frontend design plugin. Host-provided skills such as image generation and computer use also stay outside Agent Kit.
 

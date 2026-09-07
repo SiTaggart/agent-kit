@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle make operations idempotent
+  short_description: 'PStack: Principle make operations idempotent'
+policy:
+  allow_implicit_invocation: false

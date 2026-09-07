@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle subtract before you add
+  short_description: 'PStack: Principle subtract before you add'
+policy:
+  allow_implicit_invocation: false

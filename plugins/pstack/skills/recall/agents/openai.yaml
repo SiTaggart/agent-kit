@@ -1,0 +1,5 @@
+interface:
+  display_name: Recall
+  short_description: 'PStack: Recall'
+policy:
+  allow_implicit_invocation: false

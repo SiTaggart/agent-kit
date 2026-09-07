@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle minimize reader load
+  short_description: 'PStack: Principle minimize reader load'
+policy:
+  allow_implicit_invocation: false
