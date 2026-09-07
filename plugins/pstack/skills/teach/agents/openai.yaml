@@ -1,0 +1,5 @@
+interface:
+  display_name: Teach
+  short_description: 'PStack: Teach'
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,5 @@
+interface:
+  display_name: Make bot UI
+  short_description: 'PStack: Build a bot UI when native webhook support exists'
+policy:
+  allow_implicit_invocation: false

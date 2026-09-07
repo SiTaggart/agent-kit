@@ -1,0 +1,5 @@
+interface:
+  display_name: Blast radius
+  short_description: 'PStack: Blast radius'
+policy:
+  allow_implicit_invocation: false

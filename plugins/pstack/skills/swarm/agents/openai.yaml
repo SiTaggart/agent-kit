@@ -1,0 +1,5 @@
+interface:
+  display_name: Swarm
+  short_description: 'PStack: Swarm'
+policy:
+  allow_implicit_invocation: false

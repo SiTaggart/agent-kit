@@ -1,0 +1,38 @@
+{
+  "name": "pstack",
+  "version": "0.14.8+codex.20260907222846",
+  "description": "if you want to go fast, go deep first. pstack helps you write less, but higher quality code. rigorous agent workflows you can parallelize with confidence.",
+  "author": {
+    "name": "Lauren Tan"
+  },
+  "homepage": "https://github.com/cursor/plugins/tree/main/pstack",
+  "repository": "https://github.com/cursor/plugins",
+  "license": "MIT",
+  "keywords": [
+    "pstack",
+    "poteto-mode",
+    "workflow",
+    "principles",
+    "agent-style",
+    "subagents",
+    "unslop"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "PStack",
+    "shortDescription": "PStack engineering workflows adapted for Codex.",
+    "longDescription": "Codex port of Lauren Tan\u2019s PStack. Includes all 45 upstream skills, 21 principles, 23 playbooks, the complete guide, and bundled review and control companions. Cursor-only webhook and event automation capabilities are documented and gated when unavailable.",
+    "developerName": "Lauren Tan \u00b7 local Codex adaptation",
+    "category": "Developer Tools",
+    "websiteURL": "https://github.com/cursor/plugins/tree/main/pstack",
+    "logo": "./assets/logo.png",
+    "defaultPrompt": [
+      "Use $poteto-mode for this task.",
+      "Use $setup-pstack to configure available models."
+    ],
+    "capabilities": [
+      "Read",
+      "Write"
+    ]
+  }
+}
