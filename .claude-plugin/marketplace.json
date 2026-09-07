@@ -8,10 +8,28 @@
   "description": "Personal coding-agent skills and hooks.",
   "plugins": [
     {
-      "name": "agent-kit",
-      "source": "./",
+      "name": "engineering",
+      "source": "./plugins/engineering",
       "version": "0.2.1",
-      "description": "Personal coding-agent skills and hooks."
+      "description": "Planning, implementation, code review, debugging, and code taste."
+    },
+    {
+      "name": "git",
+      "source": "./plugins/git",
+      "version": "0.2.1",
+      "description": "Commits, pull requests, worktrees, Git history, and review feedback."
+    },
+    {
+      "name": "knowledge",
+      "source": "./plugins/knowledge",
+      "version": "0.2.1",
+      "description": "Obsidian, QMD, session research, and retained learnings."
+    },
+    {
+      "name": "hooks",
+      "source": "./plugins/hooks",
+      "version": "0.2.1",
+      "description": "Independently switchable shell command safeguards."
     }
   ]
 }

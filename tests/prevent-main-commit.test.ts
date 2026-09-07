@@ -1,15 +1,38 @@
 import { afterEach, expect, test } from "bun:test";
-import { symlink } from "fs/promises";
+import { cp, symlink } from "fs/promises";
 import path from "path";
 import { makeTempRoot, removeTempRoot } from "./helpers";
 
 const tempRoots: string[] = [];
-const hookPath = path.resolve(import.meta.dir, "..", "hooks", "scripts", "prevent-main-commit.sh");
-const cursorWrapperPath = path.resolve(import.meta.dir, "..", "hooks", "scripts", "cursor-shell-hook.sh");
+const hookPath = path.resolve(import.meta.dir, "..", "plugins", "hooks", "hooks", "scripts", "prevent-main-commit.sh");
+const cursorWrapperPath = path.resolve(import.meta.dir, "..", "plugins", "hooks", "hooks", "scripts", "cursor-shell-hook.sh");
 
 afterEach(async () => {
   await Promise.all(tempRoots.map(removeTempRoot));
   tempRoots.length = 0;
+});
+
+test("hook commands run with only the Hooks plugin installed", async () => {
+  const installedRoot = await makeTempRoot("installed-hooks-");
+  tempRoots.push(installedRoot);
+  await cp(path.resolve(import.meta.dir, "..", "plugins", "hooks"), installedRoot, { recursive: true });
+  const claudeConfig = await Bun.file(path.join(installedRoot, "hooks/hooks.json")).json();
+  const cursorConfig = await Bun.file(path.join(installedRoot, "hooks/cursor.json")).json();
+  const commands = [
+    claudeConfig.hooks.PreToolUse[0].hooks[0].command,
+    cursorConfig.hooks.beforeShellExecution[0].command,
+  ];
+  for (const command of commands) {
+    const child = Bun.spawn(["/bin/bash", "-c", command], {
+      cwd: installedRoot,
+      env: { ...process.env, CLAUDE_PLUGIN_ROOT: installedRoot },
+      stdin: new Blob([JSON.stringify({ command: "git status", cwd: installedRoot })]),
+      stdout: "pipe",
+      stderr: "pipe",
+    });
+    expect(await child.exited).toBe(0);
+    expect(await new Response(child.stderr).text()).toBe("");
+  }
 });
 
 test("fails closed when hook input cannot be parsed", async () => {

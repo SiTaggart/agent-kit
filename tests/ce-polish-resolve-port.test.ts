@@ -3,7 +3,7 @@ import path from "path";
 import { makeTempRoot, removeTempRoot, writeText } from "./helpers";
 
 const tempRoots: string[] = [];
-const resolvePortScript = path.join(import.meta.dir, "..", "skills", "ce-polish", "scripts", "resolve-port.sh");
+const resolvePortScript = path.join(import.meta.dir, "..", "plugins", "engineering", "skills", "ce-polish", "scripts", "resolve-port.sh");
 
 afterEach(async () => {
   await Promise.all(tempRoots.map(removeTempRoot));

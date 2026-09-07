@@ -1,0 +1,16 @@
+{
+  "name": "hooks",
+  "version": "0.2.1",
+  "description": "Independently switchable shell command safeguards.",
+  "author": {
+    "name": "Simon Taggart",
+    "email": "me@simontaggart.com"
+  },
+  "homepage": "https://github.com/SiTaggart/agent-kit",
+  "repository": "https://github.com/SiTaggart/agent-kit",
+  "license": "MIT",
+  "keywords": [
+    "hooks"
+  ],
+  "hooks": "./hooks/cursor.json"
+}

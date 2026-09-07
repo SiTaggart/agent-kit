@@ -3,10 +3,12 @@ import { mkdir, mkdtemp, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 
-const script = path.join(import.meta.dir, "..", "skills", "ce-sessions", "scripts", "discover-sessions.sh");
+const script = path.join(import.meta.dir, "..", "plugins", "knowledge", "skills", "ce-sessions", "scripts", "discover-sessions.sh");
 const metadataScript = path.join(
   import.meta.dir,
   "..",
+  "plugins",
+  "knowledge",
   "skills",
   "ce-sessions",
   "scripts",
@@ -15,6 +17,8 @@ const metadataScript = path.join(
 const skeletonScript = path.join(
   import.meta.dir,
   "..",
+  "plugins",
+  "knowledge",
   "skills",
   "ce-sessions",
   "scripts",

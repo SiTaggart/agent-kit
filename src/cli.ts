@@ -27,7 +27,7 @@ async function main(): Promise<void> {
     return;
   }
 
-  console.log("agent-kit plugin bundle is valid");
+  console.log("agent-kit marketplace plugins are valid");
 }
 
 export function parseCliArgs(args: readonly string[]): CliOptions {
@@ -63,7 +63,7 @@ function printHelp(): void {
     "Usage: bun src/cli.ts validate [options]",
     "",
     "Options:",
-    "  --root <path>   Plugin repo root (defaults to cwd)",
+    "  --root <path>   Marketplace repo root (defaults to cwd)",
     "",
     "validate   Check manifests, skills/, and hook files.",
   ].join("\n"));
