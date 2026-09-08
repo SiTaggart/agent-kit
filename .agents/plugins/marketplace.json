@@ -10,7 +10,7 @@
         "source": "local",
         "path": "./plugins/engineering"
       },
-      "version": "0.2.1",
+      "version": "0.2.2",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"
