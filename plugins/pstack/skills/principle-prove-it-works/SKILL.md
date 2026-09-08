@@ -1,9 +1,10 @@
 ---
 name: principle-prove-it-works
 description: "Apply after completing a task, before declaring done. Verify against the real artifact (run the feature, read the actual value, inspect the diff), not a proxy, self-report, or 'it compiles.'"
+disable-model-invocation: true
 ---
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
 
 # Prove It Works
 

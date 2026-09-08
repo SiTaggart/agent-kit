@@ -3,7 +3,7 @@ name: triage-issue-reports
 description: Triage Slack issue reports with one thread-only verdict, evidence review, cause-aware routing, tracker dedupe, and fail-closed ticket creation. Use only from the configured Benny triage automation.
 ---
 
-Read [Benny runtime preflight](../../CODEX.md) before this workflow.
+Read [Benny runtime preflight](../../RUNTIME.md) before this workflow.
 
 # Triage issue reports
 

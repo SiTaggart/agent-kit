@@ -1,6 +1,6 @@
 ### Pause safely
 
-Read the installed plugin's [CODEX.md](../../../CODEX.md) first. Its native tool, model, path, and session-authorization rules apply. The user merges; this port never merges, enables auto-merge, or enters a merge queue.
+Read the installed plugin's [RUNTIME.md](../../../RUNTIME.md) first. Its native tool, model, path, and session-authorization rules apply. The user merges; this port never merges, enables auto-merge, or enters a merge queue.
 
 **You own a clean stop. Leave a checkpoint a cold-start agent can resume from.** This is explicit only. On "keep going", "going to bed, keep going", or "don't stop", do not pause.
 

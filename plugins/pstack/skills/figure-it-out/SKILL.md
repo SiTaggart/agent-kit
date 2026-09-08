@@ -1,9 +1,10 @@
 ---
 name: figure-it-out
 description: "Design an auditable playbook when no narrower one fits: a large migration, an ambitious multi-part change, or work a human reviews after stepping away. Scales rigor to the task, runs a hypothesis loop, and logs decisions via show-me-your-work. Use for /figure-it-out, 'figure it out', a large migration, or when no narrower playbook applies."
+disable-model-invocation: true
 ---
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
 
 # Figure it out
 

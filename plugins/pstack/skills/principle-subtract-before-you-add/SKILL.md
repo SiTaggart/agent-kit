@@ -1,9 +1,10 @@
 ---
 name: principle-subtract-before-you-add
 description: "Apply when sequencing an addition, refactor, or rewrite. Remove dead code, redundant validators, and stub references first, then build on the simpler base."
+disable-model-invocation: true
 ---
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
 
 # Subtract Before You Add
 

@@ -3,15 +3,15 @@ name: setup-benny
 description: Configure Benny and prepare its triage and repro automations. Use when installing Benny or changing its Slack, tracker, repository, routing, control, model, or budget settings.
 ---
 
-Read [Benny runtime preflight](../../CODEX.md) before this workflow.
+Read [Benny runtime preflight](../../RUNTIME.md) before this workflow.
 
 # Set up Benny
 
 Benny ships as a dormant automation pack inside pstack. The plugin manifest exposes only pstack's normal skill root; this file and the two operational files are not slash skills.
 
-The human enters setup by pointing Codex at the pack's `FOR_AGENTS.md`. The bootstrap flow copies the whole pack into the target repository, then reads this file directly at `.agents/automations/benny/skills/setup-benny/SKILL.md`.
+The human enters setup by pointing the agent at the pack's `FOR_AGENTS.md`. The bootstrap flow copies the whole pack into the target repository, then reads this file directly at `.agents/automations/benny/skills/setup-benny/SKILL.md`.
 
-Benny needs external configuration and two live Codex automations.
+Benny needs external configuration and two live host automations.
 
 Do not create or update an automation until the user explicitly asks. Never put a secret value in plugin files, prompts, or committed configuration.
 
@@ -32,9 +32,9 @@ Merge the entire source pack into the destination:
 
 If this file is already being read from the target destination, treat the copy as complete and run the same verification before continuing.
 
-After authorization, install PStack with Codex's plugin controls or `codex plugin add pstack@agent-kit` when that marketplace contains this port. Verify marketplace source and version first; a local unpublished port is not supplied by a remote marketplace. Do not write `.cursor/settings.json`.
+After authorization, install PStack through native plugin controls: `codex plugin add pstack@agent-kit` on Codex or `/plugin install pstack@agent-kit` on Claude. Verify marketplace source and version first; a local unpublished port is not supplied by a remote marketplace. Do not write `.cursor/settings.json`.
 
-Codex currently exposes no project-scoped option in `codex plugin add --help`. A host install does not prove the upstream committed project-install contract. Treat that guarantee as unavailable unless the actual automation runtime proves an equivalent.
+A host install does not prove the upstream fresh-runtime delivery contract. Verify discovery in the actual automation runtime before claiming that guarantee.
 
 Reload the target project or start a fresh agent rooted there. Verify that these shared pstack skills resolve in the actual fresh automation runtime:
 
@@ -100,7 +100,7 @@ Ask for or confirm:
 - Polling and effort budgets
 - Model slug for triage, repro, code work, and media review
 
-Use only model IDs and reasoning settings exposed by the actual Codex task or subagent tool used for that role. Use PStack's bundled model roles as starting choices; task and subagent availability can differ. Do not guess a slug or carry over a private default.
+Use only model IDs and reasoning settings exposed by the actual host task or subagent tool used for that role. Use PStack's bundled model roles as starting choices; task and subagent availability can differ. Do not guess a slug or carry over a private default.
 
 The source channel, triage identity, repository, tracker adapter, control skill, and feature map must be explicit. Fail setup if any required value stays ambiguous.
 
@@ -124,7 +124,7 @@ The repro automation needs:
 - A pull request action that can open a draft pull request
 - The configured control-adapter skill
 
-Prefer configured Codex Slack connector actions for reads and posts. The optional `BENNY_SLACK_BOT_TOKEN` may fill a narrow gap such as editing one operations status message or downloading an attachment. Store the value in a secret manager or environment, not in YAML.
+Prefer configured host Slack connector actions for reads and posts. The optional `BENNY_SLACK_BOT_TOKEN` may fill a narrow gap such as editing one operations status message or downloading an attachment. Store the value in a secret manager or environment, not in YAML.
 
 Do not use undocumented integration endpoints.
 

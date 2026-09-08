@@ -1,6 +1,6 @@
 ### Opening a PR
 
-Read the installed plugin's [CODEX.md](../../../CODEX.md) first. Its native tool, model, path, and session-authorization rules apply. The user merges; this port never merges, enables auto-merge, or enters a merge queue.
+Read the installed plugin's [RUNTIME.md](../../../RUNTIME.md) first. Its native tool, model, path, and session-authorization rules apply. The user merges; this port never merges, enables auto-merge, or enters a merge queue.
 
 Invoked at the end of every other playbook.
 

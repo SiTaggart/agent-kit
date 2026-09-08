@@ -62,7 +62,7 @@ Reach for it when parallelism buys coverage or lets independent checks race. `$a
 $interrogate the whole branch, but skeptically. no nitpicks unless it's an actual bug or regression.
 ```
 
-[`$interrogate`](../../skills/interrogate/SKILL.md) sends the same diff, intent, and rubric to several reviewers on different available models. Model diversity is the point. Different models have different blind spots, so agreement is useful evidence to verify. The bundled Astra / Sol / Terra panel is entirely OpenAI; it does not provide cross-provider independence. The lead sorts everything into `Act on`, `Consider`, `Noted`, and `Dismissed`, with a reason for each dismissal, and applies nothing automatically.
+[`$interrogate`](../../skills/interrogate/SKILL.md) sends the same diff, intent, and rubric to several reviewers on different available models. Model diversity is the point. Different models have different blind spots, so agreement is useful evidence to verify. The bundled Codex panel uses Astra / Sol / Terra; the Claude panel uses Opus / Sonnet / Fable. Each panel shares one provider and does not provide cross-provider independence. The lead sorts everything into `Act on`, `Consider`, `Noted`, and `Dismissed`, with a reason for each dismissal, and applies nothing automatically.
 
 Read the dismissals too. The lead is a pragmatic senior engineer, not an oracle, and you can override it.
 

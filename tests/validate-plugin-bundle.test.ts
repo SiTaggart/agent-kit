@@ -16,7 +16,7 @@ test("plugin bundle validator accepts this repo", async () => {
   expect(report.ok).toBe(true);
 });
 
-test("validator rejects catalogs that still install the repository root", async () => {
+test("validator requires every supported plugin and rejects repository-root sources", async () => {
   const root = await makeTempRoot("agent-kit-marketplace-");
   const adapters = [claudeAdapter, codexAdapter, HARNESSES.cursor];
   try {
@@ -27,6 +27,17 @@ test("validator rejects catalogs that still install the repository root", async 
       await writeText(path.join(root, adapter.marketplacePath), await readText(path.join(repoRoot, adapter.marketplacePath)));
     }
     expect((await validatePluginBundle(root)).failures).toEqual([]);
+
+    const claudeCatalogPath = path.join(root, claudeAdapter.marketplacePath);
+    const claudeCatalog = await readText(claudeCatalogPath);
+    const missingPstack = JSON.parse(claudeCatalog);
+    missingPstack.plugins = missingPstack.plugins.filter((entry: { name: string }) => entry.name !== "pstack");
+    await writeText(claudeCatalogPath, JSON.stringify(missingPstack));
+    expect((await validatePluginBundle(root)).failures).toContainEqual({
+      path: claudeAdapter.marketplacePath,
+      message: "Marketplace must list pstack exactly once.",
+    });
+    await writeText(claudeCatalogPath, claudeCatalog);
 
     for (const adapter of adapters) {
       const catalogPath = path.join(root, adapter.marketplacePath);

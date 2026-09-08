@@ -48,7 +48,7 @@ In context, that's enough. [`$tdd`](../../skills/tdd/SKILL.md) writes the smalle
 
 ## Clean before you commit
 
-The [Opening a PR playbook](../../skills/poteto-mode/playbooks/opening-a-pr.md) runs `$deslop` on the diff before each commit and applies [`$unslop`](../../skills/unslop/SKILL.md) to the PR description and commit bodies. The Codex port vendors [`$deslop`](../../skills/deslop/SKILL.md) from `cursor-team-kit`: remove narrating comments, unsupported guards, dead compatibility paths, and unrelated edits.
+The [Opening a PR playbook](../../skills/poteto-mode/playbooks/opening-a-pr.md) runs `$deslop` on the diff before each commit and applies [`$unslop`](../../skills/unslop/SKILL.md) to the PR description and commit bodies. This port vendors [`$deslop`](../../skills/deslop/SKILL.md) from `cursor-team-kit`: remove narrating comments, unsupported guards, dead compatibility paths, and unrelated edits.
 
 For prose, `$unslop` takes a target and any extra rules you have:
 

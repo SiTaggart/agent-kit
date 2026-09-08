@@ -1,9 +1,10 @@
 ---
 name: reflect
 description: Spawn three parallel review subagents over the active transcript, surface learnings, and route each to a concrete edit on an existing skill. Use when the user says reflect.
+disable-model-invocation: true
 ---
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
 
 # Reflect
 
@@ -17,23 +18,23 @@ Invoke when the user says "reflect" or "/reflect". Skip when the conversation is
 
 ### 1. Locate the active transcript
 
-Use the Codex history workflow in CODEX.md. Identify this project and the exact task before reading messages. If the transcript is unavailable, use a labeled session digest and report the missing evidence.
+Use the host history workflow in RUNTIME.md. Identify this project and the exact task before reading messages. If the transcript is unavailable, use a labeled session digest and report the missing evidence.
 
 ### 2. Spawn three reviewers in parallel
 
-One message, three `spawn_agent` calls, a general-purpose Codex subagent, explicit `model:` on each, a read-only brief. Use the tools exposed to the child; the parent applies edits.
+One message, three native subagent calls, a general-purpose native subagent, explicit `model:` on each, a read-only brief. Use the tools exposed to the child; the parent applies edits.
 
 | Lens | `model` | Prompt template |
 |---|---|---|
-| Judgment | the `reflect judgment, divergent, synthesizer` role resolved per CODEX.md | `references/judgment-reviewer.md` |
-| Tooling | the `reflect tooling` role resolved per CODEX.md | `references/tooling-reviewer.md` |
-| Divergent | the `reflect judgment, divergent, synthesizer` role resolved per CODEX.md | `references/divergent-reviewer.md` |
+| Judgment | the `reflect judgment, divergent, synthesizer` role resolved per RUNTIME.md | `references/judgment-reviewer.md` |
+| Tooling | the `reflect tooling` role resolved per RUNTIME.md | `references/tooling-reviewer.md` |
+| Divergent | the `reflect judgment, divergent, synthesizer` role resolved per RUNTIME.md | `references/divergent-reviewer.md` |
 
-Pass each template verbatim, substituting the transcript path or digest where marked. Reviewers return findings in their completion messages; spawning itself returns an agent handle, not their finished findings.
+Pass each template verbatim, substituting the transcript path or digest where marked. Reviewers return findings in their completion messages; background spawning returns a handle; a foreground call may return the result directly. Follow the native tool’s documented completion contract.
 
 ### 3. Synthesize
 
-One `spawn_agent` call, a general-purpose Codex subagent, using the `reflect judgment, divergent, synthesizer` role resolved per CODEX.md, a read-only brief. Use available tools to spot-check citations. Use `references/synthesizer.md` verbatim, with each reviewer's full output inlined where marked. The synthesizer returns a structured Accepted / Rejected / Backlog list.
+One native subagent call, a general-purpose native subagent, using the `reflect judgment, divergent, synthesizer` role resolved per RUNTIME.md, a read-only brief. Use available tools to spot-check citations. Use `references/synthesizer.md` verbatim, with each reviewer's full output inlined where marked. The synthesizer returns a structured Accepted / Rejected / Backlog list.
 
 ### 4. Structural enforcement check
 
@@ -48,7 +49,7 @@ List backlog items locally. File tickets only if the user has authorized publica
 For each approved Accepted item, follow the Routing field exactly:
 
 - Trivial existing-skill edit (a one-line bullet, a tightened sentence, a stale fact corrected): parent does directly.
-- Substantive existing-skill edit (a new section, a new pattern table, more than ~10 lines): hand to the installed `skill-creator` skill and run its draft / test / iterate loop.
+- Substantive existing-skill edit (a new section, a new pattern table, more than ~10 lines): follow the selected adapter’s skill-authoring workflow and its draft / test / iterate loop.
 - `tune description: <skill path>` (the skill exists but didn't trigger when it should have): hand to `skill-creator` and check its description and invocation policy against realistic trigger examples.
 - `new skill via skill-creator: <kebab-name>`: hand creation to `skill-creator`. Do not invent the shape ad hoc.
 

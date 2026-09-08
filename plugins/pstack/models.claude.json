@@ -1,0 +1,35 @@
+{
+  "feature, refactoring": "sonnet",
+  "how explorer": "sonnet",
+  "why investigators": "sonnet",
+  "reflect tooling": "sonnet",
+  "swarm workers": "sonnet",
+  "bug-fix": "opus",
+  "perf-issue": "opus",
+  "hillclimb": "opus",
+  "judgment and prose": "opus",
+  "how explainer": "opus",
+  "why synthesizer": "opus",
+  "reflect judgment, divergent, synthesizer": "opus",
+  "hardest tasks": "opus",
+  "arena runners": [
+    "opus",
+    "sonnet",
+    "fable"
+  ],
+  "arena cross-judge pool": [
+    "opus",
+    "sonnet",
+    "fable"
+  ],
+  "architect runners": [
+    "opus",
+    "sonnet",
+    "fable"
+  ],
+  "interrogate reviewers": [
+    "opus",
+    "sonnet",
+    "fable"
+  ]
+}

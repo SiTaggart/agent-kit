@@ -3,12 +3,12 @@ name: browser-use
 description: Build or adapt a local browser/CDP harness to drive and inspect a web, IDE, or Electron UI. Use for local UI verification, screenshots, accessibility snapshots, perf profiles, visual diffs, or reproducing UI bugs.
 ---
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow.
 
 
 # Browser Use
 
-Use Codex's native browser-use capability to verify UI behavior with evidence. Read the current browser tool instructions first. On hosts exposing `mcp__cua_repl.js`, use the initialized CUA browser API and its returned documentation. Existing repo test harnesses remain useful for repeatable tests and profiling. This skill is the Codex replacement for upstream `control-ui`; it does not install a third-party browser service.
+Use the host’s available browser tools or the repo’s existing harness to verify UI behavior with evidence. Read the current tool instructions first. This replaces upstream `control-ui`; it does not install a third-party browser service.
 
 ## What It Is Used For
 
@@ -27,37 +27,20 @@ Use Codex's native browser-use capability to verify UI behavior with evidence. R
 5. Select the correct page by stable app markers, not by tab order alone.
 6. Prefer accessibility roles, labels, and stable `data-*` selectors over coordinates.
 
-## Native Codex Browser Harness
+## Native browser access
 
-Discover the available native browser tool and read its current API instructions.
-For `mcp__cua_repl.js`, the first call must contain exactly one entry-point API
-call. With a known URL and no user-selected browser:
-
-```javascript
-let browser = await cua.getBrowser({ url: "http://127.0.0.1:<port>" });
-```
-
-For an explicitly requested in-app browser:
-
-```javascript
-let tab = await cua.createBrowserTab("iab", "http://127.0.0.1:<port>", { visible: true });
-```
-
-Read the returned documentation and initial UI state before the next call. Use
-only documented APIs. Match any user-mentioned tab by its observed title, URL,
-and provider tab ID; do not open a substitute tab. Read the current state, act on
-an observed control, and capture the resulting state. Emit screenshots through
-the tool's documented image API. Save proof only through supported output APIs.
-
-The host owns the browser runtime and its credentials. Do not copy its SDK into
-this plugin, install another browser package to bypass missing capabilities, or
-silently replace the requested browser. If the native browser tool is absent,
-report that prerequisite before attempting live verification.
+On Codex, read [the Codex browser reference](references/codex-browser.md).
+On Claude Code, use only browser tools exposed in the current session. An enabled
+Claude in Chrome integration or a repo's existing browser harness can supply
+proof. Read its current tool documentation, select the observed target, and
+capture before/after state. Do not call Codex's CUA APIs on Claude. If no browser
+surface is available, report the prerequisite; do not install a service or change
+permissions merely to complete verification.
 
 ## Electron and Native Desktop
 
 Use the native browser API only when it exposes the target Electron surface.
-Otherwise use Codex's available native computer-use tool and inspect its API and
+Otherwise use the host's available native computer-use tool and inspect its API and
 current application state first. A repo's existing Electron/CDP test harness can
 supply repeatable profiling or test coverage where the host permits it. Preserve
 the same launch, selection, interaction, evidence, and cleanup loop. If neither

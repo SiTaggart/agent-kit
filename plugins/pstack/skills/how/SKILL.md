@@ -1,9 +1,10 @@
 ---
 name: how
 description: "Use for \"how does X work\", code walkthroughs before changing something, and placement / ownership / layering questions (\"where should this live\", \"which package owns this\", \"is this the right layer\"). Explains subsystem architecture, runtime flow, onboarding mental models. Use why for motivation."
+disable-model-invocation: true
 ---
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
 
 # How
 
@@ -22,25 +23,25 @@ When in doubt, take the simple path.
 
 Decompose the question into 2 to 4 exploration angles, each a distinct slice of the subsystem. Spawn all explorers in a single message:
 
-- `model`: the `how explorer` role resolved per CODEX.md
+- `model`: the `how explorer` role resolved per RUNTIME.md
 - Scope: read only. Use the tools available to the child; do not change its sandbox to obtain MCP access.
 
 Each explorer gets the prompt in `references/explorer-prompt.md` with its angle filled in. Then go to Step 3.
 
 ## Step 2b. Direct Explain (simple questions)
 
-Spawn one Codex subagent that explores and explains in one pass:
+Spawn one native subagent that explores and explains in one pass:
 
-- `model`: the `how explainer` role resolved per CODEX.md
+- `model`: the `how explainer` role resolved per RUNTIME.md
 - Scope: read only. Use the tools available to the child; do not change its sandbox to obtain MCP access.
 
 Build its prompt from `references/explainer-prompt.md` without the explorer-findings section. Go to Step 4.
 
 ## Step 3. Synthesize (complex questions only)
 
-Once all explorers have returned, spawn one Codex subagent to synthesize their findings into one explanation:
+Once all explorers have returned, spawn one native subagent to synthesize their findings into one explanation:
 
-- `model`: the `how explainer` role resolved per CODEX.md
+- `model`: the `how explainer` role resolved per RUNTIME.md
 - Scope: read only. Use the tools available to the child; do not change its sandbox to obtain MCP access.
 
 Build its prompt from `references/explainer-prompt.md` with every explorer's findings filled in.

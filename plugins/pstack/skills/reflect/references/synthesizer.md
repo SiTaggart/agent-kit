@@ -31,7 +31,7 @@ Keep (durable patterns):
 - "closed regex enums for trigger detection are brittle. Prefer schema-validated structures"
 - "skill descriptions front-load trigger keywords (60/40 trigger-vs-action)"
 - "skill-bundled scripts run under bun with own lockfile, not pnpm workspace"
-- "Codex has no skill `paths:` field; use a specific frontmatter description and supported `agents/openai.yaml` invocation policy"
+- "Use a specific frontmatter description and the host’s supported invocation policy; do not invent a skill paths field"
 
 Output exactly the format below. No preamble, no narration. One sentence per cell. A reviewer should read each Problem/Proposal pair in 5 seconds.
 

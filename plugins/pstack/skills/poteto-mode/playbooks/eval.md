@@ -1,6 +1,6 @@
 ### Eval
 
-Read the installed plugin's [CODEX.md](../../../CODEX.md) first. Its native tool, model, path, and session-authorization rules apply. The user merges; this port never merges, enables auto-merge, or enters a merge queue.
+Read the installed plugin's [RUNTIME.md](../../../RUNTIME.md) first. Its native tool, model, path, and session-authorization rules apply. The user merges; this port never merges, enables auto-merge, or enters a merge queue.
 
 **You own the experiment design. Plan, blind, run, synthesize.**
 
@@ -20,8 +20,8 @@ Read the installed plugin's [CODEX.md](../../../CODEX.md) first. Its native tool
 2. **Set up sanitized environments.** Per-candidate working dir with the variant in place. Plant any context an organic task would have: a project skeleton, the skills the candidate would naturally read.
 3. **Author one organic prompt.** What a user would type. No leakage of what's being measured.
 4. **Spawn N candidates**, parallel within the current native concurrency limit, on different models per the **arena** skill's Phase B. Each works in its own sanitized dir; same prompt to each.
-5. **Spawn one blinded judge** on a different available model (resolved per CODEX.md; OpenAI-only choices do not provide cross-provider independence) per the **arena** skill's Phase C. Judge sees outputs by sanitized label and the rubric, never a model name.
-6. **Verify the chain from transcripts, not self-report.** Read each candidate's project-scoped Codex task history or transcript discovered per CODEX.md. Validate the project and candidate task metadata before reading; do not search unrelated chats. If the host does not expose file-read events, record that missing evidence rather than inferring reads from the reply. Look at which files each candidate actually opened. Grade chain-following from the files it really read plus the shape of the code, never from the candidate's own claims.
+5. **Spawn one blinded judge** on a different available model (resolved per RUNTIME.md; Same-provider choices do not provide cross-provider independence) per the **arena** skill's Phase C. Judge sees outputs by sanitized label and the rubric, never a model name.
+6. **Verify the chain from transcripts, not self-report.** Read each candidate's project-scoped host session history or transcript discovered per RUNTIME.md. Validate the project and candidate task metadata before reading; do not search unrelated chats. If the host does not expose file-read events, record that missing evidence rather than inferring reads from the reply. Look at which files each candidate actually opened. Grade chain-following from the files it really read plus the shape of the code, never from the candidate's own claims.
 7. **Read every candidate output yourself** end to end. Compare to the judge's verdict. Disagreement means a model is biased or the rubric is ambiguous. Synthesize.
 
 **Reply:** variant under test, rubric, per-candidate notes, judge's verdict, your synthesis, and a recommendation for whether to promote the variant.

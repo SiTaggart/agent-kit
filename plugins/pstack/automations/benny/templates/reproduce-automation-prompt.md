@@ -1,6 +1,6 @@
 # Reproduce automation prompt
 
-> Source material for the copied setup workflow. Read `../CODEX.md` first. Paraphrase this intent into a native automation draft only after its Slack event trigger is supported and the copied pack is verified committed in the repository where the automation will run. The current Codex scheduler cannot supply that trigger.
+> Source material for the copied setup workflow. Read `../RUNTIME.md` first. Paraphrase this intent into a native automation draft only after its Slack event trigger is supported and the copied pack is verified committed in the repository where the automation will run. Scheduled timers alone do not supply that trigger.
 
 Read and follow `.agents/automations/benny/skills/reproduce-and-fix-issues/SKILL.md` for this run.
 

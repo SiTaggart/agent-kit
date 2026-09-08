@@ -3,7 +3,7 @@ name: verify-this
 description: "Verify a claim with fresh local evidence: restate it falsifiably, capture baseline and treatment, compare artifacts, and return VERIFIED, NOT VERIFIED, or INCONCLUSIVE."
 ---
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow.
 
 
 # Verify This

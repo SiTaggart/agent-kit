@@ -2,7 +2,7 @@
 
 ## what i want to automate
 
-i want two Codex automations that work together in one slack issue channel.
+i want two host automations that work together in one slack issue channel.
 
 ### automation 1: triage issue reports
 
@@ -29,7 +29,7 @@ i want two Codex automations that work together in one slack issue channel.
 - i treat utility and debug bots as evidence, not delegation or fix ownership.
 - i allow subagents to help, but they cannot post to slack or receive slack credentials.
 - i want this entire pack committed at `.agents/automations/benny/` in the target repository. its `SKILL.md` files are direct automation instructions, not registered plugin skills.
-- i want pstack's shared dependencies (`how`, `why`, `tdd`, `unslop`, and the required principle skills) available in the actual fresh automation runtime. Read `CODEX.md` for the missing native project-scoped installation guarantee.
+- i want pstack's shared dependencies (`how`, `why`, `tdd`, `unslop`, and the required principle skills) available in the actual fresh automation runtime. Read `RUNTIME.md` and verify skill delivery in that runtime.
 - i want each live automation prompt to read its committed operational file directly. i do not want plugin cache paths, copied excerpts, or slash-skill discovery.
 - i keep user-owned configuration, feature maps, routing maps, and secrets outside `.agents/automations/benny/` so pack refreshes cannot overwrite them.
 - i want both automations to fail closed when channel coordinates, tracker access, the control adapter, or the feature map are missing or uncertain.
@@ -54,7 +54,7 @@ start from [`configuration.example.yaml`](./templates/configuration.example.yaml
 
 ## for the agent
 
-the human enters setup by pointing Codex at this file. do not look for or invoke a discovered benny slash skill.
+the human enters setup by pointing the agent at this file. do not look for or invoke a discovered benny slash skill.
 
 1. ask which repository will run the automations.
 2. treat the directory containing this `FOR_AGENTS.md` as the source pack.
@@ -64,7 +64,7 @@ the human enters setup by pointing Codex at this file. do not look for or invoke
 6. verify that the copied `FOR_AGENTS.md` and `skills/setup-benny/SKILL.md` exist in the target repository.
 7. read and follow `.agents/automations/benny/skills/setup-benny/SKILL.md` directly from the target repository.
 
-read [the Codex runtime preflight](./CODEX.md) before installation or provisioning. Use native Codex plugin installation, after authorization, and verify the installed plugin in the actual automation runtime. Do not write Cursor settings into a Codex project.
+read [the host runtime preflight](./RUNTIME.md) before installation or provisioning. Use native plugin installation for the selected host, after authorization, and verify the installed plugin in the actual automation runtime. Do not write another host’s settings.
 
 i want verification from a fresh agent rooted in the target repository. confirm that pstack's `how`, `why`, `tdd`, `unslop`, and the principle skills used by benny resolve in the actual fresh automation runtime. A current-session skill load or a user-scoped install alone does not prove this.
 
@@ -72,7 +72,7 @@ if the automation runtime cannot load the installed plugin, the required project
 
 tell me that `.agents/automations/benny/` and any referenced secret-free configuration must be committed before either automation is enabled. do not create or update an automation until i explicitly ask.
 
-for first-time creation, follow the copied setup file and runtime preflight. The intended trigger remains each new top-level Slack report. Native Codex scheduled heartbeats and cron jobs cannot provide this trigger; do not replace it with polling or claim parity. Keep the prepared prompt and configuration dormant until a supported native trigger exists.
+for first-time creation, follow the copied setup file and runtime preflight. The intended trigger remains each new top-level Slack report. Scheduled timers alone cannot provide this trigger; do not replace it with polling or claim parity. Keep the prepared prompt and configuration dormant until a supported native trigger exists.
 
 paraphrase this intent and the finished configuration into each draft. the triage prompt must read and follow `.agents/automations/benny/skills/triage-issue-reports/SKILL.md`. the repro prompt must read and follow `.agents/automations/benny/skills/reproduce-and-fix-issues/SKILL.md`. use these repo-relative paths only after verifying they are committed in the repository where the automation will run.
 

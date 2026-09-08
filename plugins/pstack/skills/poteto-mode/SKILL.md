@@ -1,9 +1,10 @@
 ---
 name: poteto-mode
 description: poteto's agent style for concise, detailed responses, deliberate subagents, unslopped prose, simple code, and verified work. Use for poteto, /poteto-mode, or requests to work in this style.
+disable-model-invocation: true
 ---
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
 
 # Poteto mode
 
@@ -79,9 +80,9 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 
 ## Autonomy
 
-**Just do it.** Use available MCP tools within the session's scope. Authorized reversible work and external actions proceed without asking again. External messages require explicit authorization per the Codex host.
+**Just do it.** Use available MCP tools within the session's scope. Authorized reversible work and external actions proceed without asking again. External messages require explicit authorization per the selected host adapter.
 
-**Always pause** for irreversible writes that lack session authorization: force-push to shared branches, deploys, data deletion, customer messages. Honor the user's no-merge rule in CODEX.md.
+**Always pause** for irreversible writes that lack session authorization: force-push to shared branches, deploys, data deletion, customer messages. Honor the user's no-merge rule in RUNTIME.md.
 
 **Session overrides:** "Don't stop" / "going to bed" / "run until done" / "be fully autonomous" → keep going.
 
@@ -89,9 +90,9 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 
 ## Subagents
 
-**Use the poteto-agent persona for any subagent you spawn inside a playbook step** (code-writing delegates, ad-hoc helpers). Resolve `../../references/agents/poteto-agent.md` from this skill and pass its absolute path plus CODEX.md in every brief. Tell the child to read the persona before working. `$poteto-mode` and that persona route through the same instructions. Routed workflow skills (`how`, `why`, `interrogate`, `reflect`, `swarm`) set their own reviewer prompts. Respect what the skill prescribes, don't override to poteto-agent.
+**Use the poteto-agent persona for any subagent you spawn inside a playbook step** (code-writing delegates, ad-hoc helpers). Resolve `../../references/agents/poteto-agent.md` from this skill and pass its absolute path plus RUNTIME.md in every brief. Tell the child to read the persona before working. `$poteto-mode` and that persona route through the same instructions. Routed workflow skills (`how`, `why`, `interrogate`, `reflect`, `swarm`) set their own reviewer prompts. Respect what the skill prescribes, don't override to poteto-agent.
 
-**Defaults for every Codex subagent call.** Non-blocking spawning, available tools without changing sandbox permissions, file pointers not inlined bulk context, explicit model per role from [model choices](../../models.json) and optional `$setup-pstack` overrides. Follow [CODEX.md](../../CODEX.md#models) for separate reasoning settings, fresh-context briefs, capability checks, and user overrides. Code delegates tier by difficulty. The hardest changes (cross-cutting design, gnarly concurrency, subtle algorithms) go to the `hardest tasks` role, whether they need judgment or precisely specified instruction following. Trivial mechanical edits use `feature, refactoring`. Prose and judgment use `judgment and prose`. Routed skills keep their specific roles. `inherit-parent` and `auto` omit model and reasoning overrides. Keep the parent conversation's selected model as coordinator.
+**Defaults for every native subagent call.** Non-blocking spawning, available tools without changing sandbox permissions, file pointers not inlined bulk context, explicit model per role from the selected adapter’s model defaults and optional `$setup-pstack` overrides. Follow [RUNTIME.md](../../RUNTIME.md) for separate reasoning settings, fresh-context briefs, capability checks, and user overrides. Code delegates tier by difficulty. The hardest changes (cross-cutting design, gnarly concurrency, subtle algorithms) go to the `hardest tasks` role, whether they need judgment or precisely specified instruction following. Trivial mechanical edits use `feature, refactoring`. Prose and judgment use `judgment and prose`. Routed skills keep their specific roles. `inherit-parent` and `auto` omit model and reasoning overrides. Keep the parent conversation's selected model as coordinator.
 
 
 You own every subagent's work. Review the diff and write your own summary, don't pass through what it said. Interrupt-chained resumes silently drop directives, so fire a fresh subagent with consolidated scope rather than trusting a "done" summary. A second opinion is the same prompt against a different model. Agreement is high-signal.
@@ -138,7 +139,7 @@ A large or cross-cutting effort (a migration across many call sites, an ambitiou
 - **Autopilot-full.** A queue of independent PRs run to merge-ready with full autonomy. One owner per PR carries build through verification, and the root swarm-verifies each merge-ready head before handoff to the user ("autopilot this queue", "full autopilot", one-owner-per-PR programs). `playbooks/autopilot-full.md`.
 - **Autopilot-stack.** A queue of changes built and verified with full autonomy, delivered as one linear reviewed base-branch stack the operator lands herself ("autopilot-stack", "stack them, don't ship", "build the stack, I'll land it"). `playbooks/autopilot-stack.md`.
 - **Session pickup.** Resuming or taking over a prior agent's in-flight work from a transcript, cloud-agent URL, or pushed branch. `playbooks/session-pickup.md`.
-- **Pause safely.** Suspending in-flight work cleanly so it can be resumed, on an explicit pause, going offline, a Codex restart, or imminent context compaction. The complement to Session pickup. Full steps: `playbooks/pause-safely.md`.
+- **Pause safely.** Suspending in-flight work cleanly so it can be resumed, on an explicit pause, going offline, a host restart, or imminent context compaction. The complement to Session pickup. Full steps: `playbooks/pause-safely.md`.
 - **Multi-phase or multi-PR plan.** Work that spans phases or stacked PRs. `playbooks/multi-phase-plan.md`.
 - **Worktree and simulator cleanup.** Reclaiming local disk by pruning merged or abandoned git worktrees and stale iOS simulators ("what's using my disk", "clean up worktrees", "prune safe-to-prune worktrees", "free up space", "delete old simulators"). `playbooks/worktree-cleanup.md`.
 - **Opening a PR.** Invoked at the end of every other playbook. `playbooks/opening-a-pr.md`.

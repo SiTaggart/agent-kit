@@ -1,9 +1,10 @@
 ---
 name: why
 description: "Use for 'why does X work this way', 'why we picked Y', design rationale, regressions, postmortems, or data-backed thresholds. Discovers available MCPs and queries each evidence category (source control, issue tracker, long-form docs, real-time chat, infrastructure observability, error tracking, product analytics warehouse) in parallel, then returns a cited read on decisions and tradeoffs. Use how for runtime behavior."
+disable-model-invocation: true
 ---
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow. It defines tool mappings and overrides upstream host assumptions.
 
 # Why
 
@@ -60,7 +61,7 @@ Capture this as seed context (file paths, symbols, commits, PR numbers, linked t
 
 ### Discovery
 
-Discover connectors from Codex's current tool catalog or tool search. Use only available, authorized sources; report missing categories.
+Discover connectors from the host's current tool catalog or tool search. Use only available, authorized sources; report missing categories.
 
 Map each available MCP to one evidence category:
 
@@ -79,7 +80,7 @@ Aim for a complete **coverage map**, not a minimal one. Document the null, don't
 Launch all matching investigators in a single message so they run concurrently. Don't ask one agent to cover multiple MCPs.
 
 Subagent config (each):
-- `model`: the `why investigators` role resolved per CODEX.md
+- `model`: the `why investigators` role resolved per RUNTIME.md
 - Scope: read only. Use the tools available to the child; do not change its sandbox to obtain MCP access.
 
 Each investigator gets:
@@ -122,7 +123,7 @@ If your scope assessment suggests a single-commit trivial target where the PR de
 
 Spawn one synthesizer subagent:
 
-- `model`: the `why synthesizer` role resolved per CODEX.md
+- `model`: the `why synthesizer` role resolved per RUNTIME.md
 - Scope: read only. Use the tools available to the child; do not change its sandbox to obtain MCP access.
 
 The synthesizer gets:

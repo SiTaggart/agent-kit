@@ -1,10 +1,10 @@
 ### Authoring or modifying a skill
 
-Read the installed plugin's [CODEX.md](../../../CODEX.md) first. Its native tool, model, path, and session-authorization rules apply. The user merges; this port never merges, enables auto-merge, or enters a merge queue.
+Read the installed plugin's [RUNTIME.md](../../../RUNTIME.md) first. Its native tool, model, path, and session-authorization rules apply. The user merges; this port never merges, enables auto-merge, or enters a merge queue.
 
 **You own the skill's voice.**
 
-1. Use the **skill-creator** skill (the installed Codex skill for authoring SKILL.md files).
+1. Use the selected adapter’s skill-authoring workflow: an installed **skill-creator** when available, otherwise the host’s documented skill format.
 2. Validate the skill: frontmatter has `name` and `description`, referenced files exist, cross-skill links resolve.
 3. Test cases if structural. Skip if subjective.
 4. Run **Opening a PR**.

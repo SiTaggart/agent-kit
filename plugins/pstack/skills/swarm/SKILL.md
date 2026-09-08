@@ -1,13 +1,14 @@
 ---
 name: swarm
 description: "Fan out N parallel workers, drain them, and return one report. Use for /swarm, 'swarm this', or parallel coverage, races, gauntlets, and exploration."
+disable-model-invocation: true
 ---
 
 # Swarm
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow.
 
-Fan out N parallel Codex workers. They may cover separate slices, race the same brief, or mix both. The parent waits, aggregates, and returns one report.
+Fan out N parallel native workers. They may cover separate slices, race the same brief, or mix both. The parent waits, aggregates, and returns one report.
 
 ## Start
 
@@ -22,13 +23,13 @@ Open a todolist with one entry per phase before launching anything.
 
 1. State the done predicate and the artifact or report the swarm must return.
 2. Choose the shape. Partition into slices, race N workers on identical briefs, or mix both. For a race or mixed shape, declare `first pass`, `rank all`, or `best-of` before spawning.
-3. Set N from the user or derive it from the shape. N is total workers, not the current Codex concurrency limit.
-4. Pick the worker model using the `swarm workers` role resolved through CODEX.md and the bundled model choices. For a model race, name each arm's model up front.
+3. Set N from the user or derive it from the shape. N is total workers, not the current native concurrency limit.
+4. Pick the worker model using the `swarm workers` role resolved through RUNTIME.md and the bundled model choices. For a model race, name each arm's model up front.
 5. Give each worker its own writable output when it writes.
 
 ## Phase B: Fan out
 
-Spawn all N workers with the available non-blocking Codex subagent tool and the configured model and reasoning settings from CODEX.md. Start remaining workers as concurrency slots free up. Codex children share the local host; use separate worktrees for writers. No cloud isolation is implied.
+Spawn all N workers with the available non-blocking native subagent tool and the configured model and reasoning settings from RUNTIME.md. Start remaining workers as concurrency slots free up. Local children share the local host; use separate worktrees for writers. No cloud isolation is implied.
 
 When a worker must start from a non-default pushed branch, prepare its worktree at that branch and pass the absolute worktree path in its brief.
 

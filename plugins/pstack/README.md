@@ -1,16 +1,16 @@
 # pstack
 
-> Codex port of Lauren Tan's upstream PStack, pinned to `71ed0d1076fec562c1b74ee353121a8d00f75382` (v0.15.0). The original guide and author voice follow, with direct host adaptations described in [CODEX.md](./CODEX.md). This package stops at merge-ready; the user merges.
+> Codex and Claude Code port of Lauren Tan's upstream PStack, pinned to `71ed0d1076fec562c1b74ee353121a8d00f75382` (v0.15.0). The original guide and author voice follow, with direct host adaptations described in [RUNTIME.md](./RUNTIME.md). This package stops at merge-ready; the user merges.
 
 i'm [poteto](https://x.com/poteto). i'm not a president or ceo, but i've worked with millions of lines of code at Meta, Netflix, and Cursor. i'm also on the react core team where i help build and maintain react compiler.
 
 there's a growing sense that ai writes too much slop code. i agree. i don't want to ship like a team of twenty slop artists. throughput without quality is not a goal i aspire to. if you want to go fast, go deep first. 
 
-**pstack is my answer.** these are the same skills i use everyday to ship high quality code at Cursor. this turns Codex into a real engineering team. the goal is not to maximize loc, in fact it's the opposite. pstack helps you write less, but higher quality code.
+**pstack is my answer.** these are the same skills i use everyday to ship high quality code at Cursor. this turns your agent into a real engineering team. the goal is not to maximize loc, in fact it's the opposite. pstack helps you write less, but higher quality code.
 
 **pstack gives you fearless parallelism.** when you can go deep on one agent and trust it to write good, verifiable code, you can truly parallelize with confidence. start multiple agents up with `poteto-mode` and trust that they'll apply rigorous engineering principles to their work.
 
-**Codex supplies the available models.** every frontier model has its strengths and weaknesses. use any model exposed by your Codex subagent tool with pstack. in fact, many of my skills use multi-model workflows to take advantage of each model's unique strengths.
+**Your host supplies the available models.** every frontier model has its strengths and weaknesses. use any model exposed by your native subagent tool with pstack. in fact, many of my skills use multi-model workflows to take advantage of each model's unique strengths.
 
 fork it. improve it. make it yours. PRs are welcome! 
 
@@ -23,7 +23,27 @@ codex plugin marketplace add .
 codex plugin add pstack@agent-kit
 ```
 
-Once this revision is published, add the marketplace with `codex plugin marketplace add SiTaggart/agent-kit` instead of the local path. Start a fresh Codex task after installation. PStack and Agent Kit are separate plugins; use Codex plugin controls to enable or disable either one.
+For a published revision, use `codex plugin marketplace add SiTaggart/agent-kit`
+instead of the local path. Start a fresh Codex task after installation.
+
+For **Claude Code**, run these slash commands after the PR is merged:
+
+```text
+/plugin marketplace add SiTaggart/agent-kit
+/plugin install pstack@agent-kit
+/pstack:setup-pstack
+/pstack:poteto-mode
+```
+
+Refresh an existing marketplace with `/plugin marketplace update agent-kit`.
+PStack is a new Claude plugin, so existing Agent Kit users must install it once.
+Future updates use its plugin version; enable auto-updates in `/plugin` or use
+`/plugin update pstack@agent-kit`. Restart when the client requests it.
+
+The guide uses Codex `$skill-name` examples. In Claude, use `/pstack:skill-name`.
+Both hosts share the same skill files and load their own runtime adapter and
+model defaults. Cursor users can use the [native upstream plugin](https://github.com/cursor/plugins/tree/main/pstack).
+
 
 ## get started
 
@@ -34,7 +54,11 @@ two steps:
 
 new here? the [pstack guide](./docs/guide/README.md) walks you through a first real task, from setup and prompting through verification and overnight runs.
 
-that's it. the other skills are situational; the mode skill uses them for you as needed. out of the box the mode splits work by model strength: hard reasoning, prose, and judgment go to Astra with high effort (xhigh for the hardest tasks), while routine implementation and exploration go to Sol with high effort. the default panel is Astra / Sol / Terra, each with high effort. all three are OpenAI models; this is not cross-provider evidence. [models.json](./models.json) holds the role defaults. [`$setup-pstack`](./skills/setup-pstack/SKILL.md) changes any of it.
+that's it. the other skills are situational; the mode reads them as needed.
+Codex defaults use Astra for hard reasoning and Sol for routine work, with
+Astra/Sol/Terra panels. Claude defaults use Opus for hard reasoning and Sonnet for
+routine work, with Opus/Sonnet/Fable panels. Each host’s panel shares one provider.
+See [runtime guidance](./RUNTIME.md) for defaults, capability checks, and overrides.
 
 ## usage
 
@@ -97,7 +121,7 @@ the full rules and playbooks live in [`skills/poteto-mode/SKILL.md`](./skills/po
 
 [`$poteto-mode`](./skills/poteto-mode/SKILL.md) is also a sticky mode: once entered it stays on across turns, applying itself when a playbook matches or the task needs rigor and staying out of the way otherwise. opt out any time by saying so.
 
-[`$poteto-mode`](./skills/poteto-mode/SKILL.md) works extremely well with Codex goals and requested heartbeat automations. you can make Codex work for many hours without sacrificing rigor. see [overnight runs](./docs/guide/07-overnight.md) for the native continuation contract.
+[`$poteto-mode`](./skills/poteto-mode/SKILL.md) supports long active runs and requested native scheduling when the host exposes it. Claude’s session timers do not establish an unattended service after exit. see [overnight runs](./docs/guide/07-overnight.md) for the native continuation contract.
 
 ## skills
 
@@ -126,7 +150,7 @@ $interrogate review this pr.
 | [`$swarm`](./skills/swarm/SKILL.md) | you want N parallel workers across different slices or races, then one aggregated report. |
 | [`$interrogate`](./skills/interrogate/SKILL.md) | you have a diff and want several different models to try to break it, including a strict code-quality lens. |
 | [`$automate-me`](./skills/automate-me/SKILL.md) | you want your own `-mode` skill, drafted from how you've actually worked. |
-| [`$make-bot-ui`](./skills/make-bot-ui/SKILL.md) | you want a page or dashboard whose buttons wake an agent over a webhook. the upstream Grok Bot integration needs host capabilities that Codex does not currently expose; the skill reports that limit before setup. |
+| [`$make-bot-ui`](./skills/make-bot-ui/SKILL.md) | you want a page or dashboard whose buttons wake an agent over a webhook. the upstream Grok Bot integration needs an exact native webhook contract that must pass the runtime preflight; the skill reports that limit before setup. |
 | [`$setup-pstack`](./skills/setup-pstack/SKILL.md) | you want to pick which models pstack uses per role. detects your models and writes optional role overrides. |
 | [`$reflect`](./skills/reflect/SKILL.md) | a long task landed and you want the recipe captured as a skill edit. |
 | [`$teach`](./skills/teach/SKILL.md) | you want to actually understand a change or subsystem, not just have it summarized. runs how + why and weaves one plain explanation, built up diagram by diagram. |
@@ -192,11 +216,11 @@ automate-me:       $automate-me
 
 ## the `poteto-agent` and Comment Sicko subagents
 
-pstack also ships a subagent that runs my style end to end. spawn it with Codex's native subagent tool, including the complete [poteto-agent prompt](./references/agents/poteto-agent.md) and an explicit instruction to read `poteto-mode` in full, including its inline principles index, before doing any work. a generic delegate without that read drifts.
+pstack also ships a subagent that runs my style end to end. spawn it with the host's native subagent tool, including the complete [poteto-agent prompt](./references/agents/poteto-agent.md) and an explicit instruction to read `poteto-mode` in full, including its inline principles index, before doing any work. a generic delegate without that read drifts.
 
 [`$poteto-mode`](./skills/poteto-mode/SKILL.md) and the [poteto-agent prompt](./references/agents/poteto-agent.md) route through the same wrapper.
 
-pstack also ships [Comment Sicko](./references/agents/comment-sicko.md), a read-only comment reviewer whose full prompt is passed to a native Codex subagent. usually invoke it through [`$no-comments`](./skills/no-comments/SKILL.md), not directly.
+pstack also ships [Comment Sicko](./references/agents/comment-sicko.md), a read-only comment reviewer whose full prompt is passed to a native subagent. usually invoke it through [`$no-comments`](./skills/no-comments/SKILL.md), not directly.
 
 ## principles
 
@@ -237,15 +261,15 @@ twenty-three short skills, one principle each. `poteto-mode` indexes them inline
 
 a few things `poteto-mode` references but doesn't bundle:
 
-- [`$deslop`](./skills/deslop/SKILL.md) is vendored from `cursor-team-kit` in this Codex port.
-- [`control-cli`](./skills/control-cli/SKILL.md) (for CLIs and TUIs) is vendored from `cursor-team-kit` too. [`browser-use`](./skills/browser-use/SKILL.md) replaces `control-ui` with Codex's installed browser and computer-use tools; it does not require the Browser Use Python library.
-- Codex's installed `skill-creator` skill handles skill authoring. inside `poteto-mode`, the [babysit playbook](./skills/poteto-mode/playbooks/babysit.md) handles pr-status requests.
+- [`$deslop`](./skills/deslop/SKILL.md) is vendored from `cursor-team-kit` in this port.
+- [`control-cli`](./skills/control-cli/SKILL.md) (for CLIs and TUIs) is vendored from `cursor-team-kit` too. [`browser-use`](./skills/browser-use/SKILL.md) replaces `control-ui` with the host’s available browser tools or existing project harness; it does not require the Browser Use Python library.
+- The selected runtime adapter defines skill authoring. inside `poteto-mode`, the [babysit playbook](./skills/poteto-mode/playbooks/babysit.md) handles pr-status requests.
 
 the port includes these workflow dependencies. host browser and computer-use capabilities must be available for interactive verification.
 
 ## why are there no planning skills?
 
-Codex has a plan mode which works great with pstack. but personally, i don't believe in planning. the best spec is code. if you do want to make a plan, [`$poteto-mode`](./skills/poteto-mode/SKILL.md) covers it, but it's not a default. 
+Both hosts have a plan mode which works great with pstack. but personally, i don't believe in planning. the best spec is code. if you do want to make a plan, [`$poteto-mode`](./skills/poteto-mode/SKILL.md) covers it, but it's not a default.
 
 ## make it yours
 
@@ -253,13 +277,17 @@ Codex has a plan mode which works great with pstack. but personally, i don't bel
 
 type [`$automate-me`](./skills/automate-me/SKILL.md). it mines your recent transcripts, drafts a `<your-name>-mode` skill from how you've actually worked, and routes through pstack underneath. you keep pstack as the base and end up with your own routing skill alongside `poteto-mode`.
 
-models are configurable too. type [`$setup-pstack`](./skills/setup-pstack/SKILL.md). it detects the models you have access to and writes optional `~/.codex/pstack-models.json` overrides mapping each role (code, judgment, the review panels) to a model and separate reasoning effort. every skill reads them over [models.json](./models.json), so you override only what you want. this does not change the main chat model or install a global rule.
+models are configurable too. use [`setup-pstack`](./skills/setup-pstack/SKILL.md).
+it reads your host’s native delegate capabilities and writes optional overrides:
+`~/.codex/pstack-models.json` on Codex, `~/.claude/pstack-models.json` on Claude.
+See [runtime guidance](./RUNTIME.md) for the separate defaults and effort fields.
+The main chat model and global host settings stay unchanged.
 
 ## automations
 
-pstack also ships a dormant [benny automation pack](./automations/benny/). benny triages slack issue reports, then reproduces and fixes confirmed bugs with real ui evidence. its files are not registered as skills. the upstream Slack-event trigger requires an external integration; this port does not create or claim a native Codex Slack trigger.
+pstack also ships a dormant [benny automation pack](./automations/benny/). benny triages slack issue reports, then reproduces and fixes confirmed bugs with real ui evidence. its files are not registered as skills. the upstream Slack-event trigger requires an external integration; the pack remains dormant until its exact host preflight passes.
 
-to set it up, point Codex at [`FOR_AGENTS.md`](./automations/benny/FOR_AGENTS.md). setup copies the pack into the target repository at `.agents/automations/benny/`, enables pstack there for shared skills, and keeps user configuration outside the copied pack.
+to set it up, point your agent at [`FOR_AGENTS.md`](./automations/benny/FOR_AGENTS.md). setup copies the pack into the target repository at `.agents/automations/benny/`, enables pstack there for shared skills, and keeps user configuration outside the copied pack.
 
 ## license
 

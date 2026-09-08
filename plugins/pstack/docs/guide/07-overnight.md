@@ -27,6 +27,12 @@ Walk through what each line buys you:
 
 Because you'll review this work after stepping away, `$poteto-mode` routes it through [`$figure-it-out`](../../skills/figure-it-out/SKILL.md), which designs the run's phases before any code and wires in the decision log.
 
+On Claude, invoke `/pstack:poteto-mode` and request native continuation only when
+available. `/loop` and Cron tools require a live session and have a limited
+lifetime; they do not keep work running after Claude exits. User-only skills
+cannot be invoked by a timer. The adapter reports these limits before promising
+an unattended wake. See [Claude runtime guidance](../../CLAUDE-CODE.md).
+
 ## What the loop does all night
 
 ```mermaid

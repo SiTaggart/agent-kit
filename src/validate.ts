@@ -31,7 +31,7 @@ export async function validatePluginBundle(root: string): Promise<ValidationRepo
       return inspectMarketplace(document, adapter);
     }, failures);
 
-    for (const id of PLUGIN_IDS) {
+    for (const id of adapter.pluginIds) {
       const pluginRoot = `plugins/${id}`;
       const manifestPath = `${pluginRoot}/${adapter.manifestPath}`;
       await inspectJson(root, manifestPath, (document) => {
@@ -134,7 +134,7 @@ function inspectMarketplace(document: unknown, adapter: HarnessAdapter): readonl
   if (record.plugins.some((entry) => asRecord(entry)?.name === "agent-kit")) {
     failures.push({ path: relPath, message: "Replace the retired agent-kit plugin with the four focused plugins." });
   }
-  for (const id of PLUGIN_IDS) {
+  for (const id of adapter.pluginIds) {
     const entries = record.plugins.filter((entry) => asRecord(entry)?.name === id);
     const entry = asRecord(entries[0]);
     if (entries.length !== 1 || !entry) {
