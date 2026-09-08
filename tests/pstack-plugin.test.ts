@@ -26,9 +26,9 @@ test("Codex exposes the four focused plugins and PStack separately", () => {
   expect(read("LICENSE")).toContain("Copyright (c) 2026 Lauren Tan");
 });
 
-test("all 45 upstream skills and four companions resolve the Codex adapter", () => {
+test("all 47 upstream skills and four companions resolve the Codex adapter", () => {
   const skills = readdirSync(path.join(pluginRoot, "skills"));
-  expect(skills).toHaveLength(49);
+  expect(skills).toHaveLength(51);
   const implicitSkills = new Set(["setup-pstack", "deslop", "control-cli", "verify-this", "browser-use"]);
 
   for (const skill of skills) {
@@ -94,12 +94,13 @@ test("Codex history indexing isolates exact workspace metadata without reading m
 test("bundled model roles use native Codex IDs and separate reasoning settings", () => {
   const roles = JSON.parse(read("models.json"));
   const panels = new Set([
-    "how critics", "arena runners", "arena cross-judge pool", "architect runners", "interrogate reviewers",
+    "arena runners", "arena cross-judge pool", "architect runners", "interrogate reviewers",
   ]);
   // This snapshot checks packaged defaults; CODEX.md requires live capability checks at dispatch.
   const supportedModels = new Set(["gpt-6-astra", "gpt-5.6-sol", "gpt-5.6-terra"]);
   const supportedEfforts = new Set(["low", "medium", "high", "xhigh", "max", "ultra"]);
-  expect(Object.keys(roles)).toHaveLength(18);
+  expect(Object.keys(roles)).toHaveLength(17);
+  expect(roles["how critics"]).toBeUndefined();
   for (const [role, value] of Object.entries(roles)) {
     expect(Array.isArray(value)).toBe(panels.has(role));
     const choices = Array.isArray(value) ? value : [value];
