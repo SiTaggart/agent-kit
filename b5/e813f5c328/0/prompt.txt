@@ -1,9 +1,1 @@
-ok push a pr, ensure the version of the plugin is correctly bumped so that all clients update it when we merge
-
----
-
-right but what about cursor, and claude
-
----
-
 I see, cursor is less of a problem as there is a native cursor plugin for pstack, but we should include claude
