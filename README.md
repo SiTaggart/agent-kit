@@ -14,12 +14,13 @@ switch command safeguards on or off separately.
   session research, and retained learnings.
 - **[Hooks](plugins/hooks/README.md)** — independently switchable command
   safeguards. Contains no skills.
-- **[PStack for Codex](plugins/pstack/README.md)** — a pinned adaptation of
-  Lauren Tan's PStack, with its upstream skills, companions, guide, and dormant
+- **[PStack for Codex and Claude Code](plugins/pstack/README.md)** — a pinned
+  adaptation of Lauren Tan's PStack, with its upstream skills, companions, guide, and dormant
   automation pack. See its README for capability requirements and attribution.
 
 Engineering, Git, Knowledge, and Hooks support Claude Code, Codex, Cursor, and
-Grok. PStack's adapted package is Codex-only. No skill plugin includes hooks.
+Grok. PStack supports Codex and Claude Code; Cursor users can use the native
+upstream PStack plugin. No skill plugin includes hooks.
 
 ## Install
 
@@ -53,6 +54,7 @@ use published repository content and do not include local edits.
 /plugin install git@agent-kit
 /plugin install knowledge@agent-kit
 /plugin install hooks@agent-kit
+/plugin install pstack@agent-kit
 ```
 
 Install only the plugins you want. Choose project scope in the install prompt.
@@ -114,7 +116,7 @@ plugins/
   git/                           Skills, manifests, README
   knowledge/                     Skills, manifests, README
   hooks/                         Hooks, manifests, README
-  pstack/                        Codex port and its documentation
+  pstack/                        Codex and Claude port and documentation
 src/                             Marketplace validation CLI
 tests/                           Plugin and script checks
 AGENTS.md                        Repository contributor instructions

@@ -19,8 +19,8 @@ Scan for:
 
 Findings must point to skills, tools, or MCPs invoked in this transcript. Speculative routings to skills the parent never opened do not count. To check whether a skill was used, scan the transcript for:
 
-- Successful Codex file-read calls against any `SKILL.md` file, including `exec_command` reads (`cat`, `sed`, or equivalent), file/resource read tools, and calls composed through `functions.exec` (workspace `.agents/skills/`, user-level `~/.agents/skills/`, or plugin-installed paths under `~/.codex/plugins/`)
-- `spawn_agent` prompts that name a skill path, followed by the child's read evidence; a requested read alone does not prove the file was opened
+- Successful host file-read calls against a `SKILL.md` file: native reads, authorized shell reads, or Skill tool expansion with the actual body recorded. Resolve workspace, personal, and installed plugin paths through the selected adapter
+- Subagent prompts that name a skill path, followed by the child's read evidence; a requested read alone does not prove the file was opened
 - Tool calls (`exec_command`, file search, MCP, etc.) that match a skill's documented commands
 
 Two valid finding shapes:
@@ -28,7 +28,7 @@ Two valid finding shapes:
 - The parent invoked the skill and you found a real gap in its body. Route to the skill's relevant section.
 - The skill was visible in the catalog but did not trigger when it would have helped. Tune the skill's description so future agents pick it up. Route as `tune description: <skill path>`.
 
-If a skill was neither invoked nor a missed-trigger candidate, drop it. Adding text to a skill the parent never opened does not change behavior.
+If a skill was neither invoked nor a missed-trigger candidate, drop it.
 
 Surface 3-5 durable learnings. For each:
 - Principle: one sentence describing what generalizes. State the rule, not the label, no name-dropping.

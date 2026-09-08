@@ -15,7 +15,20 @@ Codex confirms the plugin is installed. Start a fresh task after installation. P
 
 For a published revision, use `codex plugin marketplace add SiTaggart/agent-kit` instead of the local path. An existing Git marketplace needs `codex plugin marketplace upgrade agent-kit` to fetch a newly published revision; unpublished working-tree changes are available only from the local source.
 
-## Pick your models
+## Claude Code
+
+After publication, use `/plugin marketplace add SiTaggart/agent-kit`, then
+`/plugin install pstack@agent-kit`. Refresh an existing catalog with
+`/plugin marketplace update agent-kit`. Existing Claude users must install this
+new plugin once. For local testing, start `claude --plugin-dir <absolute-pstack-directory>`.
+Use `/pstack:setup-pstack` and `/pstack:poteto-mode`; translate the guide's `$name`
+examples to `/pstack:name`. Claude defaults use Sonnet for routine work and Opus
+for hard reasoning, with Opus/Sonnet/Fable panels. All are Anthropic models.
+Effort inherits unless supported and explicitly configured. Claude reads
+[models.claude.json](../../models.claude.json) plus optional
+`~/.claude/pstack-models.json`, and never changes Codex's configuration.
+
+## Pick your models on Codex
 
 Run:
 
@@ -33,7 +46,7 @@ You might be wondering what happens if you use Auto. Set a role to `inherit-pare
 
 At the end of setup, `$setup-pstack` looks for a way to prove app behavior in your project, either a `verify-*` skill or an existing harness. If it finds neither, it offers once to generate one with [`$create-verification-skill`](../../skills/create-verification-skill/SKILL.md).
 
-Say yes and it writes `.agents/skills/verify-<app>/`, a project-local skill that teaches agents to drive your app the way a user does. It proves the skill works once before handing it over. Say no and setup moves on. You can run `$create-verification-skill` yourself any time. [Verify and ship](./06-verify-and-ship.md#create-a-project-verification-skill) covers when it earns its place.
+Say yes and it writes `.agents/skills/verify-<app>/` on Codex or `.claude/skills/verify-<app>/` on Claude, a project-local skill that teaches agents to drive your app the way a user does. It proves the skill works once before handing it over. Say no and setup moves on. You can run `$create-verification-skill` yourself any time. [Verify and ship](./06-verify-and-ship.md#create-a-project-verification-skill) covers when it earns its place.
 
 The next PStack invocation reads the updated model overrides. A new task is needed when installing or changing plugin files, not when editing this separate role configuration.
 
@@ -45,7 +58,7 @@ Pick something real but small, and describe it the way you'd describe it to a co
 $poteto-mode add a --json flag to this command. text output stays byte-identical. verify both.
 ```
 
-Watch the todo list. The first item is always "read the Principles section". The rest are the matched playbook's steps copied in, the Feature playbook for this prompt. If `$poteto-mode` skips a step, the step stays in the list with `skip: <reason>`, so you can see what it chose not to do.
+Watch the todo list. Its first items are the matched playbook's steps copied in, the Feature playbook for this prompt. If `$poteto-mode` skips a step, the step stays in the list with `skip: <reason>`, so you can see what it chose not to do.
 
 From here you can type normal follow-ups. `$poteto-mode` is sticky. It stays on for the conversation until you opt out by saying so.
 

@@ -3,7 +3,7 @@ name: deslop
 description: Remove AI-generated code slop and clean up code style
 ---
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow.
 
 
 # Remove AI code slop

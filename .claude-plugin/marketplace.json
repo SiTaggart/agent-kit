@@ -30,6 +30,12 @@
       "source": "./plugins/hooks",
       "version": "0.2.1",
       "description": "Independently switchable shell command safeguards."
+    },
+    {
+      "name": "pstack",
+      "source": "./plugins/pstack",
+      "version": "0.15.0",
+      "description": "PStack engineering workflows, principles, and model panels for Claude Code."
     }
   ]
 }

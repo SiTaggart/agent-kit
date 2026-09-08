@@ -3,7 +3,7 @@ name: control-cli
 description: Build or adapt a local harness to drive, inspect, and profile an interactive CLI or TUI without external services. Use for CLI UX checks, startup regressions, memory leaks, hangs, prompt flows, or terminal demos.
 ---
 
-Read [Codex runtime guidance](../../CODEX.md) before this workflow.
+Read [PStack runtime guidance](../../RUNTIME.md) before this workflow.
 
 
 # Control CLI

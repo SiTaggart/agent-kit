@@ -3,7 +3,7 @@ name: reproduce-and-fix-issues
 description: Reproduce triaged Slack bugs through a configured app-control adapter, verify existing fixes, and open a bounded draft pull request only after before-and-after proof. Use only from the configured Benny repro automation.
 ---
 
-Read [Benny runtime preflight](../../CODEX.md) before this workflow.
+Read [Benny runtime preflight](../../RUNTIME.md) before this workflow.
 
 # Reproduce and fix issues
 
@@ -120,7 +120,7 @@ Use the configured plain Unicode status strings. Keep status text short:
 - Draft pull request opened
 - Fix did not land
 
-Prefer configured Codex Slack connector actions. Use `BENNY_SLACK_BOT_TOKEN` only when the user configured it for a narrow missing capability such as editing this one status message. Never expose the token to a worker.
+Prefer configured host Slack connector actions. Use `BENNY_SLACK_BOT_TOKEN` only when the user configured it for a narrow missing capability such as editing this one status message. Never expose the token to a worker.
 
 If no operations channel is configured, keep detailed status in the automation run output. Do not substitute a source-channel root message.
 

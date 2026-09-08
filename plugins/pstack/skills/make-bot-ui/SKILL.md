@@ -2,33 +2,35 @@
 name: make-bot-ui
 description: >-
   Use when building a custom UI (page, dashboard, buttons) that should wake a
-  Codex agent over a webhook, when the user must provide a webhook sender key,
+  agent over a webhook, when the user must provide a webhook sender key,
   or when exposing that UI on Tailscale. Checks native runtime support first.
+disable-model-invocation: true
 ---
 # How to make a bot UI
 
-Read [Codex runtime guidance](../../CODEX.md) first.
+Read [PStack runtime guidance](../../RUNTIME.md) first.
 
 Build a page the user clicks. A server on this computer POSTs JSON to a webhook routine. The bot wakes with that JSON. Keep the sender key on the server. Do not put the sender key in the browser, in chat, or in this skill.
 
 ## Native runtime preflight
 
-The current Codex `automation_update` tool supports scheduled heartbeat and cron
-jobs. It does not provide inbound webhook routines, a routine panel with a sender
-key, a `secret-request` card, or a webhook-event wake envelope. There is no direct
-native equivalent of this workflow today.
+Check the current host's automation tools for the complete upstream webhook
+contract: an inbound event trigger, authenticated sender credentials, a supported
+secret-entry flow, and the documented wake payload. Scheduled timers alone do
+not supply this contract. Do not assume that Claude channels/routines or Codex
+heartbeats are compatible merely because they can wake an agent.
 
 Before building, installing software, starting servers, or requesting secrets,
 inspect the current native tool schema for all four capabilities. If any is
-missing, stop and report the missing capability. Do not invent a Codex webhook
+missing, stop and report the missing capability. Do not invent a webhook
 URL, reuse a Cursor endpoint, substitute polling, build a relay service, or create
 a scheduled job and claim webhook parity. This skill's source is ported; its
-hosted trigger is blocked until Codex supplies an equivalent.
+hosted trigger is blocked until the current host supplies the required capabilities.
 
 The exact original workflow, including proprietary API calls, secret-request
 fields, endpoint shape, panel clicks, and wake envelope, is retained in
 [the upstream host reference](references/upstream-host-workflow.md). That file is
-historical source, not executable Codex instructions.
+historical source, not executable host instructions.
 
 ## Create the webhook routine
 
@@ -46,7 +48,7 @@ creation tool and actual schema. Preserve these upstream requirements:
   back into model-visible tool output.
 
 Do not infer the original authentication headers, HTTP success code, secret-file
-layout, or wake envelope apply to a future Codex API. Verify each against the
+layout, or wake envelope apply to a future host API. Verify each against the
 actual host contract before proceeding.
 
 ## Host the page on this computer

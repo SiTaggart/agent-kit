@@ -4,10 +4,12 @@
 # operated in it. Emits a table sorted by size with a suggested bucket. Never
 # deletes anything; buckets are evidence, never deletion authorization.
 #
-# Usage: worktree-audit.sh [repo-path]   (defaults to the current repo)
+# Usage: worktree-audit.sh [repo-path] [codex|claude]
 set -u
 
 repo="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
+host="${2:-codex}"
+case "$host" in codex|claude) ;; *) echo "host must be codex or claude" >&2; exit 1 ;; esac
 [ -z "$repo" ] && { echo "not in a git repo; pass a repo path" >&2; exit 1; }
 cd "$repo" || exit 1
 
@@ -30,7 +32,12 @@ while IFS= read -r workspace; do
     session_args+=(--workspace "$workspace")
 done < <(git worktree list --porcelain | sed -n 's/^worktree //p')
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-python3 "$script_dir/../../../scripts/codex-sessions.py" "${session_args[@]}" > "$session_index" || printf '[]\n' > "$session_index"
+if [ "$host" = codex ]; then
+    python3 "$script_dir/../../../scripts/codex-sessions.py" "${session_args[@]}" > "$session_index" || printf '[]\n' > "$session_index"
+else
+    printf '[]\n' > "$session_index"
+    echo "Claude session history is unknown; verify worktree usage separately." >&2
+fi
 now=$(date +%s)
 
 printf "SIZE\tAGE\tMERGED\tDIRTY\tREMOTE\tPR\tLAST_CHAT\tBUCKET\tWORKTREE\n"
@@ -67,7 +74,7 @@ git worktree list --porcelain | sed -n 's/^worktree //p' | while IFS= read -r wt
 	[ -z "$pr" ] && pr="-"
 
 	# Exact cwd matching avoids assigning a neighboring worktree's chat.
-	last="-"; last_ts=0
+	last="unknown"; last_ts=0
 	last_ts=$(jq -r --arg wt "$wt" '[.[] | select(.cwd==$wt) | .mtime] | max // 0 | floor' "$session_index")
 	if [ "$last_ts" -gt 0 ] 2>/dev/null; then
 		last=$(date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null)

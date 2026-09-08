@@ -1,6 +1,6 @@
 # Upstream host provisioning reference
 
-Historical source, not executable Codex instructions. These sections used Cursor-only project settings and automation creation. The operational replacement is [the runtime preflight](../CODEX.md). Original source: `cursor/plugins` commit `93b00b89ef425a9c1bac0d0b317dfc49c930ac99`.
+Historical source, not executable host instructions. These sections used Cursor-only project settings and automation creation. The operational replacement is [the runtime preflight](../RUNTIME.md). Original source: `cursor/plugins` commit `93b00b89ef425a9c1bac0d0b317dfc49c930ac99`.
 
 ## README.md
 
