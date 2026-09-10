@@ -1,4 +1,0 @@
-interface:
-  display_name: "Orca Multi Review"
-  short_description: "Visible cross-provider review through Orca"
-  default_prompt: "Use $orca-multi-review to run the repository multi-model review through visible Orca agent terminals."

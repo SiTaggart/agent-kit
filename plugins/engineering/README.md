@@ -68,7 +68,6 @@ not grant permission to install plugins or perform side effects.
 - [docs-researcher](skills/docs-researcher/SKILL.md)
 - [document-review](skills/document-review/SKILL.md)
 - [onboarding](skills/onboarding/SKILL.md)
-- [orca-multi-review](skills/orca-multi-review/SKILL.md)
 - [prompt-check](skills/prompt-check/SKILL.md)
 - [repo-research-analyst](skills/repo-research-analyst/SKILL.md)
 - [repoprompt](skills/repoprompt/SKILL.md)
