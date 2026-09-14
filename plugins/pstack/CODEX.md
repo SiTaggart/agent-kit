@@ -73,12 +73,15 @@ All PStack skills use this one mapping. It selects native Codex subagent models;
 it does not change the main conversation's model or use a provider SDK.
 
 - Sol with high reasoning handles routine implementation, exploration, tooling,
-  and verification workers.
-- Astra with high reasoning handles debugging, performance work, explanation,
-  and judgment. The hardest tasks use Astra with xhigh reasoning.
-- Review and design panels use Astra, Sol, and Terra with high reasoning. These
-  are three OpenAI models, not three providers. Model agreement is supporting
-  evidence, not proof of correctness or independent model-family coverage.
+  verification workers, bug fixes, performance fixes, hillclimb attempts, and
+  explanations.
+- Astra with low reasoning handles prose, judgment, and synthesis. The hardest
+  tasks use Astra with high reasoning. Reserve xhigh for an explicit session
+  choice when a task needs more reasoning.
+- Review and design panels use Astra with low reasoning and Sol and Terra with
+  high reasoning. These are three OpenAI models, not three providers. Model
+  agreement is supporting evidence, not proof of correctness or independent
+  model-family coverage.
 
 These are starting choices based on the host's model descriptions, not measured
 PStack benchmark results. Keep the current conversation model as the coordinator.
