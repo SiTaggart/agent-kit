@@ -34,7 +34,7 @@
     {
       "name": "pstack",
       "source": "./plugins/pstack",
-      "version": "0.15.0",
+      "version": "0.15.1",
       "description": "PStack engineering workflows, principles, and model panels for Claude Code."
     }
   ]
