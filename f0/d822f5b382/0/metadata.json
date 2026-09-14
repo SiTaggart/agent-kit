@@ -1,0 +1,52 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "f0d822f5b382",
+  "session_id": "01a0a20a-ec6f-77c3-b627-60999097760d",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-14T22:36:17.105192Z",
+  "branch": "codex/pstack-lower-reasoning",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".agents/plugins/marketplace.json",
+    ".claude-plugin/marketplace.json",
+    "plugins/pstack/.claude-plugin/plugin.json",
+    "plugins/pstack/.codex-plugin/plugin.json",
+    "plugins/pstack/CODEX.md",
+    "plugins/pstack/models.json"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6-astra",
+  "turn_id": "bc71484cc099",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 53852,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 822016,
+    "output_tokens": 3598,
+    "api_call_count": 16
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-14T22:36:17.084206Z",
+    "agent_lines": 25,
+    "agent_removed": 21,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 25,
+    "total_lines_changed": 46,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    }
+  ]
+}

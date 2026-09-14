@@ -1,0 +1,5 @@
+lets revisit the [agent-kit/plugins/pstack/models.json at main · SiTaggart/agent-kit](plugin://browser@openai-bundled?mention=tab-v1\&source=extension\&browserId=0c5b63af-3e1c-4aa0-9209-7a34c48718fe\&tabId=%5B%222296f36d-388c-4524-bc62-e04d0317510b%22%2C%22133741955%22%5D\&title=agent-kit%2Fplugins%2Fpstack%2Fmodels.json+at+main+%C2%B7+SiTaggart%2Fagent-kit\&url=https%3A%2F%2Fgithub.com%2FSiTaggart%2Fagent-kit%2Fblob%2Fmain%2Fplugins%2Fpstack%2Fmodels.json) file again look at where we're using Astra on too high reasoning and where we could be using SOL high or Astra low instead. I am burning tokens right now and I think it's because astra high is getting used for far too many things
+
+---
+
+this sounds mucvh better, please implement this and version bump the plugin so it wil auto update in codex when merged. Create a pr once you are done. Include one code review and fix cycle before opening
