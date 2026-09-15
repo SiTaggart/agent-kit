@@ -16,7 +16,7 @@
     {
       "name": "git",
       "source": "./plugins/git",
-      "version": "0.2.1",
+      "version": "0.2.2",
       "description": "Commits, pull requests, worktrees, Git history, and review feedback."
     },
     {
