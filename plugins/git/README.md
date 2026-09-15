@@ -28,13 +28,13 @@ Grok Bot in Cursor uses the same plugin. Prefer project scope.
 ## Workflows
 
 Use `git-commit` to save an authorized change or `git-commit-push-pr` to commit,
-push, and open a PR. The latter also supports writing or updating a PR
-description without committing.
+push, and open a PR. `pr-description` owns PR title and body writing.
 
-Use `ce-triage-pr-feedback` to evaluate feedback before edits and
-`resolve-pr-feedback` for an authorized resolution. Their comment-fetching
-scripts stay together in this plugin. Use `git-worktree` for isolated work and
-`resolve-pr-merge-conflicts` when a PR conflicts with its base.
+Use `ce-triage-pr-feedback` to evaluate, implement, and validate agreed review
+changes. Then use `resolve-pr-feedback` to commit, push, reply, and resolve only
+the approved comments. Their comment-handling scripts stay together in this
+plugin. Use `git-worktree` for isolated work and `resolve-pr-merge-conflicts`
+when a PR conflicts with its base.
 
 Code review and implementation skills live in the optional Engineering plugin.
 Git's scripts and core workflows can run without it. Installing Git does not
@@ -49,6 +49,7 @@ authorize a commit, push, reply, merge, or deletion.
 - [git-commit-push-pr](skills/git-commit-push-pr/SKILL.md)
 - [git-history-analyzer](skills/git-history-analyzer/SKILL.md)
 - [git-worktree](skills/git-worktree/SKILL.md)
+- [pr-description](skills/pr-description/SKILL.md)
 - [pr-review-canvas](skills/pr-review-canvas/SKILL.md)
 - [resolve-pr-feedback](skills/resolve-pr-feedback/SKILL.md)
 - [resolve-pr-merge-conflicts](skills/resolve-pr-merge-conflicts/SKILL.md)
