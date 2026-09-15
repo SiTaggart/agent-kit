@@ -1,0 +1,44 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "bf1092e8762c",
+  "strategy": "manual-commit",
+  "branch": "codex/git-0.2.2",
+  "checkpoints_count": 3,
+  "files_touched": [
+    ".agents/plugins/marketplace.json",
+    ".claude-plugin/marketplace.json",
+    ".cursor-plugin/marketplace.json",
+    "plugins/git/.claude-plugin/plugin.json",
+    "plugins/git/.codex-plugin/plugin.json",
+    "plugins/git/.cursor-plugin/plugin.json",
+    "plugins/git/README.md",
+    "plugins/git/skills/ce-triage-pr-feedback/SKILL.md",
+    "plugins/git/skills/git-commit-push-pr/SKILL.md",
+    "plugins/git/skills/git-commit-push-pr/references/branch-creation.md",
+    "plugins/git/skills/git-commit-push-pr/references/pr-description-writing.md",
+    "plugins/git/skills/git-commit/SKILL.md",
+    "plugins/git/skills/pr-description/SKILL.md",
+    "plugins/git/skills/resolve-pr-feedback/SKILL.md",
+    "plugins/git/skills/resolve-pr-feedback/references/full-mode.md",
+    "plugins/git/skills/resolve-pr-feedback/references/pr-comment-resolver.md",
+    "plugins/git/skills/resolve-pr-feedback/references/targeted-mode.md",
+    "plugins/git/skills/resolve-pr-feedback/scripts/get-pr-comments",
+    "tests/validate-plugin-bundle.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/bf/1092e8762c/0/metadata.json",
+      "transcript": "/bf/1092e8762c/0/full.jsonl",
+      "compact_transcript": "/bf/1092e8762c/0/transcript.jsonl",
+      "content_hash": "/bf/1092e8762c/0/content_hash.txt",
+      "prompt": "/bf/1092e8762c/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 158762,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 5634816,
+    "output_tokens": 29082,
+    "api_call_count": 53
+  }
+}
