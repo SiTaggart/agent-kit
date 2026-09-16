@@ -1,0 +1,4 @@
+interface:
+  display_name: "Ask ChatGPT Pro"
+  short_description: "Send curated repo context to ChatGPT Pro"
+  default_prompt: "Use $ask-chatgpt-pro to get a deep second opinion on this task."
