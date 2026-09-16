@@ -11,8 +11,8 @@
     {
       "name": "engineering",
       "source": "./plugins/engineering",
-      "version": "0.2.4",
-      "description": "Planning, implementation, code review, debugging, and code taste."
+      "version": "0.2.5",
+      "description": "Project control, planning, implementation, code review, debugging, and code taste."
     },
     {
       "name": "git",

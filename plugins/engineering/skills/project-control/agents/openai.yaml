@@ -1,0 +1,4 @@
+interface:
+  display_name: "Project Control"
+  short_description: "Coordinate projects through Codex worktree tasks"
+  default_prompt: "Use $project-control to coordinate this project through tickets, isolated worktree tasks, and pull-request follow-up."

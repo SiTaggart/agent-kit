@@ -1,0 +1,4 @@
+interface:
+  display_name: "Codex Agent Team Setup"
+  short_description: "Install Agent Kit's Codex execution profiles"
+  default_prompt: "Use $codex-agent-team-setup to install or update the scout, builder, and reviewer profiles for Codex."

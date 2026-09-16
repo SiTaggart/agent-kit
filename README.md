@@ -5,9 +5,9 @@ switch command safeguards on or off separately.
 
 ## Plugins
 
-- **[Engineering](plugins/engineering/README.md)** — 31 skills for planning,
-  implementation, code review, debugging, and code taste. These workflows stay
-  together because they share guidance and reviewer personas.
+- **[Engineering](plugins/engineering/README.md)** — 33 skills for project
+  control, planning, implementation, code review, debugging, and code taste.
+  These workflows stay together because they share guidance and agent personas.
 - **[Git](plugins/git/README.md)** — 10 skills for commits, PRs, worktrees,
   history, and feedback.
 - **[Knowledge](plugins/knowledge/README.md)** — 11 skills for Obsidian, QMD,
