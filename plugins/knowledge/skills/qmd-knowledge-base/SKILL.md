@@ -1,6 +1,6 @@
 ---
 name: qmd-knowledge-base
-description: Preflight non-trivial tasks against this machine's indexed knowledge base (~12k markdown docs of wikis, specs, decisions, prior plans, and session retros) when prior decisions, product intent, ownership, conventions, expected behavior, or known failures could change the correct solution—even when the prompt does not request history. Skip only mechanical work fully defined by live source. Routes searches to relevant collections and classifies evidence authority; use the installed QMD surface for query mechanics.
+description: Preflight non-trivial tasks against this machine's indexed knowledge base (~12k markdown docs of wikis, specs, decisions, prior plans, and session retros) when prior decisions, product intent, ownership, conventions, expected behavior, or known failures could change the correct solution—even when the prompt does not request history. Skip only mechanical work fully defined by live source. Routes searches to relevant collections and classifies evidence authority; use QMD MCP tools when available, and the CLI only when MCP tools are unavailable.
 ---
 
 # QMD Knowledge Base Router
@@ -9,7 +9,9 @@ description: Preflight non-trivial tasks against this machine's indexed knowledg
 
 Route machine-specific QMD context by deciding whether indexed knowledge is relevant, which collections fit the task, and how to interpret the evidence returned.
 
-Use the installed QMD CLI or its companion skill for query construction, search modes, retrieval commands, retries, setup, and health checks. This skill does not duplicate that tool contract.
+When QMD MCP tools are available, you must use them for status, search, and document retrieval. Use the CLI only when MCP tools are unavailable. A CLI failure does not mean QMD is unavailable.
+
+Use the selected tool’s contract for query construction and retrieval mechanics.
 
 Read [`references/collections.md`](references/collections.md) when working in a mapped project or when specialized evidence such as tests, SQL, descriptors, tooling, or prior plans may matter.
 
@@ -40,15 +42,15 @@ For Spade and Termpower work, use the catalog's task routes and start with the s
 
 For an unmapped repository:
 
-1. Use the installed QMD CLI or its companion skill to inspect the live collection inventory.
+1. Use the QMD MCP `status` tool to inspect the live collection inventory. Use the CLI only when MCP tools are unavailable.
 2. Select a collection only when its source clearly matches the current project or supplies shared organizational context relevant to the task.
 3. If no collection clearly matches, skip QMD and continue with live files and RepoPromptCE.
 
 Never search unrelated Spade or Termpower collections merely because they are available.
 
-### 3. Search and retrieve through `qmd`
+### 3. Search and retrieve through QMD MCP
 
-Hand the selected collections and evidence need to the installed QMD surface. Treat snippets as leads, not complete evidence. Retrieve the full relevant result before relying on it for a substantive claim.
+Use QMD MCP `query`, `get`, and `multi_get` for the selected collections and evidence need. Use the CLI only when MCP tools are unavailable. Treat snippets as leads, not complete evidence. Retrieve the full relevant result before relying on it for a substantive claim.
 
 If the first result is weak, let `qmd` vary the query or search mode before broadening the collection set. Expand collection scope only when the missing evidence has a concrete reason to live elsewhere.
 

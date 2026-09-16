@@ -13,6 +13,9 @@ This machine has context tools that see more than the checkout in front of you.
   prior decisions, product intent, ownership, conventions, expected behavior,
   or known failures could change the correct solution; uncertainty is enough.
   Mechanical work fully defined by live source can proceed without it.
+  When QMD MCP tools are available, you must use them for status, search, and
+  document retrieval. Use the CLI only when MCP tools are unavailable. A CLI
+  failure does not mean QMD is unavailable.
 - **RepoPromptCE** — token-efficient codebase exploration: `file_search`,
   `get_file_tree`, `read_file`, `get_code_structure`, `context_builder`, and
   `manage_selection`. Beats `rg` plus file reads whenever the task spans more
