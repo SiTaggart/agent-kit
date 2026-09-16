@@ -45,6 +45,7 @@ not grant permission to install plugins or perform side effects.
 
 ## Skills
 
+- [ask-chatgpt-pro](skills/ask-chatgpt-pro/SKILL.md)
 - [ays](skills/ays/SKILL.md)
 - [bro](skills/bro/SKILL.md)
 - [ce-brainstorm](skills/ce-brainstorm/SKILL.md)
