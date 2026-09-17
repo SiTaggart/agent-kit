@@ -1,6 +1,7 @@
 # Engineering
 
-Planning, implementation, code review, debugging, and code taste.
+Project control, planning, implementation, code review, debugging, and code
+taste.
 
 Part of the [Agent Kit marketplace](../../README.md). Supports Claude Code,
 Codex, Cursor, and Grok. This plugin contains skills only; command safeguards
@@ -35,6 +36,13 @@ Use `ce-debug` for failures, `ce-polish` for browser iteration, and
 `ce-simplify-code` for cleanup. TypeScript and React work uses `code-taste`;
 Spade Python work uses `spade-python-taste`.
 
+For a persistent delivery control plane, use `project-control`. It coordinates
+Linear issues, isolated Codex worktree tasks, and pull-request follow-through.
+Each worktree task leads a stage-gated scout, builder, and reviewer team. Run
+`codex-agent-team-setup` once on each Codex machine to install those portable
+profiles and configure the recommended SOL/high defaults with a concurrency
+limit of two.
+
 Reviewer personas live in `skills/ce-review/references/reviewers/`. Worker
 personas live under their owning skill's `references/` directory. Shared
 rendering and dispatch guidance lives in `skills/ce-conventions/`.
@@ -65,11 +73,13 @@ not grant permission to install plugins or perform side effects.
 - [ce-thermo-nuclear-code-quality-review](skills/ce-thermo-nuclear-code-quality-review/SKILL.md)
 - [ce-work](skills/ce-work/SKILL.md)
 - [code-taste](skills/code-taste/SKILL.md)
+- [codex-agent-team-setup](skills/codex-agent-team-setup/SKILL.md)
 - [codiff](skills/codiff/SKILL.md)
 - [docs-researcher](skills/docs-researcher/SKILL.md)
 - [document-review](skills/document-review/SKILL.md)
 - [onboarding](skills/onboarding/SKILL.md)
 - [prompt-check](skills/prompt-check/SKILL.md)
+- [project-control](skills/project-control/SKILL.md)
 - [repo-research-analyst](skills/repo-research-analyst/SKILL.md)
 - [repoprompt](skills/repoprompt/SKILL.md)
 - [repoprompt-multi-review](skills/repoprompt-multi-review/SKILL.md)

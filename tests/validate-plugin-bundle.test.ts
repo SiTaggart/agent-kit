@@ -62,9 +62,9 @@ test("Grok reuses the Cursor plugin files", () => {
   expect(HARNESSES.grok.kind).toBe("cursor-plugin");
 });
 
-test("all 53 skills have one owner and relative skill references stay inside that plugin", async () => {
+test("all 55 skills have one owner and relative skill references stay inside that plugin", async () => {
   const owners = new Map<string, string>();
-  for (const [id, count] of [["engineering", 31], ["git", 11], ["knowledge", 11]] as const) {
+  for (const [id, count] of [["engineering", 33], ["git", 11], ["knowledge", 11]] as const) {
     const skills = await readdir(path.join(repoRoot, "plugins", id, "skills"));
     expect(skills).toHaveLength(count);
     for (const name of skills) {

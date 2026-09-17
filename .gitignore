@@ -5,3 +5,4 @@ node_modules/
 **/.system
 .cass/
 ai-refresh-setup.md
+.worktrees
