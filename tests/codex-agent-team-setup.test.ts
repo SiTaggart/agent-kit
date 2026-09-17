@@ -21,6 +21,31 @@ default_subagent_reasoning_effort = "high"
 max_concurrent_threads_per_session = 2
 `;
 
+const expectedSkillRoutes = {
+  scout: [
+    "repo-research-analyst",
+    "repoprompt",
+    "docs-researcher",
+    "web-researcher",
+    "qmd-knowledge-base",
+    "learnings-researcher",
+  ],
+  builder: [
+    "ce-work",
+    "ce-debug",
+    "code-taste",
+    "spade-python-taste",
+    "typescript-advanced-types",
+    "ce-quality-gate",
+  ],
+  reviewer: [
+    "ce-review",
+    "ce-technical-review",
+    "ce-thermo-nuclear-code-quality-review",
+    "repoprompt-multi-review",
+  ],
+} as const;
+
 test("installer applies portable profiles and reports healthy status", async () => {
   const root = await makeTempRoot("agent-team-setup-");
   try {
@@ -36,11 +61,15 @@ test("installer applies portable profiles and reports healthy status", async () 
     expect(status.healthy).toBe(true);
     expect(status.profiles.map((profile) => profile.kind)).toEqual(["unchanged", "unchanged", "unchanged"]);
 
-    for (const name of ["scout", "builder", "reviewer"]) {
+    for (const [name, expectedSkills] of Object.entries(expectedSkillRoutes)) {
       const installed = Bun.TOML.parse(await readFile(path.join(root, "agents", `${name}.toml`), "utf8"));
       expect(installed).toMatchObject({ name });
       expect("model" in installed).toBe(false);
       expect("model_reasoning_effort" in installed).toBe(false);
+      const instructions = "developer_instructions" in installed ? installed.developer_instructions : undefined;
+      expect(typeof instructions).toBe("string");
+      if (typeof instructions !== "string") throw new Error(`${name} has no developer instructions`);
+      for (const skill of expectedSkills) expect(instructions).toContain(`\`${skill}\``);
     }
   } finally {
     await removeTempRoot(root);

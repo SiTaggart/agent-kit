@@ -23,18 +23,32 @@ Required proof:
 Own the task from repository discovery through a ready pull request. Follow the
 repository instructions and use the appropriate Agent Kit skills.
 
+As the worktree delivery lead, use these skills without waiting for the project
+controller to name them:
+
+- `ce-work` for final integration or genuinely trivial direct implementation.
+- `ce-quality-gate` across the integrated diff after behavioral proof.
+- `ce-review` directly only when the reviewer profile is unavailable.
+- `git-commit-push-pr` when the Git plugin is installed and the change is ready
+  to publish.
+- `babysit-pr`, `ce-triage-pr-feedback`, and `resolve-pr-feedback` when the Git
+  plugin is installed and the open pull request needs follow-through.
+
 Explicitly orchestrate these installed Codex profiles:
 
 1. Spawn `scout` for bounded, read-only reconnaissance. Give it the issue,
-   likely ownership boundary, named research skill or persona when useful, and
-   the evidence it must return.
+   likely ownership boundary, and the evidence it must return. Its profile owns
+   the default research-skill routing; name an override only when the task needs
+   another specialist.
 2. After integrating the scout's findings, spawn `builder` for the bounded
-   implementation. Give it the accepted contract, allowed surface, applicable
-   implementation skill, and focused proof. Keep one writer at a time.
+   implementation. Give it the accepted contract, allowed surface, and focused
+   proof. Its profile owns the default work-skill routing. Keep one writer at a
+   time.
 3. Integrate and inspect the builder's work yourself. Run the changed-code
    quality gate and the closest real proof surface.
 4. Spawn `reviewer` for an independent, read-only review of the resulting diff
-   against the issue and proof. Give it the appropriate review skill or persona.
+   against the issue and proof. Its profile owns the default review-skill
+   routing; name a specialist only when the review needs one.
 5. Resolve valid findings through a bounded builder pass or directly when the
    fix is trivial. Re-run affected proof and reviewer checks as needed.
 6. Commit, push, and open the pull request only after the work is proven. Never

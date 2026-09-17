@@ -30,6 +30,23 @@ local worktrees are execution state that can be reconstructed.
 - Keep source inspection, focused tests, full checks, browser proof, backend
   proof, remote state, and unpublished local work distinct in status reports.
 
+## Lead Skill Routing
+
+Use these Agent Kit skills without waiting for the user to name them:
+
+- `ce-brainstorm` to define an unclear product outcome.
+- `ce-grill` when branchy ambiguity would materially change the project.
+- `ce-plan` to turn an accepted outcome into executable technical work.
+- `document-review` to check plans or requirements before execution.
+- `prompt-check` when a consequential dictated request needs normalization.
+- `qmd-knowledge-base` and `ce-sessions` when the Knowledge plugin is installed
+  and prior decisions or recoverable task history could change the project.
+- `git-worktree` and `babysit-pr` when the Git plugin is installed and the
+  platform does not already own the equivalent worktree or PR-monitoring step.
+
+Do not use `ce-work` to implement product code from the control task. Delegate
+implementation to a worktree task lead.
+
 ## Authority
 
 Proceed without asking when the next action is a reversible stage transition

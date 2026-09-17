@@ -23,6 +23,24 @@ max_concurrent_threads_per_session = 2
 
 Profiles omit model and reasoning settings so they inherit these defaults.
 
+## Role Skill Maps
+
+Each installed profile names its default Agent Kit skills directly in
+`developer_instructions`. Skill names are portable because the Engineering
+plugin installs them into the host skill catalog; no plugin-cache path is
+embedded in the profile.
+
+- `scout` routes repository, documentation, web, and retained-knowledge
+  research to the relevant research skills.
+- `builder` routes implementation, debugging, language taste, and changed-code
+  validation to the relevant work skills.
+- `reviewer` routes ordinary, technical, thermonuclear, and explicitly
+  requested multi-provider reviews to the relevant review skills.
+
+Knowledge-plugin skills are conditional because Engineering and Knowledge can
+be installed separately. The Engineering-owned routes are always available
+with this setup skill.
+
 ## Workflow
 
 Resolve this skill's absolute directory as `SKILL_DIR`. Do not assume a fixed
