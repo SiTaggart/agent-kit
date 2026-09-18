@@ -1,17 +1,1 @@
-Fix the merged codex-agent-team-setup skill so it writes a Codex configuration accepted by the current CLI strict parser. Replace the invalid \`[agents]\` defaults with the supported agent-role registry and concurrency schema, keep existing user config safe, add regression coverage that invokes or faithfully validates strict parsing, then run the relevant full checks. Do not commit or push.
-
----
-
-is there anything in the project control skill that specifies the pull request?
-
----
-
-does it say anything about draft vs ready for review prs?
-
----
-
-I need it to only open draft PRs, where do we specify that?/
-
----
-
-do it for me
+bump the version and create a pr for me
