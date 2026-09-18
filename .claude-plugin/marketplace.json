@@ -10,7 +10,7 @@
     {
       "name": "engineering",
       "source": "./plugins/engineering",
-      "version": "0.2.5",
+      "version": "0.2.6",
       "description": "Project control, planning, implementation, code review, debugging, and code taste."
     },
     {

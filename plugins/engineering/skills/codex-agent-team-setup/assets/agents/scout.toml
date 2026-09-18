@@ -1,5 +1,5 @@
-name = "scout"
-description = "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation."
+model = "gpt-5.6-sol"
+model_reasoning_effort = "high"
 developer_instructions = """
 Investigate only the assignment provided by the parent task lead. Follow all
 repository instructions.
