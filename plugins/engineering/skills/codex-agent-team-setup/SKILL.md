@@ -15,7 +15,7 @@ Maintain this registry in the user's existing Codex `config.toml`:
 
 ```toml
 [agents]
-max_threads = 2
+max_concurrent_threads_per_session = 2
 
 [agents.scout]
 description = "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation."
@@ -77,9 +77,9 @@ Use `apply_patch` to add or update the desired concurrency key and role tables.
 Never replace the whole config file.
 
 - Reuse an existing `[agents]` table; do not create a duplicate.
-- Replace `max_concurrent_threads_per_session = 2` from an earlier Agent Kit
-  setup with `max_threads = 2`. Do not overwrite a different user-selected
-  concurrency value without confirmation.
+- Replace legacy `max_threads = 2` from an earlier Agent Kit setup with
+  `max_concurrent_threads_per_session = 2`. Do not overwrite a different
+  user-selected concurrency value without confirmation.
 - Remove `enabled`, `default_subagent_model`, and
   `default_subagent_reasoning_effort` only when they exactly match the earlier
   Agent Kit defaults. Preserve different user-selected values.

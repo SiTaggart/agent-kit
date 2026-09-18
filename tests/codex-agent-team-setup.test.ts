@@ -17,7 +17,7 @@ const assetsDir = path.resolve(
 const codexPath = Bun.which("codex");
 
 const validConfig = `[agents]
-max_threads = 2
+max_concurrent_threads_per_session = 2
 
 [agents.scout]
 description = "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation."
@@ -147,10 +147,10 @@ test("status reports missing or incorrect agent role configuration", async () =>
 
     await writeText(
       path.join(root, "config.toml"),
-      `[agents]\nmax_threads = 4\n\n[agents.scout]\ndescription = "custom"\nconfig_file = "./agents/scout.toml"\n`,
+      `[agents]\nmax_concurrent_threads_per_session = 4\n\n[agents.scout]\ndescription = "custom"\nconfig_file = "./agents/scout.toml"\n`,
     );
     expect((await inspectStatus({ codexHome: root })).configIssues).toEqual([
-      "[agents].max_threads must be 2",
+      "[agents].max_concurrent_threads_per_session must be 2",
       '[agents.scout].description must be "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation."',
       "missing [agents.builder] table in Codex config",
       "missing [agents.reviewer] table in Codex config",
