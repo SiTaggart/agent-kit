@@ -1,0 +1,40 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "31809f575d1c",
+  "strategy": "manual-commit",
+  "branch": "codex/fix-agent-team-config",
+  "checkpoints_count": 5,
+  "files_touched": [
+    ".agents/plugins/marketplace.json",
+    ".claude-plugin/marketplace.json",
+    ".cursor-plugin/marketplace.json",
+    "plugins/engineering/.claude-plugin/plugin.json",
+    "plugins/engineering/.codex-plugin/plugin.json",
+    "plugins/engineering/.cursor-plugin/plugin.json",
+    "plugins/engineering/skills/codex-agent-team-setup/SKILL.md",
+    "plugins/engineering/skills/codex-agent-team-setup/assets/agents/builder.toml",
+    "plugins/engineering/skills/codex-agent-team-setup/assets/agents/reviewer.toml",
+    "plugins/engineering/skills/codex-agent-team-setup/assets/agents/scout.toml",
+    "plugins/engineering/skills/codex-agent-team-setup/scripts/install.ts",
+    "plugins/engineering/skills/project-control/SKILL.md",
+    "plugins/engineering/skills/project-control/references/worktree-task-contract.md",
+    "tests/codex-agent-team-setup.test.ts",
+    "tests/project-control.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/31/809f575d1c/0/metadata.json",
+      "transcript": "/31/809f575d1c/0/full.jsonl",
+      "compact_transcript": "/31/809f575d1c/0/transcript.jsonl",
+      "content_hash": "/31/809f575d1c/0/content_hash.txt",
+      "prompt": "/31/809f575d1c/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 300950,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 8240384,
+    "output_tokens": 26664,
+    "api_call_count": 67
+  }
+}
