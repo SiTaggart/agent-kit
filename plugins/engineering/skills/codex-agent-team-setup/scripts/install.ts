@@ -52,10 +52,19 @@ interface InstallPaths {
 }
 
 const desiredAgentConfig = {
-  enabled: true,
-  default_subagent_model: "gpt-5.6-sol",
-  default_subagent_reasoning_effort: "high",
   max_concurrent_threads_per_session: 2,
+  scout: {
+    description: "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation.",
+    config_file: "./agents/scout.toml",
+  },
+  builder: {
+    description: "Bounded implementation agent for one accepted change with focused verification.",
+    config_file: "./agents/builder.toml",
+  },
+  reviewer: {
+    description: "Read-only independent reviewer for a supplied diff, acceptance criteria, and verification evidence.",
+    config_file: "./agents/reviewer.toml",
+  },
 } as const;
 
 function checksum(content: string): string {
@@ -105,10 +114,8 @@ async function loadTemplates(assetsDir: string): Promise<readonly Template[]> {
       const assetPath = path.join(assetsDir, `${name}.toml`);
       const content = await readFile(assetPath, "utf8");
       const parsed: unknown = Bun.TOML.parse(content);
-      if (!isRecord(parsed) || parsed.name !== name) {
-        throw new Error(`${assetPath} must define name = "${name}".`);
-      }
-      for (const key of ["description", "developer_instructions", "sandbox_mode"] as const) {
+      if (!isRecord(parsed)) throw new Error(`${assetPath} must contain a TOML table.`);
+      for (const key of ["model", "model_reasoning_effort", "developer_instructions", "sandbox_mode"] as const) {
         if (typeof parsed[key] !== "string" || parsed[key].length === 0) {
           throw new Error(`${assetPath} must define a non-empty ${key}.`);
         }
@@ -211,7 +218,20 @@ export async function configIssues(options: InstallOptions): Promise<readonly st
 
   const issues: string[] = [];
   for (const [key, expected] of Object.entries(desiredAgentConfig)) {
-    if (parsed.agents[key] !== expected) {
+    const actual = parsed.agents[key];
+    if (isRecord(expected)) {
+      if (!isRecord(actual)) {
+        issues.push(`missing [agents.${key}] table in Codex config`);
+        continue;
+      }
+      for (const [roleKey, roleExpected] of Object.entries(expected)) {
+        if (actual[roleKey] !== roleExpected) {
+          issues.push(`[agents.${key}].${roleKey} must be ${JSON.stringify(roleExpected)}`);
+        }
+      }
+      continue;
+    }
+    if (actual !== expected) {
       issues.push(`[agents].${key} must be ${JSON.stringify(expected)}`);
     }
   }

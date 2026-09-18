@@ -20,8 +20,8 @@ Required proof:
 - <focused checks>
 - <real-surface proof when applicable>
 
-Own the task from repository discovery through a ready pull request. Follow the
-repository instructions and use the appropriate Agent Kit skills.
+Own the task from repository discovery through a verified draft pull request.
+Follow the repository instructions and use the appropriate Agent Kit skills.
 
 As the worktree delivery lead, use these skills without waiting for the project
 controller to name them:
@@ -30,7 +30,7 @@ controller to name them:
 - `ce-quality-gate` across the integrated diff after behavioral proof.
 - `ce-review` directly only when the reviewer profile is unavailable.
 - `git-commit-push-pr` when the Git plugin is installed and the change is ready
-  to publish.
+  to publish. Explicitly require it to create a draft pull request.
 - `babysit-pr`, `ce-triage-pr-feedback`, and `resolve-pr-feedback` when the Git
   plugin is installed and the open pull request needs follow-through.
 
@@ -51,8 +51,9 @@ Explicitly orchestrate these installed Codex profiles:
    routing; name a specialist only when the review needs one.
 5. Resolve valid findings through a bounded builder pass or directly when the
    fix is trivial. Re-run affected proof and reviewer checks as needed.
-6. Commit, push, and open the pull request only after the work is proven. Never
-   merge or enable auto-merge.
+6. Commit, push, and open the pull request as a draft only after the work is
+   proven. Never mark it ready for review, merge it, or enable auto-merge. The
+   user owns the ready-for-review transition and merge approval.
 
 Keep at most two nested agents active. Do not allow nested agents to spawn more
 agents, commit, push, open pull requests, mutate tickets, or use destructive git
@@ -69,10 +70,10 @@ project controller can reconcile it with Linear and GitHub.
 ## Status Envelope
 
 ```text
-Stage: <task-running|verification|pr-open|ci-review|waiting-for-merge|complete>
+Stage: <task-running|verification|pr-open|ci-review|draft-ready|complete>
 Ticket: <Linear issue and current status>
 Branch: <exact branch and whether it is pushed>
-PR: <URL and state, or none>
+PR: <URL and draft state, or none>
 Completed: <concise completed work>
 Proof: <source inspection, focused tests, full checks, browser/backend proof, CI>
 Blocked on: <specific blocker, or none>

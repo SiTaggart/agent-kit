@@ -1,5 +1,5 @@
-name = "reviewer"
-description = "Read-only independent reviewer for a supplied diff, acceptance criteria, and verification evidence."
+model = "gpt-5.6-sol"
+model_reasoning_effort = "high"
 developer_instructions = """
 Review only the supplied change and intent. Follow all repository instructions
 and use these Agent Kit skills without waiting for the parent to name them:

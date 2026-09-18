@@ -1,4 +1,5 @@
 import { expect, test } from "bun:test";
+import { spawnSync } from "node:child_process";
 import { cp, mkdir, readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import {
@@ -13,12 +14,22 @@ const assetsDir = path.resolve(
   import.meta.dir,
   "../plugins/engineering/skills/codex-agent-team-setup/assets/agents",
 );
+const codexPath = Bun.which("codex");
 
 const validConfig = `[agents]
-enabled = true
-default_subagent_model = "gpt-5.6-sol"
-default_subagent_reasoning_effort = "high"
 max_concurrent_threads_per_session = 2
+
+[agents.scout]
+description = "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation."
+config_file = "./agents/scout.toml"
+
+[agents.builder]
+description = "Bounded implementation agent for one accepted change with focused verification."
+config_file = "./agents/builder.toml"
+
+[agents.reviewer]
+description = "Read-only independent reviewer for a supplied diff, acceptance criteria, and verification evidence."
+config_file = "./agents/reviewer.toml"
 `;
 
 const expectedSkillRoutes = {
@@ -63,9 +74,12 @@ test("installer applies portable profiles and reports healthy status", async () 
 
     for (const [name, expectedSkills] of Object.entries(expectedSkillRoutes)) {
       const installed = Bun.TOML.parse(await readFile(path.join(root, "agents", `${name}.toml`), "utf8"));
-      expect(installed).toMatchObject({ name });
-      expect("model" in installed).toBe(false);
-      expect("model_reasoning_effort" in installed).toBe(false);
+      expect(installed).toMatchObject({
+        model: "gpt-5.6-sol",
+        model_reasoning_effort: "high",
+      });
+      expect("name" in installed).toBe(false);
+      expect("description" in installed).toBe(false);
       const instructions = "developer_instructions" in installed ? installed.developer_instructions : undefined;
       expect(typeof instructions).toBe("string");
       if (typeof instructions !== "string") throw new Error(`${name} has no developer instructions`);
@@ -122,7 +136,7 @@ test("uninstall preserves a locally modified managed profile", async () => {
   }
 });
 
-test("status reports missing or incorrect agent defaults", async () => {
+test("status reports missing or incorrect agent role configuration", async () => {
   const root = await makeTempRoot("agent-team-config-");
   try {
     await mkdir(root, { recursive: true });
@@ -133,12 +147,47 @@ test("status reports missing or incorrect agent defaults", async () => {
 
     await writeText(
       path.join(root, "config.toml"),
-      `[agents]\nenabled = true\ndefault_subagent_model = "gpt-5.6-sol"\ndefault_subagent_reasoning_effort = "medium"\nmax_concurrent_threads_per_session = 4\n`,
+      `[agents]\nmax_concurrent_threads_per_session = 4\n\n[agents.scout]\ndescription = "custom"\nconfig_file = "./agents/scout.toml"\n`,
     );
     expect((await inspectStatus({ codexHome: root })).configIssues).toEqual([
-      '[agents].default_subagent_reasoning_effort must be "high"',
       "[agents].max_concurrent_threads_per_session must be 2",
+      '[agents.scout].description must be "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation."',
+      "missing [agents.builder] table in Codex config",
+      "missing [agents.reviewer] table in Codex config",
     ]);
+  } finally {
+    await removeTempRoot(root);
+  }
+});
+
+test.skipIf(codexPath === null)("registered agent configuration passes the installed Codex strict parser", async () => {
+  if (codexPath === null) throw new Error("Codex CLI is unavailable");
+  const root = await makeTempRoot("agent-team-strict-config-");
+  try {
+    await writeText(path.join(root, "config.toml"), validConfig);
+    await applyProfiles({ codexHome: root });
+
+    const result = spawnSync(
+      codexPath,
+      [
+        "exec",
+        "--strict-config",
+        "--ephemeral",
+        "--skip-git-repo-check",
+        "--config",
+        'model_provider="__strict_config_probe__"',
+        "probe",
+      ],
+      {
+        encoding: "utf8",
+        env: { ...process.env, CODEX_HOME: root, NO_COLOR: "1" },
+      },
+    );
+    const output = `${result.stdout}${result.stderr}`;
+
+    expect(result.status).toBe(1);
+    expect(output).toContain("Model provider `__strict_config_probe__` not found");
+    expect(output).not.toContain("unknown field");
   } finally {
     await removeTempRoot(root);
   }

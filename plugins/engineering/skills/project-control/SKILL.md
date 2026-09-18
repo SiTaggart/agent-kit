@@ -25,8 +25,10 @@ local worktrees are execution state that can be reconstructed.
   changes the limit.
 - Manage each worktree task through its root task lead. Do not direct that
   task's nested agents individually.
-- Never merge, enable auto-merge, or use a merge queue. Hand a ready pull
-  request back to the user.
+- Open every pull request as a draft. Never mark a pull request ready for
+  review, merge it, enable auto-merge, or use a merge queue. Hand the verified
+  draft back to the user; the user owns the ready-for-review transition and
+  merge approval.
 - Keep source inspection, focused tests, full checks, browser proof, backend
   proof, remote state, and unpublished local work distinct in status reports.
 
@@ -117,7 +119,7 @@ Advance work through these stages:
 4. `verification`
 5. `pr-open`
 6. `ci-review`
-7. `waiting-for-merge`
+7. `draft-ready`
 8. `complete`
 
 Do not infer a later stage from a weaker signal. A local passing test does not
@@ -141,12 +143,13 @@ Before calling a ticket ready for the user, confirm:
 - the accepted scope is implemented
 - relevant local checks and real-surface proof are recorded
 - an independent reviewer pass has no unresolved material findings
-- the branch is pushed and the pull request describes the verified change
+- the branch is pushed and the draft pull request describes the verified change
 - required CI is green or any external blocker is explicit
 - review feedback is resolved or clearly waiting on a reviewer
 - Linear and the controller ledger reflect the real state
 
-Stop at `waiting-for-merge`. The user owns merge approval.
+Stop at `draft-ready`. Never mark the pull request ready for review. The user
+owns the ready-for-review transition and merge approval.
 
 ## Failure Recovery
 

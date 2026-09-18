@@ -1,6 +1,6 @@
 ---
 name: codex-agent-team-setup
-description: Install or update Agent Kit's portable Codex scout, builder, and reviewer profiles and configure sensible global subagent defaults. Use when setting up the project-control agent team on a machine or checking that its Codex configuration is healthy.
+description: Install or update Agent Kit's portable Codex scout, builder, and reviewer profiles and register them in Codex. Use when setting up the project-control agent team on a machine or checking that its Codex configuration is healthy.
 ---
 
 # Codex Agent Team Setup
@@ -9,19 +9,29 @@ Install the execution profiles that `project-control` worktree tasks use. The
 installer derives every source path from this skill's installed directory, so
 the same plugin works from any Agent Kit cache location.
 
-## Desired Codex Defaults
+## Desired Codex Configuration
 
-Maintain these keys in the user's existing Codex `config.toml`:
+Maintain this registry in the user's existing Codex `config.toml`:
 
 ```toml
 [agents]
-enabled = true
-default_subagent_model = "gpt-5.6-sol"
-default_subagent_reasoning_effort = "high"
 max_concurrent_threads_per_session = 2
+
+[agents.scout]
+description = "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation."
+config_file = "./agents/scout.toml"
+
+[agents.builder]
+description = "Bounded implementation agent for one accepted change with focused verification."
+config_file = "./agents/builder.toml"
+
+[agents.reviewer]
+description = "Read-only independent reviewer for a supplied diff, acceptance criteria, and verification evidence."
+config_file = "./agents/reviewer.toml"
 ```
 
-Profiles omit model and reasoning settings so they inherit these defaults.
+Each registered profile owns its model and reasoning settings. Relative
+`config_file` paths resolve from the directory that contains `config.toml`.
 
 ## Role Skill Maps
 
@@ -58,19 +68,26 @@ The command reports creates, managed updates, unchanged files, and conflicts
 under `${CODEX_HOME:-~/.codex}/agents`.
 
 Read `${CODEX_HOME:-~/.codex}/config.toml` if it exists. Plan a narrow edit to
-the existing `[agents]` table. Preserve comments, formatting, unrelated tables,
-and unrelated keys.
+the existing `[agents]` table and its role tables. Preserve comments,
+formatting, unrelated tables, and unrelated keys.
 
 ### 2. Configure Codex
 
-Use `apply_patch` to add or update the four desired keys. Never replace the
-whole config file.
+Use `apply_patch` to add or update the desired concurrency key and role tables.
+Never replace the whole config file.
 
 - Reuse an existing `[agents]` table; do not create a duplicate.
-- If legacy `max_threads` is the only concurrency key, replace it with
-  `max_concurrent_threads_per_session`.
-- Preserve keys such as `interrupt_message` and any unknown future settings.
-- If the file is absent, create it with only the desired table.
+- Replace legacy `max_threads = 2` from an earlier Agent Kit setup with
+  `max_concurrent_threads_per_session = 2`. Do not overwrite a different
+  user-selected concurrency value without confirmation.
+- Remove `enabled`, `default_subagent_model`, and
+  `default_subagent_reasoning_effort` only when they exactly match the earlier
+  Agent Kit defaults. Preserve different user-selected values.
+- Add the three role tables exactly as shown. If one already exists with
+  different values, report the conflict instead of overwriting it.
+- Preserve settings such as `interrupt_message`, comments, formatting,
+  unrelated tables, and unknown future keys.
+- If the file is absent, create it with only the desired registry.
 
 ### 3. Install profiles
 
@@ -92,10 +109,11 @@ Run:
 bun "$SKILL_DIR/scripts/install.ts" status
 ```
 
-`status` validates the installed profiles and the four `[agents]` defaults. A
-non-zero exit means setup is incomplete or a managed file has drifted.
+`status` validates the installed profiles, concurrency limit, and role
+registry. A non-zero exit means setup is incomplete or a managed file has
+drifted.
 
-Start a new Codex task after setup so the new profiles and defaults are loaded.
+Start a new Codex task after setup so the new role registry is loaded.
 
 ## Removal
 
