@@ -1,0 +1,9 @@
+bump the version and create a pr for me
+
+---
+
+Are we sure `max_threads = 2` is the right property? I know it did error when we tried to install the agetns and stuff, just making sure we have the right config property
+
+---
+
+do it
