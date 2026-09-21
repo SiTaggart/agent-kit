@@ -101,6 +101,12 @@ Use the exact Linear branch name. Create a Codex project task in an isolated
 worktree and provide the full contract from
 `references/worktree-task-contract.md`.
 
+For every new or replacement worktree task, set `model: "gpt-5.6-sol"` and
+`thinking: "xhigh"` explicitly in the `create_thread` call. These settings apply
+to the root task lead that coordinates the scout, builder, and reviewer
+profiles. Do not inherit the controller's model or the app default. If Sol or
+xhigh is unavailable, ask the user before choosing another setting.
+
 The root of that task is its delivery lead. It must explicitly orchestrate the
 installed `scout`, `builder`, and `reviewer` profiles through the required
 stages, while keeping one writer at a time and at most two nested agents active.
