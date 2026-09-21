@@ -1,0 +1,55 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "7d05a6d9a9c8",
+  "session_id": "01a0c5bf-2e2a-7651-b0ed-de285d064ea5",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-21T20:56:14.847503Z",
+  "branch": "codex/project-control-sol-xhigh",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    "plugins/engineering/skills/project-control/SKILL.md"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6-astra",
+  "turn_id": "50dfb28c5647",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 48959,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 300032,
+    "output_tokens": 1120,
+    "api_call_count": 8
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-21T20:56:14.833307Z",
+    "agent_lines": 6,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 6,
+    "total_lines_changed": 6,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 6,
+      "agent_lines_removed": 0
+    }
+  ]
+}

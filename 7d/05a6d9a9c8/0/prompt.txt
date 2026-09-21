@@ -1,0 +1,1 @@
+I need to make a small amend to the project control skill, that when it spins up new tasks with it's builder and scope persona agents, that the agent controlling that thread is set to SOL XHigh. Because I accidently created an astra max agent and burnt a tonne of tokens on implementing a linear ticket
