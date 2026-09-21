@@ -1,0 +1,31 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "ee463e71d89f",
+  "strategy": "manual-commit",
+  "branch": "codex/project-control-sol-xhigh",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".agents/plugins/marketplace.json",
+    ".claude-plugin/marketplace.json",
+    ".cursor-plugin/marketplace.json",
+    "plugins/engineering/.claude-plugin/plugin.json",
+    "plugins/engineering/.codex-plugin/plugin.json",
+    "plugins/engineering/.cursor-plugin/plugin.json"
+  ],
+  "sessions": [
+    {
+      "metadata": "/ee/463e71d89f/0/metadata.json",
+      "transcript": "/ee/463e71d89f/0/full.jsonl",
+      "compact_transcript": "/ee/463e71d89f/0/transcript.jsonl",
+      "content_hash": "/ee/463e71d89f/0/content_hash.txt",
+      "prompt": "/ee/463e71d89f/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 4078,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 249088,
+    "output_tokens": 881,
+    "api_call_count": 5
+  }
+}
