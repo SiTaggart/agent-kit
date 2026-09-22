@@ -17,7 +17,6 @@ const assetsDir = path.resolve(
 const codexPath = Bun.which("codex");
 
 const validConfig = `[agents]
-max_concurrent_threads_per_session = 2
 
 [agents.scout]
 description = "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation."
@@ -52,8 +51,6 @@ const expectedSkillRoutes = {
   reviewer: [
     "ce-review",
     "ce-technical-review",
-    "ce-thermo-nuclear-code-quality-review",
-    "repoprompt-multi-review",
   ],
 } as const;
 
@@ -75,7 +72,7 @@ test("installer applies portable profiles and reports healthy status", async () 
     for (const [name, expectedSkills] of Object.entries(expectedSkillRoutes)) {
       const installed = Bun.TOML.parse(await readFile(path.join(root, "agents", `${name}.toml`), "utf8"));
       expect(installed).toMatchObject({
-        model: "gpt-5.6-sol",
+        model: name === "scout" ? "gpt-6-luna" : "gpt-6-sol",
         model_reasoning_effort: "high",
       });
       expect("name" in installed).toBe(false);
@@ -84,6 +81,12 @@ test("installer applies portable profiles and reports healthy status", async () 
       expect(typeof instructions).toBe("string");
       if (typeof instructions !== "string") throw new Error(`${name} has no developer instructions`);
       for (const skill of expectedSkills) expect(instructions).toContain(`\`${skill}\``);
+      if (name === "reviewer") {
+        expect(instructions).toContain("For a later specialist pass, apply only the skill or skills named by the task");
+        expect(instructions).toContain("Follow their review-pass and subagent");
+        expect(instructions).not.toContain("`repoprompt-multi-review`");
+        expect(instructions).not.toContain("`ce-thermo-nuclear-code-quality-review`");
+      }
     }
   } finally {
     await removeTempRoot(root);
@@ -150,7 +153,6 @@ test("status reports missing or incorrect agent role configuration", async () =>
       `[agents]\nmax_concurrent_threads_per_session = 4\n\n[agents.scout]\ndescription = "custom"\nconfig_file = "./agents/scout.toml"\n`,
     );
     expect((await inspectStatus({ codexHome: root })).configIssues).toEqual([
-      "[agents].max_concurrent_threads_per_session must be 2",
       '[agents.scout].description must be "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation."',
       "missing [agents.builder] table in Codex config",
       "missing [agents.reviewer] table in Codex config",

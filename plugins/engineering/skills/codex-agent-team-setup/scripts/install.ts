@@ -52,7 +52,6 @@ interface InstallPaths {
 }
 
 const desiredAgentConfig = {
-  max_concurrent_threads_per_session: 2,
   scout: {
     description: "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation.",
     config_file: "./agents/scout.toml",
