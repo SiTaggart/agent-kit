@@ -1,0 +1,49 @@
+I need to update my project control skill and suite of. agents with the release of gpt-6 sol and gpt-6 luna. I also want to double check the skills each agent is told to run
+
+---
+
+I kind of want to ensure this loop also factors in [$engineering:ce-thermo-nuclear-code-quality-review](/Users/staggart/.codex/plugins/cache/agent-kit/engineering/0.2.7/skills/ce-thermo-nuclear-code-quality-review/SKILL.md), [$ponytail:ponytail-review](/Users/staggart/.codex/plugins/cache/ponytail/ponytail/4.10.0/skills/ponytail-review/SKILL.md) and both [$engineering:code-taste](/Users/staggart/.codex/plugins/cache/agent-kit/engineering/0.2.7/skills/code-taste/SKILL.md) and [$engineering:spade-python-taste](/Users/staggart/.codex/plugins/cache/agent-kit/engineering/0.2.7/skills/spade-python-taste/SKILL.md)&#x20;
+
+not necessarily together.
+
+I think running the ce-review skills first, fixing as we go with the builder. Once those are satisfied we should run thermo review, once that is satisfied run pony rail review. finally once all the review and fixes are addressed, we run code taste to ensure the end result matches our expectation.&#x20;
+
+I'm just not sure what a good loop is
+
+---
+
+can you draw me up a sequence diagram of this flow, including the actors, the skills they run, when they feedback information to whom, etc.&#x20;
+
+But actually use the skills and agetns as your source of truth so you are grounded in facts not assumptions.
+
+---
+
+just remove that disabled invocation from the skill meta data.
+
+the mermaid diagram didn't render fyi
+
+---
+
+does the final ce-quality gate include code taste by any chance?
+
+---
+
+hmmm ok so maybe we don't neeed that in the review loop
+
+---
+
+ce-review requires up to 8 reviwers? right?
+
+---
+
+so we probably need to up the concurrent agent setting in codex? we set it to two, but maybe that is throttling our progress and speed?
+
+---
+
+# Response annotations:
+Each item contains text selected from an earlier Codex response and may include a user comment. Treat items as Annotation 1, Annotation 2, and so on in array order. Use every selection as context and address every comment. For every annotation you address, include its inline directive `:codex-annotation{index="N"}`, where N is its one-based array position (for example, `:codex-annotation{index="1"}`). Do not use unstructured annotation labels.
+<response-annotations>
+[{"text":"Reviewer profile also forbade spawning the review agents that ce-review recommends for larger changes.","annotation":"this is dumb, we should let ce-review run free as it is intended to be","source":{"messageId":"msg_0f448c17fed4fe20016ab2f32b097087d0b2e8721a76f4417b","startOffset":83,"endOffset":185}},{"text":"The separate limit of two active worktree tasks remains.","annotation":"this also seems silly honestly, if a project control requires more than 2 worktrees, let it. Don't set fake limits, you are slowing down my progress of parallel tasks","source":{"messageId":"msg_0f448c17fed4fe20016ab2f32b097087d0b2e8721a76f4417b","startOffset":353,"endOffset":409}}]
+</response-annotations>
+
+## My request:
