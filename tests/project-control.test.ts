@@ -13,7 +13,7 @@ test("project control only publishes draft pull requests", async () => {
   expect(skill).toContain("Open every pull request as a draft.");
   expect(skill).toContain("Never mark the pull request ready for review.");
   expect(skill).toContain("Stop at `draft-ready`.");
-  expect(worktreeContract).toContain("open the pull request as a draft only after the work is");
+  expect(worktreeContract).toMatch(/open the pull request as a draft only\s+after the work is proven/);
   expect(worktreeContract).toContain("Explicitly require it to create a draft pull request.");
   expect(worktreeContract).toContain("Never mark it ready for review");
   expect(`${skill}\n${worktreeContract}`).not.toContain("waiting-for-merge");

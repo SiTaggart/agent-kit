@@ -15,7 +15,6 @@ Maintain this registry in the user's existing Codex `config.toml`:
 
 ```toml
 [agents]
-max_concurrent_threads_per_session = 2
 
 [agents.scout]
 description = "Read-only repository scout for bounded discovery, ownership mapping, and evidence gathering before implementation."
@@ -32,6 +31,8 @@ config_file = "./agents/reviewer.toml"
 
 Each registered profile owns its model and reasoning settings. Relative
 `config_file` paths resolve from the directory that contains `config.toml`.
+The scout uses GPT-6 Luna at high effort for bounded research. The builder and
+reviewer use GPT-6 Sol at high effort for implementation and independent review.
 
 ## Role Skill Maps
 
@@ -44,8 +45,10 @@ embedded in the profile.
   research to the relevant research skills.
 - `builder` routes implementation, debugging, language taste, and changed-code
   validation to the relevant work skills.
-- `reviewer` routes ordinary, technical, thermonuclear, and explicitly
-  requested multi-provider reviews to the relevant review skills.
+- `reviewer` uses `ce-review` for the baseline pass and its deep alias when
+  requested. The worktree task lead names separate structural and deletion
+  passes. The reviewer follows each skill's own subagent dispatch rules.
+- The worktree task lead owns explicitly requested multi-provider reviews.
 
 Knowledge-plugin skills are conditional because Engineering and Knowledge can
 be installed separately. The Engineering-owned routes are always available
@@ -73,13 +76,12 @@ formatting, unrelated tables, and unrelated keys.
 
 ### 2. Configure Codex
 
-Use `apply_patch` to add or update the desired concurrency key and role tables.
+Use `apply_patch` to add or update the role tables.
 Never replace the whole config file.
 
 - Reuse an existing `[agents]` table; do not create a duplicate.
-- Replace legacy `max_threads = 2` from an earlier Agent Kit setup with
-  `max_concurrent_threads_per_session = 2`. Do not overwrite a different
-  user-selected concurrency value without confirmation.
+- Do not set an Agent Kit concurrency limit. Preserve any user-selected
+  concurrency setting; Codex chooses its default when none is set.
 - Remove `enabled`, `default_subagent_model`, and
   `default_subagent_reasoning_effort` only when they exactly match the earlier
   Agent Kit defaults. Preserve different user-selected values.
@@ -109,9 +111,8 @@ Run:
 bun "$SKILL_DIR/scripts/install.ts" status
 ```
 
-`status` validates the installed profiles, concurrency limit, and role
-registry. A non-zero exit means setup is incomplete or a managed file has
-drifted.
+`status` validates the installed profiles and role registry. A non-zero exit
+means setup is incomplete or a managed file has drifted.
 
 Start a new Codex task after setup so the new role registry is loaded.
 

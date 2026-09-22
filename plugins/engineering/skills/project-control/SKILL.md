@@ -21,8 +21,6 @@ local worktrees are execution state that can be reconstructed.
 - Treat GitHub as the source of truth for commits, pull requests, checks, and
   review state.
 - Treat Codex tasks as the source of truth for live execution progress.
-- Keep at most two worktree tasks active at once unless the user explicitly
-  changes the limit.
 - Manage each worktree task through its root task lead. Do not direct that
   task's nested agents individually.
 - Open every pull request as a draft. Never mark a pull request ready for
@@ -41,10 +39,12 @@ Use these Agent Kit skills without waiting for the user to name them:
 - `ce-plan` to turn an accepted outcome into executable technical work.
 - `document-review` to check plans or requirements before execution.
 - `prompt-check` when a consequential dictated request needs normalization.
+- `codex-agent-team-setup` when the scout, builder, or reviewer profile is
+  missing or stale on the machine that will run the worktree task.
 - `qmd-knowledge-base` and `ce-sessions` when the Knowledge plugin is installed
   and prior decisions or recoverable task history could change the project.
-- `git-worktree` and `babysit-pr` when the Git plugin is installed and the
-  platform does not already own the equivalent worktree or PR-monitoring step.
+- `git-worktree` when the Git plugin is installed and the platform does not
+  already own worktree creation.
 
 Do not use `ce-work` to implement product code from the control task. Delegate
 implementation to a worktree task lead.
@@ -88,20 +88,24 @@ If a controller task moves to another machine, reconstruct this ledger from
 Linear and GitHub. Do not depend on transferring old Codex task history or
 worktrees.
 
-### 3. Keep a small ready queue
+### 3. Keep the ready queue current
 
 Break the project into independently shippable tickets with explicit
-acceptance criteria and dependencies. Prefer work that can reach a pull request
-without overlapping active worktrees. Keep no more than two implementation
-tasks active.
+acceptance criteria and dependencies. Launch independent tickets in isolated
+worktrees as project priorities and real dependencies allow. Keep each task on
+its own branch and avoid shared writable surfaces.
 
 ### 4. Launch an isolated worktree task
+
+Check that the registered scout, builder, and reviewer profiles are healthy on
+the target machine. Use `codex-agent-team-setup` to repair missing or stale
+managed profiles before launch.
 
 Use the exact Linear branch name. Create a Codex project task in an isolated
 worktree and provide the full contract from
 `references/worktree-task-contract.md`.
 
-For every new or replacement worktree task, set `model: "gpt-5.6-sol"` and
+For every new or replacement worktree task, set `model: "gpt-6-sol"` and
 `thinking: "xhigh"` explicitly in the `create_thread` call. These settings apply
 to the root task lead that coordinates the scout, builder, and reviewer
 profiles. Do not inherit the controller's model or the app default. If Sol or
@@ -109,7 +113,8 @@ xhigh is unavailable, ask the user before choosing another setting.
 
 The root of that task is its delivery lead. It must explicitly orchestrate the
 installed `scout`, `builder`, and `reviewer` profiles through the required
-stages, while keeping one writer at a time and at most two nested agents active.
+stages, while keeping one writer at a time in each worktree. Let the reviewer
+follow `ce-review`'s own subagent dispatch rules.
 
 ### 5. Monitor by stage
 
@@ -148,7 +153,8 @@ Before calling a ticket ready for the user, confirm:
 
 - the accepted scope is implemented
 - relevant local checks and real-surface proof are recorded
-- an independent reviewer pass has no unresolved material findings
+- the applicable review passes in the worktree contract have no unresolved
+  material findings, with reasons for any skipped passes
 - the branch is pushed and the draft pull request describes the verified change
 - required CI is green or any external blocker is explicit
 - review feedback is resolved or clearly waiting on a reviewer
