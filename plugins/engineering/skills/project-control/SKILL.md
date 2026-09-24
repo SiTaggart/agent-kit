@@ -39,6 +39,8 @@ Use these Agent Kit skills without waiting for the user to name them:
 - `ce-plan` to turn an accepted outcome into executable technical work.
 - `document-review` to check plans or requirements before execution.
 - `prompt-check` when a consequential dictated request needs normalization.
+- `task-lead` for the worktree task's scout, builder, reviewer, verification,
+  and draft pull-request loop.
 - `codex-agent-team-setup` when the scout, builder, or reviewer profile is
   missing or stale on the machine that will run the worktree task.
 - `qmd-knowledge-base` and `ce-sessions` when the Knowledge plugin is installed
@@ -102,8 +104,9 @@ the target machine. Use `codex-agent-team-setup` to repair missing or stale
 managed profiles before launch.
 
 Use the exact Linear branch name. Create a Codex project task in an isolated
-worktree and provide the full contract from
-`references/worktree-task-contract.md`.
+worktree and provide the launch prompt from
+`references/worktree-task-contract.md`. Require the root task to use
+`task-lead` for the shared execution loop.
 
 For every new or replacement worktree task, set `model: "gpt-6-sol"` and
 `thinking: "xhigh"` explicitly in the `create_thread` call. These settings apply
@@ -111,10 +114,8 @@ to the root task lead that coordinates the scout, builder, and reviewer
 profiles. Do not inherit the controller's model or the app default. If Sol or
 xhigh is unavailable, ask the user before choosing another setting.
 
-The root of that task is its delivery lead. It must explicitly orchestrate the
-installed `scout`, `builder`, and `reviewer` profiles through the required
-stages, while keeping one writer at a time in each worktree. Let the reviewer
-follow `ce-review`'s own subagent dispatch rules.
+The root of that task is its delivery lead. `task-lead` governs the installed
+`scout`, `builder`, and `reviewer` profiles and keeps one writer at a time.
 
 ### 5. Monitor by stage
 

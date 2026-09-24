@@ -1,12 +1,13 @@
 ---
 name: codex-agent-team-setup
-description: Install or update Agent Kit's portable Codex scout, builder, and reviewer profiles and register them in Codex. Use when setting up the project-control agent team on a machine or checking that its Codex configuration is healthy.
+description: Install or update Agent Kit's portable Codex scout, builder, and reviewer profiles and register them in Codex. Use when setting up task-lead or project-control on a machine or checking that its Codex configuration is healthy.
 ---
 
 # Codex Agent Team Setup
 
-Install the execution profiles that `project-control` worktree tasks use. The
-installer derives every source path from this skill's installed directory, so
+Install the execution profiles that `task-lead` uses directly or through
+`project-control`. The installer derives every source path from this skill's
+installed directory, so
 the same plugin works from any Agent Kit cache location.
 
 ## Desired Codex Configuration

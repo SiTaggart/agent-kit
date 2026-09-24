@@ -1,0 +1,4 @@
+interface:
+  display_name: "Task Lead"
+  short_description: "Lead one task through agents to a draft PR"
+  default_prompt: "Use $task-lead to run this task through scout, builder, reviewer, verification, and a draft pull request."
