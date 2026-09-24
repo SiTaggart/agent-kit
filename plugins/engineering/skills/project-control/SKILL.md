@@ -109,7 +109,7 @@ worktree and provide the launch prompt from
 `task-lead` for the shared execution loop.
 
 For every new or replacement worktree task, set `model: "gpt-6-sol"` and
-`thinking: "xhigh"` explicitly in the `create_thread` call. These settings apply
+`thinking: "high"` explicitly in the `create_thread` call. These settings apply
 to the root task lead that coordinates the scout, builder, and reviewer
 profiles. Do not inherit the controller's model or the app default. If Sol or
 xhigh is unavailable, ask the user before choosing another setting.
