@@ -36,12 +36,13 @@ Use `ce-debug` for failures, `ce-polish` for browser iteration, and
 `ce-simplify-code` for cleanup. TypeScript and React work uses `code-taste`;
 Spade Python work uses `spade-python-taste`.
 
-For a persistent delivery control plane, use `project-control`. It coordinates
-Linear issues, isolated Codex worktree tasks, and pull-request follow-through.
-Each worktree task leads a stage-gated scout, builder, and reviewer team. Run
-`codex-agent-team-setup` once on each Codex machine to install those portable
-profiles and configure the recommended SOL/high defaults with a concurrency
-limit of two.
+For one-off work, use `task-lead` in a Codex task. It leads scout, builder,
+and reviewer through verification to a draft pull request, with no project
+controller or Linear issue required. For a persistent delivery control plane,
+use `project-control`. It coordinates Linear issues, isolated Codex worktree
+tasks, and pull-request follow-through; each worktree task uses `task-lead`.
+Run `codex-agent-team-setup` on each Codex machine to install the portable
+profiles.
 
 Reviewer personas live in `skills/ce-review/references/reviewers/`. Worker
 personas live under their owning skill's `references/` directory. Shared
@@ -84,6 +85,7 @@ not grant permission to install plugins or perform side effects.
 - [repoprompt](skills/repoprompt/SKILL.md)
 - [repoprompt-multi-review](skills/repoprompt-multi-review/SKILL.md)
 - [spade-python-taste](skills/spade-python-taste/SKILL.md)
+- [task-lead](skills/task-lead/SKILL.md)
 - [typescript-advanced-types](skills/typescript-advanced-types/SKILL.md)
 - [web-researcher](skills/web-researcher/SKILL.md)
 
