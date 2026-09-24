@@ -1,0 +1,5 @@
+I like the project control set up, but there is one missing piece, whihc is having the ability to spin up a task lead with out the parent project control task. This is because task lead isn't a skill I can use outside of the project control parent.
+
+Can we make the task lead a skill so that it can run the same scout, build and review agents and the same loop to draft pr as if it had been spawned from a project control thread?
+
+this is mainly useful for one off tasks

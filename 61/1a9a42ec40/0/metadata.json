@@ -1,0 +1,67 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "611a9a42ec40",
+  "session_id": "01a0d09e-990a-7152-a665-fb50d20db44c",
+  "strategy": "manual-commit",
+  "created_at": "2026-09-24T01:31:55.457673Z",
+  "branch": "codex/task-lead-skill",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    ".claude-plugin/marketplace.json",
+    ".cursor-plugin/marketplace.json",
+    "plugins/engineering/.claude-plugin/plugin.json",
+    "plugins/engineering/.codex-plugin/plugin.json",
+    "plugins/engineering/.cursor-plugin/plugin.json",
+    "plugins/engineering/README.md",
+    "plugins/engineering/skills/codex-agent-team-setup/SKILL.md",
+    "plugins/engineering/skills/project-control/SKILL.md",
+    "plugins/engineering/skills/project-control/references/worktree-task-contract.md",
+    "plugins/engineering/skills/task-lead/SKILL.md",
+    "plugins/engineering/skills/task-lead/agents/openai.yaml",
+    "tests/project-control.test.ts",
+    "tests/validate-plugin-bundle.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6-sol",
+  "turn_id": "caa15ca0c89a",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 215322,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 2835328,
+    "output_tokens": 19383,
+    "api_call_count": 36
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-09-24T01:31:55.423722Z",
+    "agent_lines": 144,
+    "agent_removed": 93,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 144,
+    "total_lines_changed": 237,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 144,
+      "agent_lines_removed": 93
+    }
+  ]
+}

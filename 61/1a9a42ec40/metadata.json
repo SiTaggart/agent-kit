@@ -1,0 +1,38 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "611a9a42ec40",
+  "strategy": "manual-commit",
+  "branch": "codex/task-lead-skill",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".claude-plugin/marketplace.json",
+    ".cursor-plugin/marketplace.json",
+    "plugins/engineering/.claude-plugin/plugin.json",
+    "plugins/engineering/.codex-plugin/plugin.json",
+    "plugins/engineering/.cursor-plugin/plugin.json",
+    "plugins/engineering/README.md",
+    "plugins/engineering/skills/codex-agent-team-setup/SKILL.md",
+    "plugins/engineering/skills/project-control/SKILL.md",
+    "plugins/engineering/skills/project-control/references/worktree-task-contract.md",
+    "plugins/engineering/skills/task-lead/SKILL.md",
+    "plugins/engineering/skills/task-lead/agents/openai.yaml",
+    "tests/project-control.test.ts",
+    "tests/validate-plugin-bundle.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/61/1a9a42ec40/0/metadata.json",
+      "transcript": "/61/1a9a42ec40/0/full.jsonl",
+      "compact_transcript": "/61/1a9a42ec40/0/transcript.jsonl",
+      "content_hash": "/61/1a9a42ec40/0/content_hash.txt",
+      "prompt": "/61/1a9a42ec40/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 215322,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 2835328,
+    "output_tokens": 19383,
+    "api_call_count": 36
+  }
+}
