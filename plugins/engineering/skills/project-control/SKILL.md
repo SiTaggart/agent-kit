@@ -108,11 +108,11 @@ worktree and provide the launch prompt from
 `references/worktree-task-contract.md`. Require the root task to use
 `task-lead` for the shared execution loop.
 
-For every new or replacement worktree task, set `model: "gpt-6-sol"` and
+For every new or replacement worktree task, set `model: "gpt-6.1-sol"` and
 `thinking: "high"` explicitly in the `create_thread` call. These settings apply
 to the root task lead that coordinates the scout, builder, and reviewer
-profiles. Do not inherit the controller's model or the app default. If Sol or
-xhigh is unavailable, ask the user before choosing another setting.
+profiles. Do not inherit the controller's model or the app default. If GPT-6.1
+Sol or high effort is unavailable, ask the user before choosing another setting.
 
 The root of that task is its delivery lead. `task-lead` governs the installed
 `scout`, `builder`, and `reviewer` profiles and keeps one writer at a time.

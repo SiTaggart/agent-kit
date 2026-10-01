@@ -72,19 +72,24 @@ Read [models.json](models.json) in this plugin for the default role assignments.
 All PStack skills use this one mapping. It selects native Codex subagent models;
 it does not change the main conversation's model or use a provider SDK.
 
-- Sol with high reasoning handles routine implementation, exploration, tooling,
+- GPT-6.1 Sol with high reasoning handles implementation, investigation, tooling,
   verification workers, bug fixes, performance fixes, hillclimb attempts, and
   explanations.
+- GPT-6 Luna with high reasoning handles bounded source and history exploration.
+  Use Sol for investigation that needs causal analysis or code changes.
 - Astra with low reasoning handles prose, judgment, and synthesis. The hardest
   tasks use Astra with high reasoning. Reserve xhigh for an explicit session
   choice when a task needs more reasoning.
-- Review and design panels use Astra with low reasoning and Sol and Terra with
-  high reasoning. These are three OpenAI models, not three providers. Model
+- Review and design panels use Astra with low reasoning, plus GPT-6.1 Sol and
+  GPT-5.6 Terra with high reasoning. These are three OpenAI models, not three providers. Model
   agreement is supporting evidence, not proof of correctness or independent
   model-family coverage.
 
-These are starting choices based on the host's model descriptions, not measured
-PStack benchmark results. Keep the current conversation model as the coordinator.
+These are starting choices based on [OpenAI model guidance](https://learn.chatgpt.com/docs/models),
+not measured PStack benchmark results. Keep high effort as the code-work migration
+baseline. Compare medium on representative tasks before reducing it. Keep Terra
+as a distinct panel model during this update. Keep the current conversation model
+as the coordinator.
 
 ### Resolve a role before spawning
 

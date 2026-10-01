@@ -15,7 +15,10 @@ kickoff prompt; RepoPrompt owns the review and orchestration after handoff.
 3. Start a top-level `claudeCode:claude-fable-5:high` RepoPrompt session with
    the `Orchestrate` workflow. If that is the current session, reuse it instead
    of starting another Fable session.
-4. Send this kickoff prompt, filling in the target and original review request:
+4. Resolve the available `codexExec` reviewer preset for `gpt-6.1-sol` with
+   Fast mode and high effort from RepoPrompt's current model list. Use its exact
+   identifier in the prompt. If it is unavailable, report partial coverage.
+5. Send this kickoff prompt, filling in the target and original review request:
 
 ```text
 You are Fable, the controlling reviewer inside RepoPrompt. Run a multi-model
@@ -33,7 +36,7 @@ prompts, parallelism, context building, retries, and use of native sub-agents.
 
 Commission independent CE reviews from these exact reviewer agents:
 - claudeCode:claude-opus-5:high
-- codexExec:gpt-5.6-sol-fast-high
+- {{resolved codexExec preset for gpt-6.1-sol, Fast mode, high effort}}
 - cursor:grok-4.6[effort=high,fast=true]
 
 In every reviewer brief, tell the reviewer to run the CE review skill against
