@@ -163,7 +163,7 @@ test("bundled model roles use native Codex IDs and separate reasoning settings",
     "arena runners", "arena cross-judge pool", "architect runners", "interrogate reviewers",
   ]);
   // This snapshot checks packaged defaults; CODEX.md requires live capability checks at dispatch.
-  const supportedModels = new Set(["gpt-6-astra", "gpt-5.6-sol", "gpt-5.6-terra"]);
+  const supportedModels = new Set(["gpt-6-astra", "gpt-6.1-sol", "gpt-6-luna", "gpt-5.6-terra"]);
   const supportedEfforts = new Set(["low", "medium", "high", "xhigh", "max", "ultra"]);
   expect(Object.keys(roles)).toHaveLength(17);
   expect(roles["how critics"]).toBeUndefined();

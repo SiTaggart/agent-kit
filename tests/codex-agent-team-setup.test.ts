@@ -72,7 +72,7 @@ test("installer applies portable profiles and reports healthy status", async () 
     for (const [name, expectedSkills] of Object.entries(expectedSkillRoutes)) {
       const installed = Bun.TOML.parse(await readFile(path.join(root, "agents", `${name}.toml`), "utf8"));
       expect(installed).toMatchObject({
-        model: name === "scout" ? "gpt-6-luna" : "gpt-6-sol",
+        model: name === "scout" ? "gpt-6-luna" : "gpt-6.1-sol",
         model_reasoning_effort: "high",
       });
       expect("name" in installed).toBe(false);
@@ -106,18 +106,25 @@ test("installer refuses to overwrite an unmanaged profile", async () => {
   }
 });
 
-test("installer updates a profile that still matches its managed checksum", async () => {
+test("installer upgrades managed GPT-6 Sol profiles to GPT-6.1 Sol", async () => {
   const root = await makeTempRoot("agent-team-update-");
   const copiedAssets = path.join(root, "plugin-assets");
   try {
     await cp(assetsDir, copiedAssets, { recursive: true });
+    for (const name of ["builder", "reviewer"]) {
+      const file = path.join(copiedAssets, `${name}.toml`);
+      await writeFile(file, (await readFile(file, "utf8")).replace('model = "gpt-6.1-sol"', 'model = "gpt-6-sol"'));
+    }
     await applyProfiles({ codexHome: root, assetsDir: copiedAssets });
-    await writeFile(path.join(copiedAssets, "builder.toml"), `${await readFile(path.join(copiedAssets, "builder.toml"), "utf8")}\n# updated\n`);
 
-    const plan = await planProfiles({ codexHome: root, assetsDir: copiedAssets });
-    expect(plan.find((action) => action.name === "builder")?.kind).toBe("update");
-    await applyProfiles({ codexHome: root, assetsDir: copiedAssets });
-    expect(await readFile(path.join(root, "agents", "builder.toml"), "utf8")).toEndWith("# updated\n");
+    const plan = await planProfiles({ codexHome: root });
+    expect(plan.map((action) => action.kind)).toEqual(["unchanged", "update", "update"]);
+    await applyProfiles({ codexHome: root });
+    for (const name of ["builder", "reviewer"]) {
+      const installed = Bun.TOML.parse(await readFile(path.join(root, "agents", `${name}.toml`), "utf8"));
+      expect(installed).toMatchObject({ model: "gpt-6.1-sol", model_reasoning_effort: "high" });
+    }
+    expect((await planProfiles({ codexHome: root })).every((action) => action.kind === "unchanged")).toBe(true);
   } finally {
     await removeTempRoot(root);
   }

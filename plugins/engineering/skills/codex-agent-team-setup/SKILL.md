@@ -33,7 +33,11 @@ config_file = "./agents/reviewer.toml"
 Each registered profile owns its model and reasoning settings. Relative
 `config_file` paths resolve from the directory that contains `config.toml`.
 The scout uses GPT-6 Luna at high effort for bounded research. The builder and
-reviewer use GPT-6 Sol at high effort for implementation and independent review.
+reviewer use GPT-6.1 Sol at high effort for implementation and independent review.
+
+Keep high effort as the migration baseline. Compare medium on representative
+tasks before reducing it. These defaults are starting choices, not measured
+Agent Kit benchmark results. See the current [OpenAI model guidance](https://learn.chatgpt.com/docs/models).
 
 ## Role Skill Maps
 
