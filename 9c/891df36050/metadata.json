@@ -1,0 +1,42 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "9c891df36050",
+  "strategy": "manual-commit",
+  "branch": "codex/sol-6-1-agent-routing",
+  "checkpoints_count": 1,
+  "files_touched": [
+    ".agents/plugins/marketplace.json",
+    ".claude-plugin/marketplace.json",
+    ".cursor-plugin/marketplace.json",
+    "plugins/engineering/.claude-plugin/plugin.json",
+    "plugins/engineering/.codex-plugin/plugin.json",
+    "plugins/engineering/.cursor-plugin/plugin.json",
+    "plugins/engineering/skills/codex-agent-team-setup/SKILL.md",
+    "plugins/engineering/skills/codex-agent-team-setup/assets/agents/builder.toml",
+    "plugins/engineering/skills/codex-agent-team-setup/assets/agents/reviewer.toml",
+    "plugins/engineering/skills/project-control/SKILL.md",
+    "plugins/engineering/skills/repoprompt-multi-review/SKILL.md",
+    "plugins/pstack/.claude-plugin/plugin.json",
+    "plugins/pstack/.codex-plugin/plugin.json",
+    "plugins/pstack/CODEX.md",
+    "plugins/pstack/models.json",
+    "tests/codex-agent-team-setup.test.ts",
+    "tests/pstack-plugin.test.ts"
+  ],
+  "sessions": [
+    {
+      "metadata": "/9c/891df36050/0/metadata.json",
+      "transcript": "/9c/891df36050/0/full.jsonl",
+      "compact_transcript": "/9c/891df36050/0/transcript.jsonl",
+      "content_hash": "/9c/891df36050/0/content_hash.txt",
+      "prompt": "/9c/891df36050/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 137495,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1779328,
+    "output_tokens": 8471,
+    "api_call_count": 19
+  }
+}

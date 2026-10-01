@@ -1,0 +1,71 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "9c891df36050",
+  "session_id": "01a0f81b-b751-7903-9b6b-323545e5ef3c",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-01T16:37:17.270449Z",
+  "branch": "codex/sol-6-1-agent-routing",
+  "checkpoints_count": 1,
+  "save_step_count": 1,
+  "files_touched": [
+    ".agents/plugins/marketplace.json",
+    ".claude-plugin/marketplace.json",
+    ".cursor-plugin/marketplace.json",
+    "plugins/engineering/.claude-plugin/plugin.json",
+    "plugins/engineering/.codex-plugin/plugin.json",
+    "plugins/engineering/.cursor-plugin/plugin.json",
+    "plugins/engineering/skills/codex-agent-team-setup/SKILL.md",
+    "plugins/engineering/skills/codex-agent-team-setup/assets/agents/builder.toml",
+    "plugins/engineering/skills/codex-agent-team-setup/assets/agents/reviewer.toml",
+    "plugins/engineering/skills/project-control/SKILL.md",
+    "plugins/engineering/skills/repoprompt-multi-review/SKILL.md",
+    "plugins/pstack/.claude-plugin/plugin.json",
+    "plugins/pstack/.codex-plugin/plugin.json",
+    "plugins/pstack/CODEX.md",
+    "plugins/pstack/models.json",
+    "tests/codex-agent-team-setup.test.ts",
+    "tests/pstack-plugin.test.ts"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "fb1c5bfb3842",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 137495,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 1779328,
+    "output_tokens": 8471,
+    "api_call_count": 19
+  },
+  "session_metrics": {
+    "turn_count": 1
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-01T16:37:17.222365Z",
+    "agent_lines": 63,
+    "agent_removed": 44,
+    "human_added": 0,
+    "human_modified": 0,
+    "human_removed": 0,
+    "total_committed": 63,
+    "total_lines_changed": 107,
+    "agent_percentage": 100,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 1,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 0,
+      "agent_lines_removed": 0
+    },
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 63,
+      "agent_lines_removed": 44
+    }
+  ]
+}
