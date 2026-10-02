@@ -17,9 +17,12 @@ switch command safeguards on or off separately.
 - **[PStack for Codex and Claude Code](plugins/pstack/README.md)** — a pinned
   adaptation of Lauren Tan's PStack, with its upstream skills, companions, guide, and dormant
   automation pack. See its README for capability requirements and attribution.
+- **[LOX](plugins/lox/README.md)** — five explicitly invoked skills for PR
+  descriptions, simplicity review, plans, adversarial review, and a local
+  review/fix loop. Packaged separately for side-by-side trials.
 
 Engineering, Git, Knowledge, and Hooks support Claude Code, Codex, Cursor, and
-Grok. PStack supports Codex and Claude Code; Cursor users can use the native
+Grok. PStack and LOX support Codex and Claude Code; Cursor users can use the native
 upstream PStack plugin. No skill plugin includes hooks.
 
 ## Install
@@ -38,6 +41,7 @@ codex plugin add git@agent-kit
 codex plugin add knowledge@agent-kit
 codex plugin add hooks@agent-kit
 codex plugin add pstack@agent-kit
+codex plugin add lox@agent-kit
 ```
 
 Start a new task after installing. Use `/plugins` to toggle an installed plugin.
@@ -55,6 +59,7 @@ use published repository content and do not include local edits.
 /plugin install knowledge@agent-kit
 /plugin install hooks@agent-kit
 /plugin install pstack@agent-kit
+/plugin install lox@agent-kit
 ```
 
 Install only the plugins you want. Choose project scope in the install prompt.
@@ -117,6 +122,7 @@ plugins/
   knowledge/                     Skills, manifests, README
   hooks/                         Hooks, manifests, README
   pstack/                        Codex and Claude port and documentation
+  lox/                           Selected Codex and Claude trial skills
 src/                             Marketplace validation CLI
 tests/                           Plugin and script checks
 AGENTS.md                        Repository contributor instructions

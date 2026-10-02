@@ -30,13 +30,15 @@ test("validator requires every supported plugin and rejects repository-root sour
 
     const claudeCatalogPath = path.join(root, claudeAdapter.marketplacePath);
     const claudeCatalog = await readText(claudeCatalogPath);
-    const missingPstack = JSON.parse(claudeCatalog);
-    missingPstack.plugins = missingPstack.plugins.filter((entry: { name: string }) => entry.name !== "pstack");
-    await writeText(claudeCatalogPath, JSON.stringify(missingPstack));
-    expect((await validatePluginBundle(root)).failures).toContainEqual({
-      path: claudeAdapter.marketplacePath,
-      message: "Marketplace must list pstack exactly once.",
-    });
+    for (const id of ["pstack", "lox"]) {
+      const missingPlugin = JSON.parse(claudeCatalog);
+      missingPlugin.plugins = missingPlugin.plugins.filter((entry: { name: string }) => entry.name !== id);
+      await writeText(claudeCatalogPath, JSON.stringify(missingPlugin));
+      expect((await validatePluginBundle(root)).failures).toContainEqual({
+        path: claudeAdapter.marketplacePath,
+        message: `Marketplace must list ${id} exactly once.`,
+      });
+    }
     await writeText(claudeCatalogPath, claudeCatalog);
 
     for (const adapter of adapters) {
@@ -62,9 +64,9 @@ test("Grok reuses the Cursor plugin files", () => {
   expect(HARNESSES.grok.kind).toBe("cursor-plugin");
 });
 
-test("all 56 skills have one owner and relative skill references stay inside that plugin", async () => {
+test("core and LOX skills have one owner and relative skill references stay inside that plugin", async () => {
   const owners = new Map<string, string>();
-  for (const [id, count] of [["engineering", 34], ["git", 11], ["knowledge", 11]] as const) {
+  for (const [id, count] of [["engineering", 34], ["git", 11], ["knowledge", 11], ["lox", 5]] as const) {
     const skills = await readdir(path.join(repoRoot, "plugins", id, "skills"));
     expect(skills).toHaveLength(count);
     for (const name of skills) {
@@ -74,7 +76,7 @@ test("all 56 skills have one owner and relative skill references stay inside tha
     }
   }
   expect(owners.has("orca-multi-review")).toBe(false);
-  const markdown = new Bun.Glob("plugins/{engineering,git,knowledge}/skills/**/*.md");
+  const markdown = new Bun.Glob("plugins/{engineering,git,knowledge,lox}/skills/**/*.md");
   for await (const file of markdown.scan(repoRoot)) {
     const body = await readText(path.join(repoRoot, file));
     for (const match of body.matchAll(/(?:\.\.\/)+([a-z][a-z0-9-]+)(?:\/|`)/g)) {
@@ -82,6 +84,40 @@ test("all 56 skills have one owner and relative skill references stay inside tha
       if (targetOwner) expect(file, match[0]).toStartWith(`plugins/${targetOwner}/`);
     }
   }
+});
+
+test("LOX exposes only the selected skills, requires explicit invocation, and resolves its own workflow", async () => {
+  const pluginRoot = path.join(repoRoot, "plugins/lox");
+  const names = ["adversarial-code-reviewing", "auto-review", "drafting-plans", "simplicity-review", "writing-pr-descriptions"];
+  expect((await readdir(path.join(pluginRoot, "skills"))).sort()).toEqual(names);
+
+  for (const adapter of [HARNESSES.codex, HARNESSES.claude]) {
+    const manifest = JSON.parse(await readText(path.join(pluginRoot, adapter.manifestPath)));
+    expect(manifest.name).toBe("lox");
+    expect(manifest.skills).toBe("./skills/");
+    for (const component of ["hooks", "rules", "apps", "mcpServers", "agents"]) {
+      expect(manifest[component]).toBeUndefined();
+    }
+  }
+
+  for (const name of names) {
+    const skillPath = path.join(pluginRoot, "skills", name, "SKILL.md");
+    const body = await readText(skillPath);
+    const frontmatter = Bun.YAML.parse(body.split("---")[1] ?? "");
+    const metadata = Bun.YAML.parse(await readText(path.join(pluginRoot, "skills", name, "agents/openai.yaml")));
+    expect(frontmatter).toMatchObject({ name, "disable-model-invocation": true });
+    expect(metadata).toMatchObject({ policy: { allow_implicit_invocation: false } });
+    expect(body).not.toMatch(/general-code-reviewing|writing-tests|check-docs-updated|handling-codex-reviews|babysitting-prs/);
+    for (const match of body.matchAll(/\]\(([^)]+\.md)\)/g)) {
+      const target = path.resolve(path.dirname(skillPath), match[1] ?? "");
+      expect(target.startsWith(`${pluginRoot}/`)).toBe(true);
+      expect(await Bun.file(target).exists()).toBe(true);
+    }
+  }
+
+  const autoReview = await readText(path.join(pluginRoot, "skills/auto-review/SKILL.md"));
+  expect(autoReview).toContain("../adversarial-code-reviewing/SKILL.md");
+  expect(autoReview).toContain("../simplicity-review/SKILL.md");
 });
 
 test.each(["engineering", "git", "knowledge"] as const)("%s cannot register command safeguards", (id) => {

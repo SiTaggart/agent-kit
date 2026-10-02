@@ -36,6 +36,12 @@
       "source": "./plugins/pstack",
       "version": "0.15.2",
       "description": "PStack engineering workflows, principles, and model panels for Claude Code."
+    },
+    {
+      "name": "lox",
+      "version": "0.1.0",
+      "source": "./plugins/lox",
+      "description": "Five selected Lox engineering skills for explicit trials."
     }
   ]
 }
