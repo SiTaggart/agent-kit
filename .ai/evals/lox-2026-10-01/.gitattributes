@@ -1,0 +1,4 @@
+# Preserve the exact whitespace in frozen diffs and captured run evidence.
+fixtures/*.patch -whitespace
+runs/** -whitespace
+excluded-attempts/** -whitespace

@@ -1,0 +1,4 @@
+interface:
+  display_name: "Code Taste"
+  short_description: "TypeScript and React code-shape guidance"
+  default_prompt: "Use $code-taste to review TypeScript and React code shape."

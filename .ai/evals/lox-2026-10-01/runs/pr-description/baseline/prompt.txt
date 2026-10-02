@@ -1,0 +1,10 @@
+Read .eval-skills/pr-description/SKILL.md and apply it to the request below.
+Work on this frozen local fixture only. This is a headless user request.
+Read the explicitly named skill and its required local companions under .eval-skills. Follow it faithfully; do not load other installed skills, memories, or unrelated repository skills.
+The fixture contains sufficient local context. No host metadata, network calls, PR writes, commits, installation, or publication are authorized. Do not request remote metadata for this frozen local task. No external tools or delegation are available; use sequential local passes if required.
+Use pilot-base..pilot-head as the exact source changeset. The extra HEAD commit only ignores evaluation artifacts and is outside the target. Base/head source commit identity is given below; do not infer a real PR number from local history.
+Do not change source or tests unless this task explicitly authorizes fixes. Resolve routine choices from source. If a blocking answer is genuinely required, ask it and stop. Skip end menus in this headless caller-owned workflow. State proof gaps honestly.
+Return the full usable deliverable in your final response. Artifacts may be written only under .ai/ for the planning task. Auto-review may edit retry.py only; tests and README are independent constraints and must remain unchanged.
+
+REQUEST
+Draft a copy-ready Conventional Commit PR title and body for the frozen Agent Kit change 646e2e144ccc521bbd711d0a4ea230fbcbbefef4 relative to its parent. Author intent: introduce a standalone task lead for one bounded task, using the existing scout/builder/reviewer roles, while project-control coordinates the portfolio. Retain current-worktree safety and approval boundaries. Use the complete final diff and relevant tests. No tests were run by the caller for this frozen change; do not claim they passed. There is no linked Linear issue or screenshot. Return draft only.

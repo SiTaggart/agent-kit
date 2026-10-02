@@ -1,0 +1,77 @@
+{
+  "skill_name": "ce-plan",
+  "purpose": "Guard Phase 0.0 output-mode resolution: output: arg > active plan_output: config > md default; unknown values fall through with a note; commented config lines are never matched; pipeline runs force md; conventional-commit prefixes are not consumed as flag tokens.",
+  "non_purpose": "Not testing plan content quality — only which format the plan lands in and how the flag tokens are parsed.",
+  "variance_protocol": {
+    "runs_per_eval": 2,
+    "stability_metric": "resolved-format agreement across runs",
+    "pass_threshold": "2/2 runs resolve the same, expected format"
+  },
+  "grading_pipeline": {
+    "stage_1": "Programmatic: file extension of the written plan in .ai/plans/ (.md vs .html), plus presence/absence of the ignored-value note where specified.",
+    "stage_2": "None needed except eval 6, where an LLM grader confirms the feature description survived intact."
+  },
+  "setup": "Each eval states the required .compound-engineering/config.local.yaml content. Create/overwrite it in a scratch repo before the run; delete it after.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "commented-config-ignored",
+      "tests_risk": "comment_matched_as_active",
+      "setup_config": "# plan_output: html\n",
+      "prompt": "/ce-plan Add retry with exponential backoff to the webhook dispatcher.",
+      "expected_behavior": "Plan written as .md (default). The commented line must not activate HTML mode.",
+      "must_not": "An .html plan.",
+      "notes": "The original defect class: the shipped config template documents the option as '# plan_output: html'; matching it as active silently forced HTML on every run. Run history (2026-07-26): 2/2 fresh runs wrote Markdown and ignored the commented config."
+    },
+    {
+      "id": 2,
+      "name": "arg-overrides-config",
+      "tests_risk": "precedence_inversion",
+      "setup_config": "plan_output: html\n",
+      "prompt": "/ce-plan output:md Add retry with exponential backoff to the webhook dispatcher.",
+      "expected_behavior": "Plan written as .md — CLI arg beats active config.",
+      "must_not": "An .html plan.",
+      "notes": "Run history (2026-07-26): 2/2 fresh runs wrote Markdown because output:md overrode active HTML config."
+    },
+    {
+      "id": 3,
+      "name": "active-config-html",
+      "tests_risk": "config_ignored",
+      "setup_config": "plan_output: html\n",
+      "prompt": "/ce-plan Add retry with exponential backoff to the webhook dispatcher.",
+      "expected_behavior": "Plan written as .html — active config applies when no arg is given.",
+      "must_not": "An .md plan (would mean config is never read).",
+      "notes": "Run history (2026-07-26): 2/2 fresh runs wrote HTML from the active config."
+    },
+    {
+      "id": 4,
+      "name": "unknown-value-fallthrough",
+      "tests_risk": "unknown_value_mishandled",
+      "setup_config": null,
+      "prompt": "/ce-plan output:pdf Add retry with exponential backoff to the webhook dispatcher.",
+      "expected_behavior": "Plan written as .md, and a one-line note near the post-generation menu that the unknown 'pdf' value was ignored, naming the format actually used.",
+      "must_not": "Silent acceptance (no note), a hard error, or treating 'output:pdf' as part of the feature description.",
+      "notes": "Run history (2026-07-26): 2/2 fresh runs fell through to Markdown and named the ignored pdf value."
+    },
+    {
+      "id": 5,
+      "name": "pipeline-forces-md",
+      "tests_risk": "pipeline_html_leak",
+      "setup_config": "plan_output: html\n",
+      "prompt": "Invoke ce-plan as a sub-step from another skill (e.g., ce-brainstorm handoff dispatch), with HTML config active.",
+      "expected_behavior": "Plan written as .md — pipeline/sub-step invocations force md regardless of arg or config.",
+      "must_not": "An .html plan in a pipeline run.",
+      "notes": "Requires a pipeline-context harness; if impractical to stage, mark inconclusive rather than passing vacuously. Run history (2026-07-26): 2/2 staged parent ce-brainstorm handoffs forced Markdown despite active HTML config."
+    },
+    {
+      "id": 6,
+      "name": "commit-prefix-passthrough",
+      "tests_risk": "token_overconsumption",
+      "setup_config": null,
+      "prompt": "/ce-plan feat: add rate limiting to the public API",
+      "expected_behavior": "Plan written as .md; the description keeps 'feat: add rate limiting to the public API' intact — 'feat:' is not consumed as a flag token.",
+      "must_not": "A plan about 'add rate limiting' with the prefix stripped, or 'feat:' interpreted as an unknown output value.",
+      "notes": "Run history (2026-07-26): 2/2 fresh runs wrote Markdown and preserved the literal feat: prefix in the plan title."
+    }
+  ]
+}

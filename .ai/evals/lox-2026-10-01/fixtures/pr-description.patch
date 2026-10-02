@@ -1,0 +1,403 @@
+diff --git a/.claude-plugin/marketplace.json b/.claude-plugin/marketplace.json
+index e568dc6..b7b32a4 100644
+--- a/.claude-plugin/marketplace.json
++++ b/.claude-plugin/marketplace.json
+@@ -10,7 +10,7 @@
+     {
+       "name": "engineering",
+       "source": "./plugins/engineering",
+-      "version": "0.2.8",
++      "version": "0.2.9",
+       "description": "Project control, planning, implementation, code review, debugging, and code taste."
+     },
+     {
+diff --git a/.cursor-plugin/marketplace.json b/.cursor-plugin/marketplace.json
+index 527c5d7..e637105 100644
+--- a/.cursor-plugin/marketplace.json
++++ b/.cursor-plugin/marketplace.json
+@@ -11,7 +11,7 @@
+     {
+       "name": "engineering",
+       "source": "./plugins/engineering",
+-      "version": "0.2.8",
++      "version": "0.2.9",
+       "description": "Project control, planning, implementation, code review, debugging, and code taste."
+     },
+     {
+diff --git a/plugins/engineering/.claude-plugin/plugin.json b/plugins/engineering/.claude-plugin/plugin.json
+index 2301f4b..7ce85c1 100644
+--- a/plugins/engineering/.claude-plugin/plugin.json
++++ b/plugins/engineering/.claude-plugin/plugin.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "engineering",
+-  "version": "0.2.8",
++  "version": "0.2.9",
+   "description": "Project control, planning, implementation, code review, debugging, and code taste.",
+   "author": {
+     "name": "Simon Taggart",
+diff --git a/plugins/engineering/.codex-plugin/plugin.json b/plugins/engineering/.codex-plugin/plugin.json
+index e5a92c5..d6cd920 100644
+--- a/plugins/engineering/.codex-plugin/plugin.json
++++ b/plugins/engineering/.codex-plugin/plugin.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "engineering",
+-  "version": "0.2.8",
++  "version": "0.2.9",
+   "description": "Project control, planning, implementation, code review, debugging, and code taste.",
+   "author": {
+     "name": "Simon Taggart",
+diff --git a/plugins/engineering/.cursor-plugin/plugin.json b/plugins/engineering/.cursor-plugin/plugin.json
+index 2301f4b..7ce85c1 100644
+--- a/plugins/engineering/.cursor-plugin/plugin.json
++++ b/plugins/engineering/.cursor-plugin/plugin.json
+@@ -1,6 +1,6 @@
+ {
+   "name": "engineering",
+-  "version": "0.2.8",
++  "version": "0.2.9",
+   "description": "Project control, planning, implementation, code review, debugging, and code taste.",
+   "author": {
+     "name": "Simon Taggart",
+diff --git a/plugins/engineering/README.md b/plugins/engineering/README.md
+index 6cb9ff6..7df9e1d 100644
+--- a/plugins/engineering/README.md
++++ b/plugins/engineering/README.md
+@@ -36,12 +36,13 @@ Use `ce-debug` for failures, `ce-polish` for browser iteration, and
+ `ce-simplify-code` for cleanup. TypeScript and React work uses `code-taste`;
+ Spade Python work uses `spade-python-taste`.
+ 
+-For a persistent delivery control plane, use `project-control`. It coordinates
+-Linear issues, isolated Codex worktree tasks, and pull-request follow-through.
+-Each worktree task leads a stage-gated scout, builder, and reviewer team. Run
+-`codex-agent-team-setup` once on each Codex machine to install those portable
+-profiles and configure the recommended SOL/high defaults with a concurrency
+-limit of two.
++For one-off work, use `task-lead` in a Codex task. It leads scout, builder,
++and reviewer through verification to a draft pull request, with no project
++controller or Linear issue required. For a persistent delivery control plane,
++use `project-control`. It coordinates Linear issues, isolated Codex worktree
++tasks, and pull-request follow-through; each worktree task uses `task-lead`.
++Run `codex-agent-team-setup` on each Codex machine to install the portable
++profiles.
+ 
+ Reviewer personas live in `skills/ce-review/references/reviewers/`. Worker
+ personas live under their owning skill's `references/` directory. Shared
+@@ -84,6 +85,7 @@ not grant permission to install plugins or perform side effects.
+ - [repoprompt](skills/repoprompt/SKILL.md)
+ - [repoprompt-multi-review](skills/repoprompt-multi-review/SKILL.md)
+ - [spade-python-taste](skills/spade-python-taste/SKILL.md)
++- [task-lead](skills/task-lead/SKILL.md)
+ - [typescript-advanced-types](skills/typescript-advanced-types/SKILL.md)
+ - [web-researcher](skills/web-researcher/SKILL.md)
+ 
+diff --git a/plugins/engineering/skills/codex-agent-team-setup/SKILL.md b/plugins/engineering/skills/codex-agent-team-setup/SKILL.md
+index 15893bf..4441d3b 100644
+--- a/plugins/engineering/skills/codex-agent-team-setup/SKILL.md
++++ b/plugins/engineering/skills/codex-agent-team-setup/SKILL.md
+@@ -1,12 +1,13 @@
+ ---
+ name: codex-agent-team-setup
+-description: Install or update Agent Kit's portable Codex scout, builder, and reviewer profiles and register them in Codex. Use when setting up the project-control agent team on a machine or checking that its Codex configuration is healthy.
++description: Install or update Agent Kit's portable Codex scout, builder, and reviewer profiles and register them in Codex. Use when setting up task-lead or project-control on a machine or checking that its Codex configuration is healthy.
+ ---
+ 
+ # Codex Agent Team Setup
+ 
+-Install the execution profiles that `project-control` worktree tasks use. The
+-installer derives every source path from this skill's installed directory, so
++Install the execution profiles that `task-lead` uses directly or through
++`project-control`. The installer derives every source path from this skill's
++installed directory, so
+ the same plugin works from any Agent Kit cache location.
+ 
+ ## Desired Codex Configuration
+diff --git a/plugins/engineering/skills/project-control/SKILL.md b/plugins/engineering/skills/project-control/SKILL.md
+index ceff507..e206c1b 100644
+--- a/plugins/engineering/skills/project-control/SKILL.md
++++ b/plugins/engineering/skills/project-control/SKILL.md
+@@ -39,6 +39,8 @@ Use these Agent Kit skills without waiting for the user to name them:
+ - `ce-plan` to turn an accepted outcome into executable technical work.
+ - `document-review` to check plans or requirements before execution.
+ - `prompt-check` when a consequential dictated request needs normalization.
++- `task-lead` for the worktree task's scout, builder, reviewer, verification,
++  and draft pull-request loop.
+ - `codex-agent-team-setup` when the scout, builder, or reviewer profile is
+   missing or stale on the machine that will run the worktree task.
+ - `qmd-knowledge-base` and `ce-sessions` when the Knowledge plugin is installed
+@@ -102,19 +104,18 @@ the target machine. Use `codex-agent-team-setup` to repair missing or stale
+ managed profiles before launch.
+ 
+ Use the exact Linear branch name. Create a Codex project task in an isolated
+-worktree and provide the full contract from
+-`references/worktree-task-contract.md`.
++worktree and provide the launch prompt from
++`references/worktree-task-contract.md`. Require the root task to use
++`task-lead` for the shared execution loop.
+ 
+ For every new or replacement worktree task, set `model: "gpt-6-sol"` and
+-`thinking: "xhigh"` explicitly in the `create_thread` call. These settings apply
++`thinking: "high"` explicitly in the `create_thread` call. These settings apply
+ to the root task lead that coordinates the scout, builder, and reviewer
+ profiles. Do not inherit the controller's model or the app default. If Sol or
+ xhigh is unavailable, ask the user before choosing another setting.
+ 
+-The root of that task is its delivery lead. It must explicitly orchestrate the
+-installed `scout`, `builder`, and `reviewer` profiles through the required
+-stages, while keeping one writer at a time in each worktree. Let the reviewer
+-follow `ce-review`'s own subagent dispatch rules.
++The root of that task is its delivery lead. `task-lead` governs the installed
++`scout`, `builder`, and `reviewer` profiles and keeps one writer at a time.
+ 
+ ### 5. Monitor by stage
+ 
+diff --git a/plugins/engineering/skills/project-control/references/worktree-task-contract.md b/plugins/engineering/skills/project-control/references/worktree-task-contract.md
+index cc11e63..b7a2242 100644
+--- a/plugins/engineering/skills/project-control/references/worktree-task-contract.md
++++ b/plugins/engineering/skills/project-control/references/worktree-task-contract.md
+@@ -21,68 +21,11 @@ Required proof:
+ - <real-surface proof when applicable>
+ 
+ Own the task from repository discovery through a verified draft pull request.
+-Follow the repository instructions and use the appropriate Agent Kit skills.
+-
+-As the worktree delivery lead, use these skills without waiting for the project
+-controller to name them:
+-
+-- `ce-work` for final integration or genuinely trivial direct implementation.
+-- `ce-quality-gate` across the integrated diff after the final review fix.
+-- `ce-review` directly only when the reviewer profile is unavailable.
+-- `repoprompt-multi-review` only when explicitly requested; run it from this
+-  lead task because it commissions its own independent reviewers.
+-- `git-commit-push-pr` when the Git plugin is installed and the change is ready
+-  to publish. Explicitly require it to create a draft pull request.
+-- `ce-triage-pr-feedback` and `resolve-pr-feedback` when the Git plugin is
+-  installed and the open pull request needs approved feedback addressed.
+-
+-Explicitly orchestrate these installed Codex profiles:
+-
+-1. Spawn `scout` for bounded, read-only reconnaissance. Give it the issue,
+-   likely ownership boundary, and the evidence it must return. Its profile owns
+-   the default research-skill routing; name an override only when the task needs
+-   another specialist.
+-2. After integrating the scout's findings, spawn `builder` for the bounded
+-   implementation. Give it the accepted contract, allowed surface, and focused
+-   proof. Its profile owns the default work-skill routing, including applicable
+-   language taste before code-shape decisions. Keep one writer at a time.
+-3. Integrate and inspect the builder's work yourself. Run the changed-code
+-   quality gate and the closest real proof surface before review.
+-4. Ask `reviewer` to run `ce-review` on the integrated diff against the issue
+-   and proof. Let it select and dispatch review lenses under `ce-review`'s own
+-   instructions. Give material findings to `builder` in a bounded pass. Re-run
+-   affected proof and ask the reviewer to check the fixes. Repeat until the
+-   current diff has no unresolved material findings.
+-5. For substantive code changes, ask `reviewer` for a separate
+-   `ce-thermo-nuclear-code-quality-review` pass. Resolve structural findings
+-   through `builder`, then recheck this pass. Revisit `ce-review` when a fix
+-   changes behavior or ownership boundaries.
+-6. After the structural pass, ask `reviewer` for a separate
+-   `ponytail:ponytail-review` pass when that plugin is installed. Apply cuts
+-   through `builder` only when they preserve the contract and make the result
+-   smaller. Recheck the cuts and affected proof.
+-7. Run the final quality gate, including applicable `code-taste` for TypeScript
+-   or React and `spade-python-taste` for Spade Python services, and the closest
+-   real proof after the last fix. Revisit any earlier review pass affected by
+-   the final fixes. Commit, push, and open the pull request as a draft only
+-   after the work is proven. Never mark it ready for review, merge it, or enable
+-   auto-merge. The user owns the ready-for-review transition and merge approval.
+-
+-For a genuinely trivial change without structural or deletion risk, the task
+-lead may skip the thermo or Ponytail pass and state why. Do not run a taste
+-skill for a language the diff does not touch. Classify each finding as a fix,
+-an evidence-backed rejection, or an out-of-scope deferral. A pass is satisfied
+-when no accepted finding remains unresolved and the current diff and affected
+-proof support that result. Do not restart every pass for a local fix that
+-cannot affect its verdict.
+-
+-Do not allow nested agents to commit, push, open pull requests, mutate tickets,
+-or use destructive git commands. You remain responsible for scope, integration,
+-proof, and reporting.
+-
+-You may work directly when the change is genuinely trivial or a profile is
+-unavailable, but report the skipped role and reason. Do not silently omit the
+-scout, builder, or reviewer stages for ordinary implementation work.
++Follow the repository instructions and use $task-lead for the scout, builder,
++reviewer, verification, and draft pull-request loop. Explicitly require
++`git-commit-push-pr` to create a draft pull request when that skill is used.
++Use `repoprompt-multi-review` only when explicitly requested; it commissions
++its own independent reviewers from this lead task.
+ 
+ When asked for status, return the status envelope below exactly enough that the
+ project controller can reconcile it with Linear and GitHub.
+@@ -107,5 +50,6 @@ Needs from controller: <decision or action, or none>
+ 
+ The project controller communicates with the worktree task lead, not its scout,
+ builder, or reviewer. The task lead owns nested-agent prompts, integration, and
+-local recovery. The controller owns project priority, ticket state, cross-task
+-dependencies, and pull-request follow-through.
++local recovery. The controller owns project priority, ticket state, and
++cross-task dependencies. Both read the same draft pull-request state; the task
++lead owns fixes and proof in its worktree.
+diff --git a/plugins/engineering/skills/task-lead/SKILL.md b/plugins/engineering/skills/task-lead/SKILL.md
+new file mode 100644
+index 0000000..057113e
+--- /dev/null
++++ b/plugins/engineering/skills/task-lead/SKILL.md
+@@ -0,0 +1,92 @@
++---
++name: task-lead
++description: Lead one scoped software task through scout, builder, reviewer, verification, and a draft pull request. Use when the user requests a task lead or this full workflow, or when project-control delegates a worktree task.
++---
++
++# Task Lead
++
++Own one accepted task from repository discovery through a verified draft pull
++request. This skill runs in the current Codex task. It does not need a
++`project-control` parent or a Linear issue.
++
++## Establish the task
++
++- Identify the outcome, acceptance criteria, scope boundary, and closest real
++  proof surface. Read repository instructions and current worktree state.
++- If the task has a Linear issue, read its current scope and exact branch name
++  before editing. Use that branch. Without an issue, use a suitable feature
++  branch for the draft pull request; do not invent a Linear issue.
++- Keep the work isolated from unrelated changes. Use the current worktree when
++  it is suitable, or establish an isolated worktree before implementation.
++  Preserve uncommitted work, inspect any existing pull request for this branch,
++  and never push to the default branch.
++- Check that the Codex `scout`, `builder`, and `reviewer` profiles are available.
++  Use `codex-agent-team-setup` when installed profiles need repair. If a role
++  cannot run, do its work directly and report the skipped role and reason.
++
++Use `ce-work` for final integration or a genuinely trivial direct edit, and
++`ce-quality-gate` on the integrated diff. Use `git-commit-push-pr` when the Git
++plugin is installed and explicitly require a **draft** pull request. These
++steps are authorized by the user's request to run the task-lead workflow to a
++draft PR; do not infer authority to deploy, merge, or expand the task.
++Run `repoprompt-multi-review` from the lead task only when explicitly requested;
++it commissions its own independent reviewers.
++
++## Run the agent loop
++
++1. Spawn `scout` for bounded, read-only reconnaissance. Give it the task,
++   likely owner boundary, and evidence to return. Its profile chooses the
++   relevant research skills.
++2. Use the scout's findings to give `builder` the accepted contract, allowed
++   files or owner boundary, and focused proof. Its profile chooses the work
++   skills and applicable language taste. Keep one writer at a time.
++3. Inspect and integrate the builder's work yourself. Run the changed-code
++   quality gate and the closest real proof surface before review.
++4. Ask `reviewer` to run `ce-review` on the integrated diff, acceptance
++   criteria, and proof. Let `ce-review` choose its own review lenses. Send
++   material findings to `builder` in a bounded fix pass, rerun affected proof,
++   and ask `reviewer` to check the fixes. Repeat until no material finding
++   remains unresolved.
++5. For substantive code changes, ask `reviewer` for a separate
++   `ce-thermo-nuclear-code-quality-review` pass. Resolve structural findings
++   through `builder`, then recheck this pass. Revisit `ce-review` when a fix
++   changes behavior or ownership boundaries.
++6. After the structural pass, ask `reviewer` for a separate
++   `ponytail:ponytail-review` pass when installed. Apply cuts through `builder`
++   only when they preserve the contract and make the result smaller. Recheck
++   the cuts and affected proof.
++7. Run the final quality gate, including `code-taste` for touched TypeScript or
++   React and `spade-python-taste` for touched Spade Python services. Repeat the
++   closest real proof after the last fix. Revisit any review pass affected by
++   final changes.
++
++For a genuinely trivial change without structural or deletion risk, you may
++skip the thermo or Ponytail pass and state why. Classify each finding as a fix,
++an evidence-backed rejection, or an out-of-scope deferral. A pass is satisfied
++when no accepted finding remains unresolved on the current diff. Do not rerun
++an unaffected pass merely because another pass found a local fix.
++
++Nested agents do not commit, push, open pull requests, mutate tickets, or use
++destructive Git commands. The task lead owns scope, integration, proof, Git
++publication, and reporting. Work directly only for a genuinely trivial change
++or when a profile is unavailable; use `ce-review` directly if the reviewer
++profile cannot run, and explain any skipped role.
++
++## Publish and follow through
++
++After proof and review, commit, push, and open or update the draft pull request.
++Never mark it ready for review, merge it, enable auto-merge, or use a merge
++queue. The user owns the ready-for-review transition and merge approval.
++
++Check required CI and actionable review feedback on the draft. Use
++`ce-triage-pr-feedback` and `resolve-pr-feedback` when installed and applicable.
++Route fixes through the builder, recheck affected proof and review, then push
++the updated branch. Stop at a verified draft with green required checks and no
++unresolved material findings. If CI or external review is still pending, report
++the exact state and next action without calling the task complete.
++
++Keep source inspection, focused tests, full checks, browser or backend proof,
++remote CI, and unpublished local work distinct in the final report. Include
++the branch, draft PR URL, completed scope, proof, review passes, and any blocker.
++When a project controller exists, also use its requested status envelope; the
++controller owns project priority, ticket state, and cross-task dependencies.
+diff --git a/plugins/engineering/skills/task-lead/agents/openai.yaml b/plugins/engineering/skills/task-lead/agents/openai.yaml
+new file mode 100644
+index 0000000..0d8ec10
+--- /dev/null
++++ b/plugins/engineering/skills/task-lead/agents/openai.yaml
+@@ -0,0 +1,4 @@
++interface:
++  display_name: "Task Lead"
++  short_description: "Lead one task through agents to a draft PR"
++  default_prompt: "Use $task-lead to run this task through scout, builder, reviewer, verification, and a draft pull request."
+diff --git a/tests/project-control.test.ts b/tests/project-control.test.ts
+index 27e83c8..0ed867c 100644
+--- a/tests/project-control.test.ts
++++ b/tests/project-control.test.ts
+@@ -3,19 +3,26 @@ import path from "node:path";
+ import { readText } from "./helpers";
+ 
+ const projectControlDir = path.resolve(import.meta.dir, "../plugins/engineering/skills/project-control");
++const taskLeadDir = path.resolve(import.meta.dir, "../plugins/engineering/skills/task-lead");
+ 
+-test("project control only publishes draft pull requests", async () => {
+-  const [skill, worktreeContract] = await Promise.all([
++test("project control launches the reusable task lead workflow", async () => {
++  const [skill, worktreeContract, taskLead] = await Promise.all([
+     readText(path.join(projectControlDir, "SKILL.md")),
+     readText(path.join(projectControlDir, "references/worktree-task-contract.md")),
++    readText(path.join(taskLeadDir, "SKILL.md")),
+   ]);
+ 
++  expect(skill).toContain("Require the root task to use\n`task-lead`");
++  expect(worktreeContract).toContain("use $task-lead");
++  expect(taskLead).toContain("It does not need a\n`project-control` parent or a Linear issue.");
++  for (const role of ["scout", "builder", "reviewer"]) {
++    expect(taskLead).toContain(`\`${role}\``);
++  }
+   expect(skill).toContain("Open every pull request as a draft.");
+   expect(skill).toContain("Never mark the pull request ready for review.");
+   expect(skill).toContain("Stop at `draft-ready`.");
+-  expect(worktreeContract).toMatch(/open the pull request as a draft only\s+after the work is proven/);
+-  expect(worktreeContract).toContain("Explicitly require it to create a draft pull request.");
+-  expect(worktreeContract).toContain("Never mark it ready for review");
+-  expect(`${skill}\n${worktreeContract}`).not.toContain("waiting-for-merge");
+-  expect(`${skill}\n${worktreeContract}`).not.toContain("ready pull request");
++  expect(taskLead).toContain("After proof and review, commit, push, and open or update the draft pull request.");
++  expect(taskLead).toContain("Never mark it ready for review, merge it, enable auto-merge");
++  expect(worktreeContract).toContain("create a draft pull request");
++  expect(`${skill}\n${worktreeContract}\n${taskLead}`).not.toContain("waiting-for-merge");
+ });
+diff --git a/tests/validate-plugin-bundle.test.ts b/tests/validate-plugin-bundle.test.ts
+index 924a20f..bbaebea 100644
+--- a/tests/validate-plugin-bundle.test.ts
++++ b/tests/validate-plugin-bundle.test.ts
+@@ -62,9 +62,9 @@ test("Grok reuses the Cursor plugin files", () => {
+   expect(HARNESSES.grok.kind).toBe("cursor-plugin");
+ });
+ 
+-test("all 55 skills have one owner and relative skill references stay inside that plugin", async () => {
++test("all 56 skills have one owner and relative skill references stay inside that plugin", async () => {
+   const owners = new Map<string, string>();
+-  for (const [id, count] of [["engineering", 33], ["git", 11], ["knowledge", 11]] as const) {
++  for (const [id, count] of [["engineering", 34], ["git", 11], ["knowledge", 11]] as const) {
+     const skills = await readdir(path.join(repoRoot, "plugins", id, "skills"));
+     expect(skills).toHaveLength(count);
+     for (const name of skills) {

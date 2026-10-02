@@ -1,0 +1,29 @@
+{
+  "name": "lox",
+  "version": "0.1.0",
+  "description": "Selected Lox engineering skills for explicit side-by-side trials.",
+  "author": {
+    "name": "Lachlan (lox)"
+  },
+  "homepage": "https://github.com/lox/agent-skills",
+  "repository": "https://github.com/SiTaggart/agent-kit",
+  "keywords": [
+    "lox",
+    "review",
+    "simplicity",
+    "planning",
+    "pull-requests"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "LOX",
+    "shortDescription": "Five explicitly invoked engineering skills.",
+    "developerName": "Lox \u00b7 local adaptation",
+    "category": "Developer Tools",
+    "websiteURL": "https://github.com/lox/agent-skills",
+    "defaultPrompt": [
+      "Use $simplicity-review from LOX on this change.",
+      "Use $auto-review from LOX on this branch."
+    ]
+  }
+}

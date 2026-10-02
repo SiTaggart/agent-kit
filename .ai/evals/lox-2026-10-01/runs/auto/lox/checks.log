@@ -1,0 +1,128 @@
+COMMAND
+/bin/zsh -lc 'python3 -B -m unittest -v'
+EXIT 1
+STDOUT/STDERR
+test_failure_exhausts_exact_budget (test_retry.RetryTests.test_failure_exhausts_exact_budget) ... FAIL
+test_first_attempt_success (test_retry.RetryTests.test_first_attempt_success) ... ok
+test_invalid_budget_never_calls_operation (test_retry.RetryTests.test_invalid_budget_never_calls_operation) ... ok
+test_last_allowed_attempt_can_succeed (test_retry.RetryTests.test_last_allowed_attempt_can_succeed) ... FAIL
+test_other_errors_do_not_retry (test_retry.RetryTests.test_other_errors_do_not_retry) ... ok
+
+======================================================================
+FAIL: test_failure_exhausts_exact_budget (test_retry.RetryTests.test_failure_exhausts_exact_budget)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/staggart/.codex/worktrees/0afa/agent-kit/.ai/evals/lox-2026-10-01/runs/auto/lox/workspace/test_retry.py", line 23, in test_failure_exhausts_exact_budget
+    with self.assertRaisesRegex(ConnectionError, "offline"):
+         ~~~~~~~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: ConnectionError not raised
+
+======================================================================
+FAIL: test_last_allowed_attempt_can_succeed (test_retry.RetryTests.test_last_allowed_attempt_can_succeed)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "/Users/staggart/.codex/worktrees/0afa/agent-kit/.ai/evals/lox-2026-10-01/runs/auto/lox/workspace/test_retry.py", line 15, in test_last_allowed_attempt_can_succeed
+    self.assertEqual(retry(operation, 3), "recovered")
+    ~~~~~~~~~~~~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+AssertionError: None != 'recovered'
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.001s
+
+FAILED (failures=2)
+
+
+COMMAND
+/bin/zsh -lc 'python3 -B -m unittest -v'
+EXIT 0
+STDOUT/STDERR
+test_failure_exhausts_exact_budget (test_retry.RetryTests.test_failure_exhausts_exact_budget) ... ok
+test_first_attempt_success (test_retry.RetryTests.test_first_attempt_success) ... ok
+test_invalid_budget_never_calls_operation (test_retry.RetryTests.test_invalid_budget_never_calls_operation) ... ok
+test_last_allowed_attempt_can_succeed (test_retry.RetryTests.test_last_allowed_attempt_can_succeed) ... ok
+test_other_errors_do_not_retry (test_retry.RetryTests.test_other_errors_do_not_retry) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.000s
+
+OK
+
+
+COMMAND
+/bin/zsh -lc 'git diff --check; git status --short; git diff -- retry.py; git diff --exit-code pilot-head -- README.md test_retry.py; git diff --exit-code pilot-base -- retry.py; nl -ba retry.py; cat README.md test_retry.py'
+EXIT 0
+STDOUT/STDERR
+ M retry.py
+diff --git a/retry.py b/retry.py
+index bc93c72..3460547 100644
+--- a/retry.py
++++ b/retry.py
+@@ -2,7 +2,7 @@ def retry(operation, max_attempts):
+     """Call operation at most max_attempts times after transient failure."""
+     if max_attempts < 1:
+         raise ValueError("max_attempts must be positive")
+-    for attempt in range(max_attempts - 1):
++    for attempt in range(max_attempts):
+         try:
+             return operation()
+         except ConnectionError:
+     1	def retry(operation, max_attempts):
+     2	    """Call operation at most max_attempts times after transient failure."""
+     3	    if max_attempts < 1:
+     4	        raise ValueError("max_attempts must be positive")
+     5	    for attempt in range(max_attempts):
+     6	        try:
+     7	            return operation()
+     8	        except ConnectionError:
+     9	            if attempt == max_attempts - 1:
+    10	                raise
+# Retry fixture
+Retry ConnectionError only. max_attempts includes the first call. Call the operation at most that many times. Return success from the final allowed attempt. Propagate the final ConnectionError and all other errors. Reject budgets below one before calling the operation.
+
+Tests: python3 -B -m unittest -v
+Compile: python3 -B -c "import ast, pathlib; [ast.parse(p.read_text()) for p in pathlib.Path('.').glob('*.py')]"
+No configured linter or formatter. Do not add dependencies.
+import unittest
+from retry import retry
+
+class RetryTests(unittest.TestCase):
+    def test_first_attempt_success(self):
+        self.assertEqual(retry(lambda: "ok", 3), "ok")
+
+    def test_last_allowed_attempt_can_succeed(self):
+        calls = []
+        def operation():
+            calls.append(1)
+            if len(calls) < 3:
+                raise ConnectionError("transient")
+            return "recovered"
+        self.assertEqual(retry(operation, 3), "recovered")
+        self.assertEqual(len(calls), 3)
+
+    def test_failure_exhausts_exact_budget(self):
+        calls = []
+        def operation():
+            calls.append(1)
+            raise ConnectionError("offline")
+        with self.assertRaisesRegex(ConnectionError, "offline"):
+            retry(operation, 3)
+        self.assertEqual(len(calls), 3)
+
+    def test_invalid_budget_never_calls_operation(self):
+        calls = []
+        with self.assertRaises(ValueError):
+            retry(lambda: calls.append(1), 0)
+        self.assertEqual(calls, [])
+
+    def test_other_errors_do_not_retry(self):
+        calls = []
+        def operation():
+            calls.append(1)
+            raise RuntimeError("permanent")
+        with self.assertRaisesRegex(RuntimeError, "permanent"):
+            retry(operation, 3)
+        self.assertEqual(len(calls), 1)
+
+if __name__ == "__main__":
+    unittest.main()
+

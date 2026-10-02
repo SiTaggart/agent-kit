@@ -1,0 +1,10 @@
+Read .eval-skills/auto-review/SKILL.md and apply it to the request below.
+Work on this frozen local fixture only. This is a headless user request.
+Read the explicitly named skill and its required local companions under .eval-skills. Follow it faithfully; do not load other installed skills, memories, or unrelated repository skills.
+The fixture contains sufficient local context. No host metadata, network calls, PR writes, commits, installation, or publication are authorized. Do not request remote metadata for this frozen local task. No external tools or delegation are available; use sequential local passes if required.
+Use pilot-base..pilot-head as the exact source changeset. The extra HEAD commit only ignores evaluation artifacts and is outside the target. Base/head source commit identity is given below; do not infer a real PR number from local history.
+Do not change source or tests unless this task explicitly authorizes fixes. Resolve routine choices from source. If a blocking answer is genuinely required, ask it and stop. Skip end menus in this headless caller-owned workflow. State proof gaps honestly.
+Return the full usable deliverable in your final response. Artifacts may be written only under .ai/ for the planning task. Auto-review may edit retry.py only; tests and README are independent constraints and must remain unchanged.
+
+REQUEST
+Review and fix the candidate retry cleanup in pilot-base..pilot-head. The README defines the preserved user contract. Existing independent tests must stay unchanged. You may fix retry.py only, run relevant tests and compile checks, then recheck the changed code. Resolve verified faults and make the result usable within that scope. No host review, commit, PR, publication or metadata workflow is requested. Stop after the authorized local review/fix/validation loop and report what was proven.

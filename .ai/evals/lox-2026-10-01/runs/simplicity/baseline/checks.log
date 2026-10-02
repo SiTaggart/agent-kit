@@ -1,0 +1,360 @@
+COMMAND
+/bin/zsh -lc 'bun test tests/project-control.test.ts'
+EXIT 0
+STDOUT/STDERR
+bun test v1.3.12 (700fc117)
+
+tests/project-control.test.ts:
+(pass) project control only publishes draft pull requests [0.63ms]
+
+ 1 pass
+ 0 fail
+ 8 expect() calls
+Ran 1 test across 1 file. [30.00ms]
+
+
+COMMAND
+/bin/zsh -lc "bun -e 'import { createHash } from \"node:crypto\";
+import path from \"node:path\";
+const skillDir = path.resolve(\"plugins/engineering/skills/codex-agent-team-setup\");
+const names = [\"scout\", \"builder\", \"reviewer\"];
+const templates = new Map();
+for (const name of names) templates.set(path.join(skillDir, \"assets/agents\", "'`${name}.toml`), await Bun.file(path.join(skillDir, "assets/agents", `${name}.toml`)).text());
+const files = new Map(templates);
+const writes = [];
+const root = "/frozen-review/codex";
+const ledgerPath = `${root}/agent-kit/managed-agents.json`;
+const configPath = `${root}/config.toml`;
+const target = (name) => `${root}/agents/${name}.toml`;
+const source = (name) => templates.get(path.join(skillDir, "assets/agents", `${name}.toml`));
+const sha = (content) => createHash("sha256").update(content).digest("hex");
+globalThis.reviewFs = {
+  readFile: async (file) => { if (!files.has(file)) throw Object.assign(new Error("missing"), { code: "ENOENT" }); return files.get(file); },
+  mkdir: async () => {},
+  writeFile: async (file, content) => { writes.push(file); files.set(file, content); },
+  rename: async (from, to) => { files.set(to, files.get(from)); files.delete(from); },
+  rm: async (file) => { files.delete(file); },
+  unlink: async (file) => { files.delete(file); },
+};
+const installerSource = await Bun.file(`${skillDir}/scripts/install.ts`).text();
+const adapted = installerSource.replace(/import '"\\{ mkdir, readFile, rename, rm, unlink, writeFile \\} from \"node:fs\\/promises\";/, \"const { mkdir, readFile, rename, rm, unlink, writeFile } = globalThis.reviewFs;\").replaceAll(\"import.meta.dir\", JSON.stringify("'`${skillDir}/scripts`));
+if (adapted === installerSource || adapted.includes("node:fs/promises")) throw new Error("IO seam replacement failed");
+const transpiled = new Bun.Transpiler({ loader: "ts" }).transformSync(adapted);
+const { planProfiles, applyProfiles, inspectStatus, configIssues, uninstallProfiles } = await import(`data:text/javascript;base64,${Buffer.from(transpiled).toString("base64")}`);
+const assert = (condition, message) => { if (!condition) throw new Error(message); };
+const reset = () => { files.clear(); for (const [file, content] of templates) files.set(file, content); writes.length = 0; };
+const setupDoc = await Bun.file(`${skillDir}/SKILL.md`).text();
+const validConfig = setupDoc.match(/```toml'"\\n([\\s\\S]*?)"'```/)[1];
+const roles = Bun.TOML.parse(validConfig).agents;
+reset();
+files.set(configPath, validConfig);
+assert((await planProfiles({ codexHome: root })).every((a) => a.kind === "create"), "new install must create");
+await applyProfiles({ codexHome: root });
+assert((await inspectStatus({ codexHome: root })).healthy, "documented registry must be healthy");
+assert(files.get(configPath) === validConfig, "apply must preserve config bytes");
+console.log("PASS: fresh install, unchanged detection, documented registry, config untouched");
+reset();
+const legacyLedger = { version: 1, profiles: {} };
+for (const name of names) {
+  const legacy = source(name).replace(/''^model = .*'"\\nmodel_reasoning_effort = .*\\n/, "'`name = "${name}"'"\\ndescription = "'${JSON.stringify(roles[name].description)}'"\\n"'`);
+  files.set(target(name), legacy);
+  legacyLedger.profiles[name] = { checksum: sha(legacy) };
+}
+files.set(ledgerPath, JSON.stringify(legacyLedger));
+files.set(configPath, validConfig);
+assert((await planProfiles({ codexHome: root })).every((a) => a.kind === "update"), "legacy managed files must update");
+await applyProfiles({ codexHome: root });
+assert((await inspectStatus({ codexHome: root })).healthy, "repaired setup must be healthy");
+for (const name of names) assert(files.get(target(name)) === source(name), "repair must install exact template bytes");
+console.log("PASS: legacy managed profile repair using old-format checksums");
+for (const managed of [false, true]) {
+  reset();
+  if (managed) { await applyProfiles({ codexHome: root }); writes.length = 0; }
+  const custom = managed ? `${source("scout")}'"\\n# user edit\\n"'` : "developer_instructions = '"\\\"custom\\\"\\n\";
+  files.set(target(\"scout\"), custom);
+  const ledgerBefore = files.get(ledgerPath);
+  assert((await planProfiles({ codexHome: root })).find((a) => a.name === \"scout\").kind === \"conflict\", \"user profile must conflict\");
+  let refused = false;
+  try { await applyProfiles({ codexHome: root }); } catch (error) { refused = error.message.includes(\"Refusing to overwrite conflicting profiles\"); }
+  assert(refused && writes.length === 0, \"conflict must refuse before writes\");
+  assert(files.get(target(\"scout\")) === custom && files.get(ledgerPath) === ledgerBefore, \"conflict must preserve user bytes and ledger\");
+}
+console.log(\"PASS: unmanaged and edited managed profiles refuse all apply writes\");
+reset();
+files.set(configPath, validConfig);
+await applyProfiles({ codexHome: root });
+files.set(target(\"reviewer\"), "'`${source("reviewer")}'"\\n# local edit\\n"'`);
+const removal = await uninstallProfiles({ codexHome: root });
+assert(JSON.stringify(removal.removed) === JSON.stringify(["scout", "builder"]), "uninstall must remove unchanged owned files");
+assert(JSON.stringify(removal.preserved) === JSON.stringify(["reviewer"]), "uninstall must preserve edited owned file");
+assert(files.get(configPath) === validConfig, "uninstall must preserve config");
+console.log("PASS: checksum-based uninstall preserves edits and config");
+reset();
+assert((await configIssues({ codexHome: root }))[0].includes("missing Codex config"), "missing config must be detected");
+files.set(configPath, "[agents]'"\\nmax_concurrent_threads_per_session = 4\\n[agents.scout]\\ndescription = \\\"custom\\\"\\nconfig_file = \\\"./agents/scout.toml\\\"\\n\");
+assert((await configIssues({ codexHome: root })).length === 4, \"concurrency, description and missing roles must be detected\");
+files.set(configPath, validConfig.replace(\"./agents/builder.toml\", \"./agents/custom.toml\"));
+assert((await configIssues({ codexHome: root }))[0].includes(\"[agents.builder].config_file\"), \"role path drift must be detected\");
+files.set(configPath, \"[agents\\n\");
+assert((await configIssues({ codexHome: root }))[0].includes(\"invalid Codex config\"), \"malformed config must be detected\");
+console.log(\"PASS: missing/malformed config, scalar drift, missing roles and path drift\");
+'"
+EXIT 1
+STDOUT/STDERR
+error: NameTooLong while resolving package 'data:text/javascript;base64,aW1wb3J0IHsgY3JlYXRlSGFzaCwgcmFuZG9tVVVJRCB9IGZyb20gIm5vZGU6Y3J5cHRvIjsKaW1wb3J0IHsgaG9tZWRpciB9IGZyb20gIm5vZGU6b3MiOwppbXBvcnQgcGF0aCBmcm9tICJub2RlOnBhdGgiOwpjb25zdCB7IG1rZGlyLCByZWFkRmlsZSwgcmVuYW1lLCBybSwgdW5saW5rLCB3cml0ZUZpbGUgfSA9IGdsb2JhbFRoaXMucmV2aWV3RnM7CmNvbnN0IFBST0ZJTEVfTkFNRVMgPSBbInNjb3V0IiwgImJ1aWxkZXIiLCAicmV2aWV3ZXIiXTsKY29uc3QgTEVER0VSX1ZFUlNJT04gPSAxOwpjb25zdCBkZXNpcmVkQWdlbnRDb25maWcgPSB7CiAgbWF4X2NvbmN1cnJlbnRfdGhyZWFkc19wZXJfc2Vzc2lvbjogMiwKICBzY291dDogewogICAgZGVzY3JpcHRpb246ICJSZWFkLW9ubHkgcmVwb3NpdG9yeSBzY291dCBmb3IgYm91bmRlZCBkaXNjb3ZlcnksIG93bmVyc2hpcCBtYXBwaW5nLCBhbmQgZXZpZGVuY2UgZ2F0aGVyaW5nIGJlZm9yZSBpbXBsZW1lbnRhdGlvbi4iLAogICAgY29uZmlnX2ZpbGU6ICIuL2FnZW50cy9zY291dC50b21sIgogIH0sCiAgYnVpbGRlcjogewogICAgZGVzY3JpcHRpb246ICJCb3VuZGVkIGltcGxlbWVudGF0aW9uIGFnZW50IGZvciBvbmUgYWNjZXB0ZWQgY2hhbmdlIHdpdGggZm9jdXNlZCB2ZXJpZmljYXRpb24uIiwKICAgIGNvbmZpZ19maWxlOiAiLi9hZ2VudHMvYnVpbGRlci50b21sIgogIH0sCiAgcmV2aWV3ZXI6IHsKICAgIGRlc2NyaXB0aW9uOiAiUmVhZC1vbmx5IGluZGVwZW5kZW50IHJldmlld2VyIGZvciBhIHN1cHBsaWVkIGRpZmYsIGFjY2VwdGFuY2UgY3JpdGVyaWEsIGFuZCB2ZXJpZmljYXRpb24gZXZpZGVuY2UuIiwKICAgIGNvbmZpZ19maWxlOiAiLi9hZ2VudHMvcmV2aWV3ZXIudG9tbCIKICB9Cn07CmZ1bmN0aW9uIGNoZWNrc3VtKGNvbnRlbnQpIHsKICByZXR1cm4gY3JlYXRlSGFzaCgic2hhMjU2IikudXBkYXRlKGNvbnRlbnQpLmRpZ2VzdCgiaGV4Iik7Cn0KZnVuY3Rpb24gaXNSZWNvcmQodmFsdWUpIHsKICByZXR1cm4gdHlwZW9mIHZhbHVlID09PSAib2JqZWN0IiAmJiB2YWx1ZSAhPT0gbnVsbCAmJiAhQXJyYXkuaXNBcnJheSh2YWx1ZSk7Cn0KZnVuY3Rpb24gcmVzb2x2ZVBhdGhzKG9wdGlvbnMpIHsKICBjb25zdCBjb2RleEhvbWUgPSBwYXRoLnJlc29sdmUob3B0aW9ucy5jb2RleEhvbWUpOwogIHJldHVybiB7CiAgICBhZ2VudHNEaXI6IHBhdGguam9pbihjb2RleEhvbWUsICJhZ2VudHMiKSwKICAgIGNvbmZpZ1BhdGg6IHBhdGguam9pbihjb2RleEhvbWUsICJjb25maWcudG9tbCIpLAogICAgbGVkZ2VyUGF0aDogcGF0aC5qb2luKGNvZGV4SG9tZSwgImFnZW50LWtpdCIsICJtYW5hZ2VkLWFnZW50cy5qc29uIiksCiAgICBhc3NldHNEaXI6IG9wdGlvbnMuYXNzZXRzRGlyID8gcGF0aC5yZXNvbHZlKG9wdGlvbnMuYXNzZXRzRGlyKSA6IHBhdGgucmVzb2x2ZSgiL1VzZXJzL3N0YWdnYXJ0Ly5jb2RleC93b3JrdHJlZXMvMGFmYS9hZ2VudC1raXQvLmFpL2V2YWxzL2xveC0yMDI2LTEwLTAxL3J1bnMvc2ltcGxpY2l0eS9iYXNlbGluZS93b3Jrc3BhY2UvcGx1Z2lucy9lbmdpbmVlcmluZy9za2lsbHMvY29kZXgtYWdlbnQtdGVhbS1zZXR1cC9zY3JpcHRzIiwgIi4uL2Fzc2V0cy9hZ2VudHMiKQogIH07Cn0KYXN5bmMgZnVuY3Rpb24gcmVhZE9wdGlvbmFsKGZpbGVQYXRoKSB7CiAgdHJ5IHsKICAgIHJldHVybiBhd2FpdCByZWFkRmlsZShmaWxlUGF0aCwgInV0ZjgiKTsKICB9IGNhdGNoIChlcnJvcikgewogICAgaWYgKGlzUmVjb3JkKGVycm9yKSAmJiBlcnJvci5jb2RlID09PSAiRU5PRU5UIikKICAgICAgcmV0dXJuIG51bGw7CiAgICB0aHJvdyBlcnJvcjsKICB9Cn0KYXN5bmMgZnVuY3Rpb24gYXRvbWljV3JpdGUoZmlsZVBhdGgsIGNvbnRlbnQpIHsKICBhd2FpdCBta2RpcihwYXRoLmRpcm5hbWUoZmlsZVBhdGgpLCB7IHJlY3Vyc2l2ZTogdHJ1ZSB9KTsKICBjb25zdCB0ZW1wb3JhcnlQYXRoID0gcGF0aC5qb2luKHBhdGguZGlybmFtZShmaWxlUGF0aCksIGAuJHtwYXRoLmJhc2VuYW1lKGZpbGVQYXRoKX0uJHtyYW5kb21VVUlEKCl9LnRtcGApOwogIHRyeSB7CiAgICBhd2FpdCB3cml0ZUZpbGUodGVtcG9yYXJ5UGF0aCwgY29udGVudCwgeyBlbmNvZGluZzogInV0ZjgiLCBtb2RlOiAzODQgfSk7CiAgICBhd2FpdCByZW5hbWUodGVtcG9yYXJ5UGF0aCwgZmlsZVBhdGgpOwogIH0gY2F0Y2ggKGVycm9yKSB7CiAgICBhd2FpdCBybSh0ZW1wb3JhcnlQYXRoLCB7IGZvcmNlOiB0cnVlIH0pOwogICAgdGhyb3cgZXJyb3I7CiAgfQp9CmFzeW5jIGZ1bmN0aW9uIGxvYWRUZW1wbGF0ZXMoYXNzZXRzRGlyKSB7CiAgcmV0dXJuIGF3YWl0IFByb21pc2UuYWxsKFBST0ZJTEVfTkFNRVMubWFwKGFzeW5jIChuYW1lKSA9PiB7CiAgICBjb25zdCBhc3NldFBhdGggPSBwYXRoLmpvaW4oYXNzZXRzRGlyLCBgJHtuYW1lfS50b21sYCk7CiAgICBjb25zdCBjb250ZW50ID0gYXdhaXQgcmVhZEZpbGUoYXNzZXRQYXRoLCAidXRmOCIpOwogICAgY29uc3QgcGFyc2VkID0gQnVuLlRPTUwucGFyc2UoY29udGVudCk7CiAgICBpZiAoIWlzUmVjb3JkKHBhcnNlZCkpCiAgICAgIHRocm93IG5ldyBFcnJvcihgJHthc3NldFBhdGh9IG11c3QgY29udGFpbiBhIFRPTUwgdGFibGUuYCk7CiAgICBmb3IgKGNvbnN0IGtleSBvZiBbIm1vZGVsIiwgIm1vZGVsX3JlYXNvbmluZ19lZmZvcnQiLCAiZGV2ZWxvcGVyX2luc3RydWN0aW9ucyIsICJzYW5kYm94X21vZGUiXSkgewogICAgICBpZiAodHlwZW9mIHBhcnNlZFtrZXldICE9PSAic3RyaW5nIiB8fCBwYXJzZWRba2V5XS5sZW5ndGggPT09IDApIHsKICAgICAgICB0aHJvdyBuZXcgRXJyb3IoYCR7YXNzZXRQYXRofSBtdXN0IGRlZmluZSBhIG5vbi1lbXB0eSAke2tleX0uYCk7CiAgICAgIH0KICAgIH0KICAgIHJldHVybiB7IG5hbWUsIGNvbnRlbnQsIGNoZWNrc3VtOiBjaGVja3N1bShjb250ZW50KSB9OwogIH0pKTsKfQphc3luYyBmdW5jdGlvbiByZWFkTGVkZ2VyKGxlZGdlclBhdGgpIHsKICBjb25zdCBjb250ZW50ID0gYXdhaXQgcmVhZE9wdGlvbmFsKGxlZGdlclBhdGgpOwogIGlmIChjb250ZW50ID09PSBudWxsKQogICAgcmV0dXJuIHsgdmVyc2lvbjogTEVER0VSX1ZFUlNJT04sIHByb2ZpbGVzOiB7fSB9OwogIGNvbnN0IHBhcnNlZCA9IEpTT04ucGFyc2UoY29udGVudCk7CiAgaWYgKCFpc1JlY29yZChwYXJzZWQpIHx8IHBhcnNlZC52ZXJzaW9uICE9PSBMRURHRVJfVkVSU0lPTiB8fCAhaXNSZWNvcmQocGFyc2VkLnByb2ZpbGVzKSkgewogICAgdGhyb3cgbmV3IEVycm9yKGBJbnZhbGlkIEFnZW50IEtpdCBwcm9maWxlIGxlZGdlcjogJHtsZWRnZXJQYXRofWApOwogIH0KICBjb25zdCBwcm9maWxlcyA9IHt9OwogIGZvciAoY29uc3QgbmFtZSBvZiBQUk9GSUxFX05BTUVTKSB7CiAgICBjb25zdCBlbnRyeSA9IHBhcnNlZC5wcm9maWxlc1tuYW1lXTsKICAgIGlmIChlbnRyeSA9PT0gdW5kZWZpbmVkKQogICAgICBjb250aW51ZTsKICAgIGlmICghaXNSZWNvcmQoZW50cnkpIHx8IHR5cGVvZiBlbnRyeS5jaGVja3N1bSAhPT0gInN0cmluZyIpIHsKICAgICAgdGhyb3cgbmV3IEVycm9yKGBJbnZhbGlkICR7bmFtZX0gZW50cnkgaW4gQWdlbnQgS2l0IHByb2ZpbGUgbGVkZ2VyOiAke2xlZGdlclBhdGh9YCk7CiAgICB9CiAgICBwcm9maWxlc1tuYW1lXSA9IHsgY2hlY2tzdW06IGVudHJ5LmNoZWNrc3VtIH07CiAgfQogIHJldHVybiB7IHZlcnNpb246IExFREdFUl9WRVJTSU9OLCBwcm9maWxlcyB9Owp9CmFzeW5jIGZ1bmN0aW9uIHdyaXRlTGVkZ2VyKGxlZGdlclBhdGgsIGxlZGdlcikgewogIGF3YWl0IGF0b21pY1dyaXRlKGxlZGdlclBhdGgsIGAke0pTT04uc3RyaW5naWZ5KGxlZGdlciwgbnVsbCwgMil9CmApOwp9CmV4cG9ydCBhc3luYyBmdW5jdGlvbiBwbGFuUHJvZmlsZXMob3B0aW9ucykgewogIGNvbnN0IHBhdGhzID0gcmVzb2x2ZVBhdGhzKG9wdGlvbnMpOwogIGNvbnN0IFt0ZW1wbGF0ZXMsIGxlZGdlcl0gPSBhd2FpdCBQcm9taXNlLmFsbChbbG9hZFRlbXBsYXRlcyhwYXRocy5hc3NldHNEaXIpLCByZWFkTGVkZ2VyKHBhdGhzLmxlZGdlclBhdGgpXSk7CiAgcmV0dXJuIGF3YWl0IFByb21pc2UuYWxsKHRlbXBsYXRlcy5tYXAoYXN5bmMgKHRlbXBsYXRlKSA9PiB7CiAgICBjb25zdCB0YXJnZXRQYXRoID0gcGF0aC5qb2luKHBhdGhzLmFnZW50c0RpciwgYCR7dGVtcGxhdGUubmFtZX0udG9tbGApOwogICAgY29uc3QgaW5zdGFsbGVkID0gYXdhaXQgcmVhZE9wdGlvbmFsKHRhcmdldFBhdGgpOwogICAgaWYgKGluc3RhbGxlZCA9PT0gbnVsbCkgewogICAgICByZXR1cm4geyBuYW1lOiB0ZW1wbGF0ZS5uYW1lLCB0YXJnZXRQYXRoLCBraW5kOiAiY3JlYXRlIiwgZGV0YWlsOiAicHJvZmlsZSBpcyBub3QgaW5zdGFsbGVkIiB9OwogICAgfQogICAgY29uc3QgaW5zdGFsbGVkQ2hlY2tzdW0gPSBjaGVja3N1bShpbnN0YWxsZWQpOwogICAgaWYgKGluc3RhbGxlZENoZWNrc3VtID09PSB0ZW1wbGF0ZS5jaGVja3N1bSkgewogICAgICByZXR1cm4geyBuYW1lOiB0ZW1wbGF0ZS5uYW1lLCB0YXJnZXRQYXRoLCBraW5kOiAidW5jaGFuZ2VkIiwgZGV0YWlsOiAicHJvZmlsZSBtYXRjaGVzIHRoZSBwbHVnaW4iIH07CiAgICB9CiAgICBpZiAoaW5zdGFsbGVkQ2hlY2tzdW0gPT09IGxlZGdlci5wcm9maWxlc1t0ZW1wbGF0ZS5uYW1lXT8uY2hlY2tzdW0pIHsKICAgICAgcmV0dXJuIHsgbmFtZTogdGVtcGxhdGUubmFtZSwgdGFyZ2V0UGF0aCwga2luZDogInVwZGF0ZSIsIGRldGFpbDogInByZXZpb3VzbHkgbWFuYWdlZCBwcm9maWxlIGhhcyBhbiB1cGRhdGUiIH07CiAgICB9CiAgICByZXR1cm4gewogICAgICBuYW1lOiB0ZW1wbGF0ZS5uYW1lLAogICAgICB0YXJnZXRQYXRoLAogICAgICBraW5kOiAiY29uZmxpY3QiLAogICAgICBkZXRhaWw6ICJwcm9maWxlIGlzIHVubWFuYWdlZCBvciB3YXMgbW9kaWZpZWQgbG9jYWxseSIKICAgIH07CiAgfSkpOwp9CmV4cG9ydCBhc3luYyBmdW5jdGlvbiBhcHBseVByb2ZpbGVzKG9wdGlvbnMpIHsKICBjb25zdCBwYXRocyA9IHJlc29sdmVQYXRocyhvcHRpb25zKTsKICBjb25zdCBbYWN0aW9ucywgdGVtcGxhdGVzXSA9IGF3YWl0IFByb21pc2UuYWxsKFtwbGFuUHJvZmlsZXMob3B0aW9ucyksIGxvYWRUZW1wbGF0ZXMocGF0aHMuYXNzZXRzRGlyKV0pOwogIGNvbnN0IGNvbmZsaWN0cyA9IGFjdGlvbnMuZmlsdGVyKChhY3Rpb24pID0+IGFjdGlvbi5raW5kID09PSAiY29uZmxpY3QiKTsKICBpZiAoY29uZmxpY3RzLmxlbmd0aCA+IDApIHsKICAgIHRocm93IG5ldyBFcnJvcihgUmVmdXNpbmcgdG8gb3ZlcndyaXRlIGNvbmZsaWN0aW5nIHByb2ZpbGVzOiAke2NvbmZsaWN0cy5tYXAoKGFjdGlvbikgPT4gYWN0aW9uLm5hbWUpLmpvaW4oIiwgIil9YCk7CiAgfQogIGF3YWl0IG1rZGlyKHBhdGhzLmFnZW50c0RpciwgeyByZWN1cnNpdmU6IHRydWUgfSk7CiAgY29uc3QgcHJvZmlsZXMgPSB7fTsKICBmb3IgKGNvbnN0IHRlbXBsYXRlIG9mIHRlbXBsYXRlcykgewogICAgY29uc3QgYWN0aW9uID0gYWN0aW9ucy5maW5kKChjYW5kaWRhdGUpID0+IGNhbmRpZGF0ZS5uYW1lID09PSB0ZW1wbGF0ZS5uYW1lKTsKICAgIGlmIChhY3Rpb24/LmtpbmQgPT09ICJjcmVhdGUiIHx8IGFjdGlvbj8ua2luZCA9PT0gInVwZGF0ZSIpIHsKICAgICAgYXdhaXQgYXRvbWljV3JpdGUoYWN0aW9uLnRhcmdldFBhdGgsIHRlbXBsYXRlLmNvbnRlbnQpOwogICAgfQogICAgcHJvZmlsZXNbdGVtcGxhdGUubmFtZV0gPSB7IGNoZWNrc3VtOiB0ZW1wbGF0ZS5jaGVja3N1bSB9OwogIH0KICBhd2FpdCB3cml0ZUxlZGdlcihwYXRocy5sZWRnZXJQYXRoLCB7IHZlcnNpb246IExFREdFUl9WRVJTSU9OLCBwcm9maWxlcyB9KTsKICByZXR1cm4gYWN0aW9uczsKfQpleHBvcnQgYXN5bmMgZnVuY3Rpb24gY29uZmlnSXNzdWVzKG9wdGlvbnMpIHsKICBjb25zdCB7IGNvbmZpZ1BhdGggfSA9IHJlc29sdmVQYXRocyhvcHRpb25zKTsKICBjb25zdCBjb250ZW50ID0gYXdhaXQgcmVhZE9wdGlvbmFsKGNvbmZpZ1BhdGgpOwogIGlmIChjb250ZW50ID09PSBudWxsKQogICAgcmV0dXJuIFtgbWlzc2luZyBDb2RleCBjb25maWc6ICR7Y29uZmlnUGF0aH1gXTsKICBsZXQgcGFyc2VkOwogIHRyeSB7CiAgICBwYXJzZWQgPSBCdW4uVE9NTC5wYXJzZShjb250ZW50KTsKICB9IGNhdGNoIChlcnJvcikgewogICAgcmV0dXJuIFtgaW52YWxpZCBDb2RleCBjb25maWc6ICR7ZXJyb3IgaW5zdGFuY2VvZiBFcnJvciA/IGVycm9yLm1lc3NhZ2UgOiBTdHJpbmcoZXJyb3IpfWBdOwogIH0KICBpZiAoIWlzUmVjb3JkKHBhcnNlZCkgfHwgIWlzUmVjb3JkKHBhcnNlZC5hZ2VudHMpKQogICAgcmV0dXJuIFsibWlzc2luZyBbYWdlbnRzXSB0YWJsZSBpbiBDb2RleCBjb25maWciXTsKICBjb25zdCBpc3N1ZXMgPSBbXTsKICBmb3IgKGNvbnN0IFtrZXksIGV4cGVjdGVkXSBvZiBPYmplY3QuZW50cmllcyhkZXNpcmVkQWdlbnRDb25maWcpKSB7CiAgICBjb25zdCBhY3R1YWwgPSBwYXJzZWQuYWdlbnRzW2tleV07CiAgICBpZiAoaXNSZWNvcmQoZXhwZWN0ZWQpKSB7CiAgICAgIGlmICghaXNSZWNvcmQoYWN0dWFsKSkgewogICAgICAgIGlzc3Vlcy5wdXNoKGBtaXNzaW5nIFthZ2VudHMuJHtrZXl9XSB0YWJsZSBpbiBDb2RleCBjb25maWdgKTsKICAgICAgICBjb250aW51ZTsKICAgICAgfQogICAgICBmb3IgKGNvbnN0IFtyb2xlS2V5LCByb2xlRXhwZWN0ZWRdIG9mIE9iamVjdC5lbnRyaWVzKGV4cGVjdGVkKSkgewogICAgICAgIGlmIChhY3R1YWxbcm9sZUtleV0gIT09IHJvbGVFeHBlY3RlZCkgewogICAgICAgICAgaXNzdWVzLnB1c2goYFthZ2VudHMuJHtrZXl9XS4ke3JvbGVLZXl9IG11c3QgYmUgJHtKU09OLnN0cmluZ2lmeShyb2xlRXhwZWN0ZWQpfWApOwogICAgICAgIH0KICAgICAgfQogICAgICBjb250aW51ZTsKICAgIH0KICAgIGlmIChhY3R1YWwgIT09IGV4cGVjdGVkKSB7CiAgICAgIGlzc3Vlcy5wdXNoKGBbYWdlbnRzXS4ke2tleX0gbXVzdCBiZSAke0pTT04uc3RyaW5naWZ5KGV4cGVjdGVkKX1gKTsKICAgIH0KICB9CiAgcmV0dXJuIGlzc3VlczsKfQpleHBvcnQgYXN5bmMgZnVuY3Rpb24gaW5zcGVjdFN0YXR1cyhvcHRpb25zKSB7CiAgY29uc3QgW3Byb2ZpbGVzLCBpc3N1ZXNdID0gYXdhaXQgUHJvbWlzZS5hbGwoW3BsYW5Qcm9maWxlcyhvcHRpb25zKSwgY29uZmlnSXNzdWVzKG9wdGlvbnMpXSk7CiAgcmV0dXJuIHsKICAgIGhlYWx0aHk6IHByb2ZpbGVzLmV2ZXJ5KChwcm9maWxlKSA9PiBwcm9maWxlLmtpbmQgPT09ICJ1bmNoYW5nZWQiKSAmJiBpc3N1ZXMubGVuZ3RoID09PSAwLAogICAgcHJvZmlsZXMsCiAgICBjb25maWdJc3N1ZXM6IGlzc3VlcwogIH07Cn0KZXhwb3J0IGFzeW5jIGZ1bmN0aW9uIHVuaW5zdGFsbFByb2ZpbGVzKG9wdGlvbnMpIHsKICBjb25zdCBwYXRocyA9IHJlc29sdmVQYXRocyhvcHRpb25zKTsKICBjb25zdCBsZWRnZXIgPSBhd2FpdCByZWFkTGVkZ2VyKHBhdGhzLmxlZGdlclBhdGgpOwogIGNvbnN0IHJlbWFpbmluZyA9IHt9OwogIGNvbnN0IHJlbW92ZWQgPSBbXTsKICBjb25zdCBwcmVzZXJ2ZWQgPSBbXTsKICBmb3IgKGNvbnN0IG5hbWUgb2YgUFJPRklMRV9OQU1FUykgewogICAgY29uc3QgbWFuYWdlZCA9IGxlZGdlci5wcm9maWxlc1tuYW1lXTsKICAgIGlmIChtYW5hZ2VkID09PSB1bmRlZmluZWQpCiAgICAgIGNvbnRpbnVlOwogICAgY29uc3QgdGFyZ2V0UGF0aCA9IHBhdGguam9pbihwYXRocy5hZ2VudHNEaXIsIGAke25hbWV9LnRvbWxgKTsKICAgIGNvbnN0IGluc3RhbGxlZCA9IGF3YWl0IHJlYWRPcHRpb25hbCh0YXJnZXRQYXRoKTsKICAgIGlmIChpbnN0YWxsZWQgPT09IG51bGwpIHsKICAgICAgcmVtb3ZlZC5wdXNoKG5hbWUpOwogICAgICBjb250aW51ZTsKICAgIH0KICAgIGlmIChjaGVja3N1bShpbnN0YWxsZWQpID09PSBtYW5hZ2VkLmNoZWNrc3VtKSB7CiAgICAgIGF3YWl0IHVubGluayh0YXJnZXRQYXRoKTsKICAgICAgcmVtb3ZlZC5wdXNoKG5hbWUpOwogICAgICBjb250aW51ZTsKICAgIH0KICAgIHJlbWFpbmluZ1tuYW1lXSA9IG1hbmFnZWQ7CiAgICBwcmVzZXJ2ZWQucHVzaChuYW1lKTsKICB9CiAgaWYgKE9iamVjdC5rZXlzKHJlbWFpbmluZykubGVuZ3RoID09PSAwKSB7CiAgICBhd2FpdCBybShwYXRocy5sZWRnZXJQYXRoLCB7IGZvcmNlOiB0cnVlIH0pOwogIH0gZWxzZSB7CiAgICBhd2FpdCB3cml0ZUxlZGdlcihwYXRocy5sZWRnZXJQYXRoLCB7IHZlcnNpb246IExFREdFUl9WRVJTSU9OLCBwcm9maWxlczogcmVtYWluaW5nIH0pOwogIH0KICByZXR1cm4geyByZW1vdmVkLCBwcmVzZXJ2ZWQgfTsKfQpmdW5jdGlvbiBmb3JtYXRBY3Rpb25zKGFjdGlvbnMpIHsKICByZXR1cm4gYWN0aW9ucy5tYXAoKGFjdGlvbikgPT4gYCR7YWN0aW9uLmtpbmQucGFkRW5kKDkpfSAke2FjdGlvbi5uYW1lfTogJHthY3Rpb24uZGV0YWlsfWApLmpvaW4oYApgKTsKfQpmdW5jdGlvbiBwYXJzZUNsaUFyZ3MoYXJncykgewogIGNvbnN0IGNvbW1hbmQgPSBhcmdzWzBdID8/ICJzdGF0dXMiOwogIGNvbnN0IGhvbWVJbmRleCA9IGFyZ3MuaW5kZXhPZigiLS1jb2RleC1ob21lIik7CiAgY29uc3QgZXhwbGljaXRIb21lID0gaG9tZUluZGV4ID49IDAgPyBhcmdzW2hvbWVJbmRleCArIDFdIDogdW5kZWZpbmVkOwogIGlmIChob21lSW5kZXggPj0gMCAmJiBleHBsaWNpdEhvbWUgPT09IHVuZGVmaW5lZCkKICAgIHRocm93IG5ldyBFcnJvcigiLS1jb2RleC1ob21lIHJlcXVpcmVzIGEgcGF0aC4iKTsKICByZXR1cm4gewogICAgY29tbWFuZCwKICAgIG9wdGlvbnM6IHsgY29kZXhIb21lOiBleHBsaWNpdEhvbWUgPz8gcHJvY2Vzcy5lbnYuQ09ERVhfSE9NRSA/PyBwYXRoLmpvaW4oaG9tZWRpcigpLCAiLmNvZGV4IikgfQogIH07Cn0KYXN5bmMgZnVuY3Rpb24gbWFpbigpIHsKICBjb25zdCB7IGNvbW1hbmQsIG9wdGlvbnMgfSA9IHBhcnNlQ2xpQXJncyhCdW4uYXJndi5zbGljZSgyKSk7CiAgaWYgKGNvbW1hbmQgPT09ICJwbGFuIikgewogICAgY29uc29sZS5sb2coZm9ybWF0QWN0aW9ucyhhd2FpdCBwbGFuUHJvZmlsZXMob3B0aW9ucykpKTsKICAgIHJldHVybjsKICB9CiAgaWYgKGNvbW1hbmQgPT09ICJhcHBseSIpIHsKICAgIGNvbnNvbGUubG9nKGZvcm1hdEFjdGlvbnMoYXdhaXQgYXBwbHlQcm9maWxlcyhvcHRpb25zKSkpOwogICAgY29uc29sZS5sb2coIlByb2ZpbGVzIGluc3RhbGxlZC4gVXBkYXRlIGNvbmZpZy50b21sIGFzIGRlc2NyaWJlZCBieSB0aGUgc2V0dXAgc2tpbGwsIHRoZW4gcnVuIHN0YXR1cy4iKTsKICAgIHJldHVybjsKICB9CiAgaWYgKGNvbW1hbmQgPT09ICJzdGF0dXMiKSB7CiAgICBjb25zdCBzdGF0dXMgPSBhd2FpdCBpbnNwZWN0U3RhdHVzKG9wdGlvbnMpOwogICAgY29uc29sZS5sb2coZm9ybWF0QWN0aW9ucyhzdGF0dXMucHJvZmlsZXMpKTsKICAgIGZvciAoY29uc3QgaXNzdWUgb2Ygc3RhdHVzLmNvbmZpZ0lzc3VlcykKICAgICAgY29uc29sZS5sb2coYGNvbmZpZyAgICAke2lzc3VlfWApOwogICAgaWYgKCFzdGF0dXMuaGVhbHRoeSkKICAgICAgcHJvY2Vzcy5leGl0Q29kZSA9IDE7CiAgICByZXR1cm47CiAgfQogIGlmIChjb21tYW5kID09PSAidW5pbnN0YWxsIikgewogICAgY29uc3QgcmVzdWx0ID0gYXdhaXQgdW5pbnN0YWxsUHJvZmlsZXMob3B0aW9ucyk7CiAgICBjb25zb2xlLmxvZyhgcmVtb3ZlZCAgICR7cmVzdWx0LnJlbW92ZWQuam9pbigiLCAiKSB8fCAibm9uZSJ9YCk7CiAgICBjb25zb2xlLmxvZyhgcHJlc2VydmVkICR7cmVzdWx0LnByZXNlcnZlZC5qb2luKCIsICIpIHx8ICJub25lIn1gKTsKICAgIHJldHVybjsKICB9CiAgdGhyb3cgbmV3IEVycm9yKGBVbmtub3duIGNvbW1hbmQ6ICR7Y29tbWFuZH0uIEV4cGVjdGVkIHBsYW4sIGFwcGx5LCBzdGF0dXMsIG9yIHVuaW5zdGFsbC5gKTsKfQppZiAoaW1wb3J0Lm1ldGEubWFpbikgewogIGF3YWl0IG1haW4oKS5jYXRjaCgoZXJyb3IpID0+IHsKICAgIGNvbnNvbGUuZXJyb3IoZXJyb3IgaW5zdGFuY2VvZiBFcnJvciA/IGVycm9yLm1lc3NhZ2UgOiBTdHJpbmcoZXJyb3IpKTsKICAgIHByb2Nlc3MuZXhpdENvZGUgPSAxOwogIH0pOwp9Cg==' from '/Users/staggart/.codex/worktrees/0afa/agent-kit/.ai/evals/lox-2026-10-01/runs/simplicity/baseline/workspace/[eval]'
+
+Bun v1.3.12 (macOS arm64)
+
+
+COMMAND
+/bin/zsh -lc "bun -e 'import { createHash, randomUUID } from \"node:crypto\";
+import { homedir } from \"node:os\";
+import path from \"node:path\";
+const dir = path.resolve(\"plugins/engineering/skills/codex-agent-team-setup\");
+const names = [\"scout\", \"builder\", \"reviewer\"];
+const assets = new Map();
+for (const name of names) assets.set("'`${dir}/assets/agents/${name}.toml`, await Bun.file(`${dir}/assets/agents/${name}.toml`).text());
+const files = new Map(assets);
+let writes = 0;
+const fs = {
+readFile: async (p) => { if (!files.has(p)) throw Object.assign(new Error("missing"), {code:"ENOENT"}); return files.get(p); },
+mkdir: async () => {}, writeFile: async (p,c) => { writes++; files.set(p,c); },
+rename: async (p,q) => {files.set(q,files.get(p));files.delete(p);},
+rm: async (p) => {files.delete(p);}, unlink: async (p) => {files.delete(p);}
+};
+let code = await Bun.file(`${dir}/scripts/install.ts`).text();
+code = code.replace(/''^import .*;$/gm, "").replace(/''^export /gm, "").replaceAll("import.meta.dir", JSON.stringify(`${dir}/scripts`)).replaceAll("import.meta.main", "false");
+code = new Bun.Transpiler({loader:"ts"}).transformSync(code);
+const AsyncFunction = Object.getPrototypeOf(async function(){}).constructor;
+const api = await new AsyncFunction("fs", "createHash", "randomUUID", "homedir", "path", "Bun", `const { mkdir, readFile, rename, rm, unlink, writeFile } = fs;'"\\n"'${code}'"\\nreturn {planProfiles, applyProfiles, inspectStatus, configIssues, uninstallProfiles};"'`)(fs,createHash,randomUUID,homedir,path,Bun);
+const root = "/frozen-review/codex";
+const config = `${root}/config.toml`, ledger = `${root}/agent-kit/managed-agents.json`;
+const target = (name) => `${root}/agents/${name}.toml`;
+const template = (name) => assets.get(`${dir}/assets/agents/${name}.toml`);
+const options = {codexHome:root};
+const assert = (ok,msg) => {if (!ok) throw new Error(msg);};
+const reset = () => { files.clear();for (const [p,c] of assets) files.set(p,c);writes=0;};
+const doc = await Bun.file(`${dir}/SKILL.md`).text();
+const valid = doc.match(/```toml'"\\n([\\s\\S]*?)"'```/)[1];
+const roles = Bun.TOML.parse(valid).agents;
+files.set(config,valid);
+assert((await api.planProfiles(options)).every(a=>a.kind==="create"),"fresh create");
+await api.applyProfiles(options);
+assert((await api.inspectStatus(options)).healthy,"documented config healthy");
+assert(files.get(config)===valid,"apply preserves config");
+console.log("PASS: fresh install, unchanged status, documented config unchanged");
+reset();
+const oldLedger = {version:1,profiles:{}};
+for (const name of names) {
+const old = template(name).replace(/''^model = .*'"\\nmodel_reasoning_effort = .*\\n/,"'`name = "${name}"'"\\ndescription = "'${JSON.stringify(roles[name].description)}'"\\n"'`);
+files.set(target(name),old);oldLedger.profiles[name]={checksum:createHash("sha256").update(old).digest("hex")};
+}
+files.set(ledger,JSON.stringify(oldLedger));files.set(config,valid);
+assert((await api.planProfiles(options)).every(a=>a.kind==="update"),"old managed update");
+await api.applyProfiles(options);
+assert((await api.inspectStatus(options)).healthy,"repaired status healthy");
+for (const name of names) assert(files.get(target(name))===template(name),"exact installed bytes");
+console.log("PASS: legacy managed TOML repair with old checksum ledger");
+for (const managed of [false,true]) {
+reset();if(managed)await api.applyProfiles(options);writes=0;
+const custom = managed?`${template("scout")}'"\\n# local edit\\n"'`:"custom profile";
+files.set(target("scout"),custom);const before=files.get(ledger);
+assert((await api.planProfiles(options)).find(a=>a.name==="scout").kind==="conflict","conflict detection");
+let refused=false;try{await api.applyProfiles(options);}catch(e){refused=e.message.includes("Refusing to overwrite");}
+assert(refused&&writes===0&&files.get(target("scout"))===custom&&files.get(ledger)===before,"conflict preservation");
+}
+console.log("PASS: unmanaged/edited managed conflicts preserve files and ledger before any write");
+reset();files.set(config,valid);await api.applyProfiles(options);
+files.set(target("reviewer"),`${template("reviewer")}'"\\n# local edit\\n"'`);
+const result=await api.uninstallProfiles(options);
+assert(JSON.stringify(result.removed)===JSON.stringify(["scout","builder"])&&JSON.stringify(result.preserved)===JSON.stringify(["reviewer"])&&files.get(config)===valid,"safe uninstall");
+console.log("PASS: uninstall preserves edited managed profile and config");
+reset();assert((await api.configIssues(options))[0].includes("missing Codex config"),"missing config");
+files.set(config,"[agents]'"\\nmax_concurrent_threads_per_session = 4\\n[agents.scout]\\ndescription = \\\"custom\\\"\\nconfig_file = \\\"./agents/scout.toml\\\"\\n\");
+assert((await api.configIssues(options)).length===4,\"scalar, description and role drift\");
+files.set(config,valid.replace(\"./agents/builder.toml\",\"./agents/custom.toml\"));
+assert((await api.configIssues(options))[0].includes(\"[agents.builder].config_file\"),\"path drift\");
+files.set(config,\"[agents\\n\");assert((await api.configIssues(options))[0].includes(\"invalid Codex config\"),\"malformed config\");
+console.log(\"PASS: missing/malformed config, concurrency/description drift, missing roles, role path drift\");
+'"
+EXIT 1
+STDOUT/STDERR
+PASS: fresh install, unchanged status, documented config unchanged
+PASS: legacy managed TOML repair with old checksum ledger
+PASS: unmanaged/edited managed conflicts preserve files and ledger before any write
+PASS: uninstall preserves edited managed profile and config
+21 | const root = "/frozen-review/codex";
+22 | const config = `${root}/config.toml`, ledger = `${root}/agent-kit/managed-agents.json`;
+23 | const target = (name) => `${root}/agents/${name}.toml`;
+24 | const template = (name) => assets.get(`${dir}/assets/agents/${name}.toml`);
+25 | const options = {codexHome:root};
+26 | const assert = (ok,msg) => {if (!ok) throw new Error(msg);};
+                                                    ^
+error: malformed config
+      at assert (/Users/staggart/.codex/worktrees/0afa/agent-kit/.ai/evals/lox-2026-10-01/runs/simplicity/baseline/workspace/[eval]:26:48)
+      at /Users/staggart/.codex/worktrees/0afa/agent-kit/.ai/evals/lox-2026-10-01/runs/simplicity/baseline/workspace/[eval]:68:31
+
+Bun v1.3.12 (macOS arm64)
+
+
+COMMAND
+/bin/zsh -lc "bun -e 'for (const s of [\"[agents\\n\", \"model = [\", \"a = @invalid\", \"a = \\\"unterminated\", \"[agents]\\nmax_concurrent_threads_per_session = nope\\n\"]) { try {console.log(JSON.stringify(s), JSON.stringify(Bun.TOML.parse(s)));} catch(e) {console.log(JSON.stringify(s), \"ERROR\", e.message);} }'"
+EXIT 0
+STDOUT/STDERR
+"[agents\n" {"agents":{}}
+"model = [" ERROR Unexpected end of file
+"a = @invalid" {"a":"@invalid"}
+"a = \"unterminated" ERROR Unterminated basic string
+"[agents]\nmax_concurrent_threads_per_session = nope\n" {"agents":{"max_concurrent_threads_per_session":"nope"}}
+
+
+COMMAND
+/bin/zsh -lc "git diff --check pilot-base..pilot-head; git diff --quiet pilot-head HEAD -- . ':"'!.gitignore'"'; git status --short; cat .agents/plugins/marketplace.json; nl -ba tests/project-control.test.ts"
+EXIT 0
+STDOUT/STDERR
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-PIiAB8xK' (errno=Operation not permitted)
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-jZsOra0x' (errno=Operation not permitted)
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-wXXMFSZS' (errno=Operation not permitted)
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-SDBLcEeE' (errno=Operation not permitted)
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-0ol9gqxh' (errno=Operation not permitted)
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-Om0BEjuM' (errno=Operation not permitted)
+{
+  "name": "agent-kit",
+  "interface": {
+    "displayName": "Agent Kit"
+  },
+  "plugins": [
+    {
+      "name": "engineering",
+      "source": {
+        "source": "local",
+        "path": "./plugins/engineering"
+      },
+      "version": "0.2.6",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "git",
+      "source": {
+        "source": "local",
+        "path": "./plugins/git"
+      },
+      "version": "0.2.2",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "knowledge",
+      "source": {
+        "source": "local",
+        "path": "./plugins/knowledge"
+      },
+      "version": "0.2.1",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "hooks",
+      "source": {
+        "source": "local",
+        "path": "./plugins/hooks"
+      },
+      "version": "0.2.1",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    },
+    {
+      "name": "pstack",
+      "source": {
+        "source": "local",
+        "path": "./plugins/pstack"
+      },
+      "version": "0.15.1",
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Developer Tools"
+    }
+  ]
+}
+     1	import { expect, test } from "bun:test";
+     2	import path from "node:path";
+     3	import { readText } from "./helpers";
+     4	
+     5	const projectControlDir = path.resolve(import.meta.dir, "../plugins/engineering/skills/project-control");
+     6	
+     7	test("project control only publishes draft pull requests", async () => {
+     8	  const [skill, worktreeContract] = await Promise.all([
+     9	    readText(path.join(projectControlDir, "SKILL.md")),
+    10	    readText(path.join(projectControlDir, "references/worktree-task-contract.md")),
+    11	  ]);
+    12	
+    13	  expect(skill).toContain("Open every pull request as a draft.");
+    14	  expect(skill).toContain("Never mark the pull request ready for review.");
+    15	  expect(skill).toContain("Stop at `draft-ready`.");
+    16	  expect(worktreeContract).toContain("open the pull request as a draft only after the work is");
+    17	  expect(worktreeContract).toContain("Explicitly require it to create a draft pull request.");
+    18	  expect(worktreeContract).toContain("Never mark it ready for review");
+    19	  expect(`${skill}\n${worktreeContract}`).not.toContain("waiting-for-merge");
+    20	  expect(`${skill}\n${worktreeContract}`).not.toContain("ready pull request");
+    21	});
+
+
+COMMAND
+/bin/zsh -lc "bun -e 'import { createHash, randomUUID } from \"node:crypto\"; import { homedir } from \"node:os\"; import path from \"node:path\";
+const dir=path.resolve(\"plugins/engineering/skills/codex-agent-team-setup\");
+let code=await Bun.file("'`${dir}/scripts/install.ts`).text();
+code=code.replace(/''^import .*;$/gm,"").replace(/''^export /gm,"").replaceAll("import.meta.dir",JSON.stringify(`${dir}/scripts`)).replaceAll("import.meta.main","false");
+code=new Bun.Transpiler({loader:"ts"}).transformSync(code);
+const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;
+let content=null;
+const fs={readFile:async()=>{if(content===null)throw Object.assign(new Error("missing"),{code:"ENOENT"});return content;}};
+const configIssues=await new AsyncFunction("fs","createHash","randomUUID","homedir","path","Bun",`const {mkdir,readFile,rename,rm,unlink,writeFile}=fs;'"\\n"'${code}'"\\nreturn configIssues;"'`)(fs,createHash,randomUUID,homedir,path,Bun);
+const assert=(ok,message)=>{if(!ok)throw new Error(message);};
+const options={codexHome:"/frozen-review/codex"};
+const doc=await Bun.file(`${dir}/SKILL.md`).text();const valid=doc.match(/```toml'"\\n([\\s\\S]*?)"'```/)[1];
+assert((await configIssues(options))[0].includes("missing Codex config"),"missing config");
+content=valid;assert((await configIssues(options)).length===0,"documented registry");
+content="model = [";assert((await configIssues(options))[0].includes("invalid Codex config"),"invalid config");
+content="[unrelated]'"\\nkey = true\\n\";assert((await configIssues(options))[0].includes(\"missing [agents]\"),\"missing agents table\");
+content=\"[agents]\\nmax_concurrent_threads_per_session = 4\\n[agents.scout]\\ndescription = \\\"custom\\\"\\nconfig_file = \\\"./agents/scout.toml\\\"\\n\";assert((await configIssues(options)).length===4,\"scalar, description and missing roles\");
+content=valid.replace(\"./agents/builder.toml\",\"./agents/custom.toml\");assert((await configIssues(options))[0].includes(\"[agents.builder].config_file\"),\"role path drift\");
+content=valid+\"\\n[unrelated]\\nkey = true\\n\";assert((await configIssues(options)).length===0,\"unrelated config preserved\");
+console.log(\"PASS: read-only config probes: documented registry, missing/invalid config, missing agents, concurrency/description drift, missing roles, role path drift and unrelated tables\");
+'"
+EXIT 0
+STDOUT/STDERR
+PASS: read-only config probes: documented registry, missing/invalid config, missing agents, concurrency/description drift, missing roles, role path drift and unrelated tables
+
+
+COMMAND
+/bin/zsh -lc 'bun run validate; git status --short'
+EXIT 0
+STDOUT/STDERR
+$ bun src/cli.ts validate
+agent-kit marketplace plugins are valid
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-m2VvATvM' (errno=Operation not permitted)
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-34TNGNAA' (errno=Operation not permitted)
+

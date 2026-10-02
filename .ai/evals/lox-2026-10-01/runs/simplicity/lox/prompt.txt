@@ -1,0 +1,10 @@
+Read .eval-skills/simplicity-review/SKILL.md and apply it to the request below.
+Work on this frozen local fixture only. This is a headless user request.
+Read the explicitly named skill and its required local companions under .eval-skills. Follow it faithfully; do not load other installed skills, memories, or unrelated repository skills.
+The fixture contains sufficient local context. No host metadata, network calls, PR writes, commits, installation, or publication are authorized. Do not request remote metadata for this frozen local task. No external tools or delegation are available; use sequential local passes if required.
+Use pilot-base..pilot-head as the exact source changeset. The extra HEAD commit only ignores evaluation artifacts and is outside the target. Base/head source commit identity is given below; do not infer a real PR number from local history.
+Do not change source or tests unless this task explicitly authorizes fixes. Resolve routine choices from source. If a blocking answer is genuinely required, ask it and stop. Skip end menus in this headless caller-owned workflow. State proof gaps honestly.
+Return the full usable deliverable in your final response. Artifacts may be written only under .ai/ for the planning task. Auto-review may edit retry.py only; tests and README are independent constraints and must remain unchanged.
+
+REQUEST
+Perform a review-only simplicity/maintainability review of frozen Agent Kit change 5875aaf54b4797a29650b4ed5274a7935f7912f2 against its parent. Author intent: repair project-control role setup so agent TOML/config is compatible, existing managed installations can be repaired, user-owned profiles are protected, and documented behavior matches the setup tool. Inspect changed installer, assets, docs, tests and direct consumers. Preserve required drift detection, checksum ownership and config safety. Suggest concrete smaller replacements only when they reduce resulting complexity and preserve this contract; an already-simple verdict is acceptable. Cite changed lines. Do not apply fixes.

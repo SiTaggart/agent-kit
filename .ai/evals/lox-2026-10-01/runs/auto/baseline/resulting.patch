@@ -1,0 +1,13 @@
+diff --git a/retry.py b/retry.py
+index bc93c72..3460547 100644
+--- a/retry.py
++++ b/retry.py
+@@ -2,7 +2,7 @@ def retry(operation, max_attempts):
+     """Call operation at most max_attempts times after transient failure."""
+     if max_attempts < 1:
+         raise ValueError("max_attempts must be positive")
+-    for attempt in range(max_attempts - 1):
++    for attempt in range(max_attempts):
+         try:
+             return operation()
+         except ConnectionError:

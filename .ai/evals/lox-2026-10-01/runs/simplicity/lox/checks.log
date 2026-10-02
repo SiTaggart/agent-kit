@@ -1,0 +1,31 @@
+COMMAND
+/bin/zsh -lc 'git diff --check pilot-base..pilot-head'
+EXIT 0
+STDOUT/STDERR
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-l7sJwEGp' (errno=Operation not permitted)
+git: warning: confstr() failed with code 5: couldn't get path of DARWIN_USER_TEMP_DIR; using /tmp instead
+git: error: couldn't create cache file '/tmp/xcrun_db-hmV8Q47N' (errno=Operation not permitted)
+
+
+COMMAND
+/bin/zsh -lc 'bun test tests/project-control.test.ts'
+EXIT 0
+STDOUT/STDERR
+bun test v1.3.12 (700fc117)
+
+tests/project-control.test.ts:
+(pass) project control only publishes draft pull requests [0.56ms]
+
+ 1 pass
+ 0 fail
+ 8 expect() calls
+Ran 1 test across 1 file. [30.00ms]
+
+
+COMMAND
+/bin/zsh -lc "bun -e 'import { readFileSync } from \"node:fs\"; const root = \"plugins/engineering/skills/codex-agent-team-setup\"; const doc = readFileSync("'`${root}/SKILL.md`, "utf8"); const sample = doc.match(/```toml'"\\n([\\s\\S]*?)"'```/); if (!sample) throw new Error("Missing documented config"); const config = Bun.TOML.parse(sample[1]); const tests = readFileSync("tests/codex-agent-team-setup.test.ts", "utf8"); const fixture = tests.match(/const validConfig = `(['"\\s\\S]*?)"'`;/); if (!fixture || JSON.stringify(Bun.TOML.parse(fixture[1])) !== JSON.stringify(config)) throw new Error("Documented config differs from test config"); if (config.agents.max_concurrent_threads_per_session !== 2) throw new Error("Concurrency differs"); for (const name of ["scout", "builder", "reviewer"]) { const profile = Bun.TOML.parse(readFileSync(`${root}/assets/agents/${name}.toml`, "utf8")); if (profile.model !== "gpt-5.6-sol" || profile.model_reasoning_effort !== "high" || "name" in profile || "description" in profile) throw new Error(`Invalid profile shape: ${name}`); if (profile.sandbox_mode !== (name === "builder" ? "workspace-write" : "read-only")) throw new Error(`Unexpected sandbox: ${name}`); if (config.agents[name].config_file !== `./agents/${name}.toml` || typeof config.agents[name].description !== "string") throw new Error(`Invalid registry: ${name}`); } console.log("Read-only TOML checks passed: documented registry, test config, and three profiles.");'"'"
+EXIT 0
+STDOUT/STDERR
+Read-only TOML checks passed: documented registry, test config, and three profiles.
+

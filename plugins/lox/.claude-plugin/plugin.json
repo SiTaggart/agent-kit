@@ -1,0 +1,18 @@
+{
+  "name": "lox",
+  "version": "0.1.0",
+  "description": "Selected Lox engineering skills for explicit side-by-side trials.",
+  "author": {
+    "name": "Lachlan (lox)"
+  },
+  "homepage": "https://github.com/lox/agent-skills",
+  "repository": "https://github.com/SiTaggart/agent-kit",
+  "keywords": [
+    "lox",
+    "review",
+    "simplicity",
+    "planning",
+    "pull-requests"
+  ],
+  "skills": "./skills/"
+}

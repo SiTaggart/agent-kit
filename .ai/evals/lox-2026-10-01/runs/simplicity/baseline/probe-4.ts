@@ -1,0 +1,21 @@
+import { createHash, randomUUID } from "node:crypto"; import { homedir } from "node:os"; import path from "node:path";
+const dir=path.resolve("plugins/engineering/skills/codex-agent-team-setup");
+let code=await Bun.file(`${dir}/scripts/install.ts`).text();
+code=code.replace(/^import .*;$/gm,"").replace(/^export /gm,"").replaceAll("import.meta.dir",JSON.stringify(`${dir}/scripts`)).replaceAll("import.meta.main","false");
+code=new Bun.Transpiler({loader:"ts"}).transformSync(code);
+const AsyncFunction=Object.getPrototypeOf(async function(){}).constructor;
+let content=null;
+const fs={readFile:async()=>{if(content===null)throw Object.assign(new Error("missing"),{code:"ENOENT"});return content;}};
+const configIssues=await new AsyncFunction("fs","createHash","randomUUID","homedir","path","Bun",`const {mkdir,readFile,rename,rm,unlink,writeFile}=fs;\n${code}\nreturn configIssues;`)(fs,createHash,randomUUID,homedir,path,Bun);
+const assert=(ok,message)=>{if(!ok)throw new Error(message);};
+const options={codexHome:"/frozen-review/codex"};
+const doc=await Bun.file(`${dir}/SKILL.md`).text();const valid=doc.match(/```toml\n([\s\S]*?)```/)[1];
+assert((await configIssues(options))[0].includes("missing Codex config"),"missing config");
+content=valid;assert((await configIssues(options)).length===0,"documented registry");
+content="model = [";assert((await configIssues(options))[0].includes("invalid Codex config"),"invalid config");
+content="[unrelated]\nkey = true\n";assert((await configIssues(options))[0].includes("missing [agents]"),"missing agents table");
+content="[agents]\nmax_concurrent_threads_per_session = 4\n[agents.scout]\ndescription = \"custom\"\nconfig_file = \"./agents/scout.toml\"\n";assert((await configIssues(options)).length===4,"scalar, description and missing roles");
+content=valid.replace("./agents/builder.toml","./agents/custom.toml");assert((await configIssues(options))[0].includes("[agents.builder].config_file"),"role path drift");
+content=valid+"\n[unrelated]\nkey = true\n";assert((await configIssues(options)).length===0,"unrelated config preserved");
+console.log("PASS: read-only config probes: documented registry, missing/invalid config, missing agents, concurrency/description drift, missing roles, role path drift and unrelated tables");
+

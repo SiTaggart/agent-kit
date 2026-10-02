@@ -1,0 +1,6 @@
+interface:
+  display_name: "Auto Review"
+  short_description: "LOX: Auto Review"
+  default_prompt: "Use $auto-review from LOX to review this change with adversarial and simplicity lenses, fix grounded local findings, validate, and recheck."
+policy:
+  allow_implicit_invocation: false

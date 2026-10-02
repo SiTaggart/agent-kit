@@ -1,0 +1,10 @@
+test_failure_exhausts_exact_budget (test_retry.RetryTests.test_failure_exhausts_exact_budget) ... ok
+test_first_attempt_success (test_retry.RetryTests.test_first_attempt_success) ... ok
+test_invalid_budget_never_calls_operation (test_retry.RetryTests.test_invalid_budget_never_calls_operation) ... ok
+test_last_allowed_attempt_can_succeed (test_retry.RetryTests.test_last_allowed_attempt_can_succeed) ... ok
+test_other_errors_do_not_retry (test_retry.RetryTests.test_other_errors_do_not_retry) ... ok
+
+----------------------------------------------------------------------
+Ran 5 tests in 0.000s
+
+OK
