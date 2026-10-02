@@ -1,0 +1,9 @@
+can i have a pr please
+
+---
+
+Is it worth keeping the eval stuff in the repository? What benefit is that?
+
+---
+
+Trim everything that you can and then push it out to the PR so I can merge it.
