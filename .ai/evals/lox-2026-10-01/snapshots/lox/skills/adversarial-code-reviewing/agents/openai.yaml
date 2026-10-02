@@ -1,6 +1,0 @@
-interface:
-  display_name: "Adversarial Review"
-  short_description: "LOX: Adversarial Review"
-  default_prompt: "Use $adversarial-code-reviewing from LOX to find material production risks in this change."
-policy:
-  allow_implicit_invocation: false

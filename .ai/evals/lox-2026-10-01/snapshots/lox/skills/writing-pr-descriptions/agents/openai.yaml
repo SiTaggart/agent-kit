@@ -1,6 +1,0 @@
-interface:
-  display_name: "Write PR Description"
-  short_description: "LOX: Write PR Description"
-  default_prompt: "Use $writing-pr-descriptions from LOX to draft or refresh concise PR metadata from the final diff."
-policy:
-  allow_implicit_invocation: false

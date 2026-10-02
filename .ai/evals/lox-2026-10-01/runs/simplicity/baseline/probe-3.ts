@@ -1,1 +1,0 @@
-for (const s of ["[agents\n", "model = [", "a = @invalid", "a = \"unterminated", "[agents]\nmax_concurrent_threads_per_session = nope\n"]) { try {console.log(JSON.stringify(s), JSON.stringify(Bun.TOML.parse(s)));} catch(e) {console.log(JSON.stringify(s), "ERROR", e.message);} }

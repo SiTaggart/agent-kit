@@ -1,6 +1,0 @@
-interface:
-  display_name: "Simplicity Review"
-  short_description: "LOX: Simplicity Review"
-  default_prompt: "Use $simplicity-review from LOX to find grounded ways to remove unnecessary complexity."
-policy:
-  allow_implicit_invocation: false

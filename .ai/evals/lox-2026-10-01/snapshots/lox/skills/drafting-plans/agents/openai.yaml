@@ -1,6 +1,0 @@
-interface:
-  display_name: "Drafting Plans"
-  short_description: "LOX: Drafting Plans"
-  default_prompt: "Use $drafting-plans from LOX to draft a concise implementation plan with useful delivery slices."
-policy:
-  allow_implicit_invocation: false
