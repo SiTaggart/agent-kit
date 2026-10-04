@@ -1,6 +1,6 @@
 # pstack
 
-> Codex and Claude Code port of Lauren Tan's upstream PStack, pinned to `e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a` (v0.15.9). The original guide and author voice follow, with direct host adaptations described in [RUNTIME.md](./RUNTIME.md). This package stops at merge-ready; the user merges. Maintainers repeat the sync with [`$sync-pstack`](./skills/sync-pstack/SKILL.md).
+> Codex and Claude Code port of Lauren Tan's upstream PStack, pinned to `e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a` (v0.15.9). The original guide and author voice follow, with direct host adaptations described in [RUNTIME.md](./RUNTIME.md). This package stops at merge-ready; the user merges. Maintainers of the agent-kit repository repeat the sync with the repo skill [sync-pstack](../../.cursor/skills/sync-pstack/SKILL.md). That skill is not part of this plugin.
 
 i'm [poteto](https://x.com/poteto). i'm not a president or ceo, but i've worked with millions of lines of code at Meta, Netflix, and Cursor. i'm also on the react core team where i help build and maintain react compiler.
 
@@ -152,7 +152,6 @@ $interrogate review this pr.
 | [`$automate-me`](./skills/automate-me/SKILL.md) | you want your own `-mode` skill, drafted from how you've actually worked. |
 | [`$make-bot-ui`](./skills/make-bot-ui/SKILL.md) | you want a page or dashboard whose buttons wake an agent over a webhook. the upstream Grok Bot integration needs an exact native webhook contract that must pass the runtime preflight; the skill reports that limit before setup. |
 | [`$setup-pstack`](./skills/setup-pstack/SKILL.md) | you want to pick which models pstack uses per role. detects your models and writes optional role overrides. |
-| [`$sync-pstack`](./skills/sync-pstack/SKILL.md) | you maintain this port and want the upstream delta since the recorded pin, with host adapters and model assignments kept. |
 | [`$reflect`](./skills/reflect/SKILL.md) | a long task landed and you want the recipe captured as a skill edit. |
 | [`$correct`](./skills/correct/SKILL.md) | you keep correcting agents for the same mistakes. mines history for mistake classes, fixes each at the highest level that works (architecture, then types, lint, and ci, then tests, with docs last), and keeps a table pairing each rule with what enforces it. |
 | [`$teach`](./skills/teach/SKILL.md) | you want to actually understand a change or subsystem, not just have it summarized. runs how + why and weaves one plain explanation, built up diagram by diagram. |

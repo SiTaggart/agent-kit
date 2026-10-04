@@ -26,9 +26,10 @@ test("Codex exposes the four focused plugins, PStack, and LOX separately", () =>
   expect(read("LICENSE")).toContain("Copyright (c) 2026 Lauren Tan");
 });
 
-test("all 47 upstream skills and four companions resolve the host adapter and preserve activation policy", () => {
+test("all 50 upstream skills and four companions resolve the host adapter and preserve activation policy", () => {
   const skills = readdirSync(path.join(pluginRoot, "skills"));
-  expect(skills).toHaveLength(51);
+  expect(skills).toHaveLength(54);
+  expect(skills).not.toContain("sync-pstack");
   const implicitSkills = new Set(["setup-pstack", "deslop", "control-cli", "verify-this", "browser-use"]);
 
   for (const skill of skills) {
