@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle explain the number
+  short_description: 'PStack: Principle explain the number'
+policy:
+  allow_implicit_invocation: false

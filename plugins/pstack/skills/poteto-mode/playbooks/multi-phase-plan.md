@@ -33,16 +33,16 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 
 ### Arm the program
 
-- [ ] State the protocol and this plan to the operator, then stop. Start execution only on her explicit go.
-- [ ] On her go, record the program objective with this exact text. "<The plan path, the PR ids in order, the verification rule, who merges, and the done condition.>" Use the native goal tool only when the operator explicitly requested a goal; otherwise keep this objective in the program store.
+- [ ] State the protocol and this plan to the operator, then stop. Start execution only on the operator's explicit go.
+- [ ] On the operator's go, record the program objective with this exact text. "<The plan path, the PR ids in order, the verification rule, who merges, and the done condition.>" Use the native goal tool only when the operator explicitly requested a goal; otherwise keep this objective in the program store.
 - [ ] Read these from the installed plugin at program start. Resolve every placeholder to the actual absolute path. Re-read them at every tick.
   - [ ] `<absolute-plugin-root>/skills/poteto-mode/playbooks/<execution playbook>.md`
   - [ ] `<absolute-plugin-root>/skills/swarm/SKILL.md`
   - [ ] `<absolute-control-skill-path>/SKILL.md`
   - [ ] `<absolute-plugin-root>/skills/poteto-mode/playbooks/opening-a-pr.md`
   - [ ] `<absolute-plugin-root>/skills/<each other leaf skill the program uses>/SKILL.md`
-- [ ] Arm the 30-minute audit tick through native scheduling for the requested recurring program and confirm success. During the active turn, use bounded waits. If no scheduler is available, name the unattended-wakeup gap and keep a durable resume point. Never leave the cadence to memory.
-- [ ] Use this tick prompt, verbatim. "Re-read the installed execution playbook and the active native goal or stored program objective. Audit the operation against both and fix drift in this tick. Probe every active lane and judge progress by side effects only. Revalidate a suspect lane through its current native status and live tool handle. Interrupt and replace a terminal or missing lane with its durable evidence. An observation timeout is not terminal. Then send the operator a status message on meaningful change or at the cadence she explicitly requested, keeping unchanged scheduled checks quiet otherwise, with the queue table of PR, owner, state, and head SHA, the verdicts since the last tick, what merged, open operator gates, and blockers."
+- [ ] On the operator's go, arm the 1 hour audit tick through native scheduling for the requested recurring program and confirm success. During the active turn, use bounded waits. If no scheduler is available, name the unattended-wakeup gap and keep a durable resume point. Never leave the cadence to memory.
+- [ ] Use this tick prompt, verbatim. "Re-read the installed execution playbook and the active native goal or stored program objective. Audit the operation against both and fix drift in this tick. Probe every active lane and judge progress by side effects only. Revalidate a suspect lane through its current native status and live tool handle. An observation timeout is not terminal. Interrupt and replace a terminal or missing lane with its durable evidence. Then post a short status message to the operator in chat only when the audit found a tracked change that no earlier status message reported, such as a PR opened, a code-ready head, a round launched or closed, a verdict, a handoff, a stuck agent and the action taken, a blocker added or cleared, or a decision only the operator can make. Name every such change and nothing else. Do not repeat a table, the merged list, or an unchanged blocker. If the audit found none, end the turn with no reply text. Either way, log this tick's row in your decision trail. The row names the items reported, or none."
 - [ ] On the operator's hold or stand-down, send every owner a zero-writes order at once.
 
 ### Spawn owners
@@ -57,16 +57,16 @@ Tests alone are not sufficient verification. A PR is verified only when its unit
 ### PR mechanics, for every PR
 
 - [ ] Resolve the forge once. Default to `gh`; if `command -v origin` succeeds and Origin can resolve the repository, use `origin pr` for every PR operation. Record any fallback to `gh`. Never require `gt`.
-- [ ] Open the PR ready, never draft, with `origin pr create --status open --base <base-branch>` or `gh pr create --base <base-branch>` according to the resolved forge. A stack child targets its parent branch.
+- [ ] Open the PR ready, never draft, per **Opening a PR**. Use the run's built-in PR tool when it has one, else `origin pr create --status open --base <base-branch>` or `gh pr create --base <base-branch>` according to the resolved forge. A stack child targets its parent branch.
 - [ ] Run the repo's lint and typecheck once before the PR-facing push. Push with hooks on.
 - [ ] Run `/deslop` before each commit and `/no-comments` before review.
 - [ ] Triage every Bugbot and security-reviewer comment per `../references/bugbot-triage.md`.
-- [ ] Rebase onto current trunk before babysit and again before the merge-ready report.
+- [ ] Rebase onto current trunk before the code-ready report and babysit. Keep that merge base in fix rounds. Rebase again only at handoff prep, on a `git merge-tree` conflict with trunk, or on a CI failure that comes from a change on trunk. The user merges.
 
 ### Verdict and merge, for every PR
 
-- [ ] At the merge-ready head SHA, run the swarm per `pstack/skills/swarm/SKILL.md`. One gates lane. The ten live lanes from the PR's **Verify, live** block. The perf lane from its **Verify, perf** block. One audit lane that reads the diff and the receipts and distrusts the PR body.
-- [ ] Clean only when every lane is `PASS`. Findings go back to the owner. A new head gets a fresh swarm and a fresh verdict.
+- [ ] At the code-ready head SHA and at each later push that changes the patch, run the swarm per the installed **swarm** skill. One gates lane. The ten live lanes from the PR's **Verify, live** block. The perf lane from its **Verify, perf** block. Two or more audit lanes, each with its own focus, that read the diff and the receipts and distrust the PR body. The root audits the receipts in the merge-ready report before the verdict.
+- [ ] Clean only when every lane is `PASS`. Findings go back to the owner, including a defect that a lane filed as a note. A new head gets a fresh swarm and a fresh verdict, except for results that stay valid under the patch-id rule in `playbooks/shipping.md`. The user merges.
 - [ ] <The merge or append rule from the execution playbook, with the patch-id rule from `playbooks/shipping.md`.>
 
 ### Boot recipe, for every live lane

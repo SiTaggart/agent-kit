@@ -1,0 +1,5 @@
+interface:
+  display_name: Sync pstack
+  short_description: 'PStack: Sync pstack'
+policy:
+  allow_implicit_invocation: false
