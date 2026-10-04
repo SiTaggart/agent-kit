@@ -116,7 +116,7 @@ Hooks. Keeping the old plugin enabled can duplicate skills and safeguards.
 .agents/plugins/marketplace.json  Codex catalog
 .claude-plugin/marketplace.json   Claude catalog
 .cursor-plugin/marketplace.json   Cursor/Grok catalog
-.cursor/skills/sync-pstack/       Repo-only skill for syncing the pstack port
+.agents/skills/sync-pstack/       Repo-only skill for syncing the pstack port
 plugins/
   engineering/                   Skills, manifests, README
   git/                           Skills, manifests, README

@@ -8,7 +8,7 @@ disable-model-invocation: true
 
 Bring the upstream delta since the recorded pin into this Codex and Claude port. Do not rewrite the port.
 
-This skill belongs to the agent-kit repository. It is not a skill in the pstack plugin, and it must not be copied into `plugins/pstack/skills/`.
+This skill belongs to the agent-kit repository at `.agents/skills/sync-pstack/`. It is not a skill in the pstack plugin, and it must not be copied into `plugins/pstack/skills/`.
 
 ## Intent
 
@@ -16,7 +16,7 @@ The port tracks Lauren Tan's PStack. A sync copies behavior that landed upstream
 
 ## Where the pin lives
 
-The recorded pin is the commit and version in the first blockquote of [plugins/pstack/README.md](../../plugins/pstack/README.md). The package version in both plugin manifests and both marketplace catalogs tracks that upstream version.
+The recorded pin is the commit and version in the first blockquote of [plugins/pstack/README.md](../../../plugins/pstack/README.md). The package version in both plugin manifests and both marketplace catalogs tracks that upstream version.
 
 Confirm the upstream tree from that README and the plugin manifests. Today that tree is `pstack/` on `main` of `https://github.com/cursor/plugins`. If those docs and the tree disagree, follow the repo.
 
