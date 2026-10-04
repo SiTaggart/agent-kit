@@ -36,7 +36,7 @@ Run:
 $setup-pstack
 ```
 
-[`$setup-pstack`](../../skills/setup-pstack/SKILL.md) detects the models you have access to, shows you each role (code delegates, judgment, the review panels), and asks what you want. Answer the questions. It writes optional `~/.codex/pstack-models.json` overrides that every pstack skill reads over the bundled [models.json](../../models.json). No global rule or main-chat model setting changes. The quality-first defaults use Astra with high effort for hard reasoning, xhigh for the hardest tasks, and Sol with high effort for routine work. Panels use Astra, Sol, and Terra with high effort; all three are OpenAI models.
+[`$setup-pstack`](../../skills/setup-pstack/SKILL.md) detects the models you have access to, asks for a reasoning budget, shows you each role (code delegates, judgment, the review panels), and asks what you want. Answer the questions. It writes optional `~/.codex/pstack-models.json` overrides that every pstack skill reads over the bundled [models.json](../../models.json). No global rule or main-chat model setting changes. The budget changes effort on those roles. It does not replace which model a role uses. The quality-first defaults use Astra with high effort for hard reasoning, xhigh for the hardest tasks, and Sol with high effort for routine work. Panels use Astra, Sol, and Terra with high effort; all three are OpenAI models.
 
 You only override what you care about. A role with no entry in the overrides keeps the bundled default. To restore a default later, delete that role's entry, or just run `$setup-pstack` again.
 

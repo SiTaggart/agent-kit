@@ -65,7 +65,7 @@ Before the skill hands back its summary, it spawns a reviewer on a different ava
 
 The contract above drives one task to one finish condition. Some nights hold more, a queue of independent changes or a whole program. Three playbooks scale the same trust up.
 
-[Autopilot-full](../../skills/poteto-mode/playbooks/autopilot-full.md) runs a queue of independent PRs to merge-ready. Each PR gets one owner agent that carries it from build through verification, and no owner declares readiness on its own verdict. A swarm of fresh verifiers checks every merge-ready head, and only a clean verdict allows handoff to the user for merging:
+[Autopilot-full](../../skills/poteto-mode/playbooks/autopilot-full.md) runs a queue of independent PRs to merge-ready. Each PR gets one owner agent that carries it from build through verification, and no owner declares readiness on its own verdict. A swarm of fresh verifiers starts a round at the owner's code-ready head and again at every later push that changes the patch. Only a clean verdict allows handoff to the user for merging:
 
 ```text
 $poteto-mode full autopilot on this queue. each item is independent. i want them merge-ready by morning.

@@ -1,6 +1,6 @@
 # pstack
 
-> Codex and Claude Code port of Lauren Tan's upstream PStack, pinned to `71ed0d1076fec562c1b74ee353121a8d00f75382` (v0.15.0). The original guide and author voice follow, with direct host adaptations described in [RUNTIME.md](./RUNTIME.md). This package stops at merge-ready; the user merges.
+> Codex and Claude Code port of Lauren Tan's upstream PStack, pinned to `e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a` (v0.15.9). The original guide and author voice follow, with direct host adaptations described in [RUNTIME.md](./RUNTIME.md). This package stops at merge-ready; the user merges. Maintainers of the agent-kit repository repeat the sync with the repo skill [sync-pstack](../../.agents/skills/sync-pstack/SKILL.md). That skill is not part of this plugin.
 
 i'm [poteto](https://x.com/poteto). i'm not a president or ceo, but i've worked with millions of lines of code at Meta, Netflix, and Cursor. i'm also on the react core team where i help build and maintain react compiler.
 
@@ -49,7 +49,7 @@ model defaults. Cursor users can use the [native upstream plugin](https://github
 
 two steps:
 
-1. run [`$setup-pstack`](./skills/setup-pstack/SKILL.md) and choose which models you want.
+1. run [`$setup-pstack`](./skills/setup-pstack/SKILL.md), pick a reasoning budget, and choose which models you want.
 2. use [`$poteto-mode`](./skills/poteto-mode/SKILL.md) whenever you're doing anything that requires rigor.
 
 new here? the [pstack guide](./docs/guide/README.md) walks you through a first real task, from setup and prompting through verification and overnight runs.
@@ -99,7 +99,7 @@ morning.
 | [shipping](./skills/poteto-mode/playbooks/shipping.md) | independently verify a green stack, then hand the contiguous verified run to the user for bottom-up merging. |
 | [autonomous run](./skills/poteto-mode/playbooks/autonomous-run.md) | drive a long task to completion without stopping. |
 | [orchestrate](./skills/poteto-mode/playbooks/orchestrate.md) | a standing project handed to one coordinator chat: multi-day, many stacked prs, fleets of subagents. |
-| [autopilot-full](./skills/poteto-mode/playbooks/autopilot-full.md) | run independent prs to merge-ready with one owner per pr and root verification of each merge-ready head. |
+| [autopilot-full](./skills/poteto-mode/playbooks/autopilot-full.md) | run independent prs to merge-ready with one owner per pr and a root swarm verdict on each round, from the code-ready head on. |
 | [autopilot-stack](./skills/poteto-mode/playbooks/autopilot-stack.md) | build and verify one linear base-branch stack for the operator to review and land. |
 | [session pickup](./skills/poteto-mode/playbooks/session-pickup.md) | resume or take over a prior agent's in-flight work. |
 | [pause safely](./skills/poteto-mode/playbooks/pause-safely.md) | suspend in-flight work cleanly so it can be resumed later. |
@@ -153,8 +153,10 @@ $interrogate review this pr.
 | [`$make-bot-ui`](./skills/make-bot-ui/SKILL.md) | you want a page or dashboard whose buttons wake an agent over a webhook. the upstream Grok Bot integration needs an exact native webhook contract that must pass the runtime preflight; the skill reports that limit before setup. |
 | [`$setup-pstack`](./skills/setup-pstack/SKILL.md) | you want to pick which models pstack uses per role. detects your models and writes optional role overrides. |
 | [`$reflect`](./skills/reflect/SKILL.md) | a long task landed and you want the recipe captured as a skill edit. |
+| [`$correct`](./skills/correct/SKILL.md) | you keep correcting agents for the same mistakes. mines history for mistake classes, fixes each at the highest level that works (architecture, then types, lint, and ci, then tests, with docs last), and keeps a table pairing each rule with what enforces it. |
 | [`$teach`](./skills/teach/SKILL.md) | you want to actually understand a change or subsystem, not just have it summarized. runs how + why and weaves one plain explanation, built up diagram by diagram. |
 | [`$tdd`](./skills/tdd/SKILL.md) | you're fixing a bug and there's a cheap local test path. write the failing test first, then the fix. |
+| [`$benchmark-checklist`](./skills/benchmark-checklist/SKILL.md) | you ran a benchmark or measured a speedup or regression. vets the number (limiter, tuning, errors, repeat runs, end-to-end relevance) before you report or act on it. |
 | [`$no-comments`](./skills/no-comments/SKILL.md) | strip comments before review; spawns Comment Sicko, fixes accepted findings, offers encodings for claimed constraints. |
 | [`$typescript-best-practices`](./skills/typescript-best-practices/SKILL.md) | you're reading or editing typescript. grounds the type-system-discipline principle in syntax. |
 | [`$figure-it-out`](./skills/figure-it-out/SKILL.md) | no bundled playbook fits. designs a rigorous, auditable playbook for the task. |
@@ -208,6 +210,7 @@ tdd:               $tdd implement
 unslop:            can we unslop and tighten the new changes?
 reflect:           $reflect that took too long. capture what we learned so the next run doesn't
                    repeat it.
+correct:           $correct
 show-me-your-work: $show-me-your-work keep a decision trail i can review when i'm back.
 automate-me:       $automate-me
 ```
@@ -224,10 +227,10 @@ pstack also ships [Comment Sicko](./references/agents/comment-sicko.md), a read-
 
 ## principles
 
-twenty-three short skills, one principle each. `poteto-mode` indexes them inline and reads that index at task start. the standalone files are there so other skills can reference a principle by name, and so the index can point at the full rule for each.
+twenty-four short skills, one principle each. `poteto-mode` indexes them inline and reads that index at task start. the standalone files are there so other skills can reference a principle by name, and so the index can point at the full rule for each.
 
 <details>
-<summary>all twenty-three principles</summary>
+<summary>all twenty-four principles</summary>
 
 | principle | group | rule |
 |---|---|---|
@@ -251,6 +254,7 @@ twenty-three short skills, one principle each. `poteto-mode` indexes them inline
 | [fix-root-causes](./skills/principle-fix-root-causes/SKILL.md) | verification | Trace each symptom to its root cause and fix it there; reproduce first, ask why until you reach it, resist nil-check guards that silence crashes. |
 | [sequence-verifiable-units](./skills/principle-sequence-verifiable-units/SKILL.md) | verification | Apply to multi-step work (sweeps, migrations, runs of similar edits) and to how you stack commits and PRs. Break work into small units that each end in a verifiable state, check each before the next, and order delivery so the sequence proves itself to a reviewer. |
 | [test-behavior-not-implementation](./skills/principle-test-behavior-not-implementation/SKILL.md) | verification | Apply when you write, change, or keep a test. Call the code the way its users do and assert the result they observe against a literal expected value. If the test would still pass when every imported function returns undefined, rewrite the assertion or delete the test. |
+| [explain-the-number](./skills/principle-explain-the-number/SKILL.md) | verification | Apply before you trust, report, or act on a number you measured: a speedup, a regression, a throughput, a latency, or an eval result. Find what limits it, and rule out that it measured something other than the work you think. |
 | [guard-the-context-window](./skills/principle-guard-the-context-window/SKILL.md) | delegation | Route bulk to subagents; keep summaries in the main thread, not raw payloads. |
 | [never-block-on-the-human](./skills/principle-never-block-on-the-human/SKILL.md) | delegation | Proceed, present the result, let the human course-correct after the fact; reserve confirmation for irreversible actions. |
 | [encode-lessons-in-structure](./skills/principle-encode-lessons-in-structure/SKILL.md) | meta | Encode the rule as a lint, metadata flag, runtime check, or script instead of more text. |

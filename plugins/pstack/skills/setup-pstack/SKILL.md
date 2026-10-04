@@ -1,6 +1,6 @@
 ---
 name: setup-pstack
-description: Configure which models pstack uses per role. Detects your available models and writes host-specific model overrides for the bundled defaults. Use for /setup-pstack, "configure pstack models", or changing pstack's model choices.
+description: Configure which models pstack uses per role and at what reasoning budget. Detects your available models and writes host-specific model overrides for the bundled defaults. Use for /setup-pstack, "configure pstack models", "pstack budget", or changing pstack's model choices.
 ---
 
 # Setup pstack
@@ -17,11 +17,20 @@ Enumerate the model slugs you can pass to a native subagent in this session. Tha
 
 ### 2. Load current state
 
-Use the selected host’s bundled mapping. If its override file already exists, read it and treat its values as the current choices over those defaults. Report invalid JSON rather than overwriting it.
+Use the selected host’s bundled mapping. If its override file already exists, read it and treat its values as the current choices over those defaults. Report invalid JSON rather than overwriting it. Drop a key that is not `budget` and is not a bundled role. A retired role such as `how critics` is one of those keys. Tell the user which keys you dropped.
 
-### 3. Map and confirm
+### 3. Budget, map, and confirm
 
-Show every role with its current model, marking any real slug not in the detected set as needing a choice. Ask whether to accept as-is or change specific roles, offering the detected models plus `inherit-parent` and `auto` (both mean: this role runs on the parent chat model, which is how Auto users stay on Auto) as the options. Prefer the available user-input tool over free text, within its supported schema. Reuse choices already supplied by the user. For panel roles (arena runners, architect runners, interrogate reviewers) the value is a list, and one subagent runs per entry, alias entries included, so the list length sets the count. `arena cross-judge pool` is also a list, but Arena selects one value from it that differs from the parent model when possible, per RUNTIME.md; each host’s defaults use models from one provider. `swarm workers` is the default model for every worker unless a race or comparison assigns another model per arm.
+**(a) Ask for a budget.** Prefer the available user-input tool over free text. Offer these four options with these exact labels, and name the current budget when the override file records one.
+
+- `unlimited — keep bundled effort`
+- `large — xhigh reasoning`
+- `medium — high reasoning`
+- `small — medium reasoning`
+
+**(b) Apply it to effort, not to model ids.** Build the working table from the bundled defaults, and on a re-run keep any role the user changed by model, list, or alias (`inherit-parent`, `auto`). `unlimited` leaves every bundled effort as it is. `large`, `medium`, and `small` set the host effort field of every real choice, panel entries included, to `xhigh`, `high`, or `medium`. Codex stores that field as `reasoning_effort`. Claude stores it as `effort`. Do not rewrite a model id to encode effort. `inherit-parent` and `auto` omit both model and effort. If the detected tool cannot use the chosen effort, keep the model and mark the effort as needing a choice.
+
+**(c) Show the roles and confirm.** Show every role with its current model and effort, marking any real slug not in the detected set as needing a choice. Also list each key step 2 dropped. Ask whether to accept as-is or change specific roles, offering the detected models plus `inherit-parent` and `auto` (both mean: this role runs on the parent chat model, which is how Auto users stay on Auto) as the options. Prefer the available user-input tool over free text, within its supported schema. Reuse choices already supplied by the user. For panel roles (arena runners, architect runners, interrogate reviewers) the value is a list, and one subagent runs per entry, alias entries included, so the list length sets the count. `arena cross-judge pool` is also a list, but Arena selects one value from it that differs from the parent model when possible, per RUNTIME.md; each host’s defaults use models from one provider. `swarm workers` is the default model for every worker unless a race or comparison assigns another model per arm. The bundled model ids stay unless the user changes that role.
 
 ### 4. Validate
 
@@ -29,7 +38,7 @@ Every real slug written must be in the detected set. `inherit-parent` and `auto`
 
 ### 5. Write the overrides
 
-Write the selected host’s override file using its exact bundled role labels. Preserve existing choices the user did not change. Overwrite the complete merged JSON object so re-runs stay idempotent. Delete a role to return it to the bundled default. Each choice is a model string or an object with `model` and the host’s optional effort field (`reasoning_effort` for Codex, `effort` for Claude); panel roles take a non-empty list of choices. Validate role keys, single versus panel shape, supported models and reasoning levels before writing. Reject extra object fields. `inherit-parent` and `auto` omit both model and effort. Follow RUNTIME.md for runtime fallback and dispatch.
+Write the selected host’s override file using its exact bundled role labels, plus a top-level `budget` string of `unlimited`, `large`, `medium`, or `small`. `budget` is setup metadata, not a role. Preserve existing choices the user did not change. Overwrite the complete merged JSON object so re-runs stay idempotent. Delete a role to return it to the bundled default. Each choice is a model string or an object with `model` and the host’s optional effort field (`reasoning_effort` for Codex, `effort` for Claude); panel roles take a non-empty list of choices. Validate role keys, single versus panel shape, supported models and reasoning levels before writing. Reject extra object fields. `inherit-parent` and `auto` omit both model and effort. Follow RUNTIME.md for runtime fallback and dispatch. Do not replace bundled model ids with another host's defaults.
 
 Example shape for two overrides (leave other roles at their existing or bundled values):
 

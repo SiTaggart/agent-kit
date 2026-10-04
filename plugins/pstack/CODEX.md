@@ -100,7 +100,9 @@ as the coordinator.
    `feature, refactoring`; difficult changes use `hardest tasks`; unnamed prose
    and judgment delegates (including Comment Sicko) use `judgment and prose`.
    History/source miners use `how explorer`. Unknown role keys are errors, not
-   permission to invent another model default.
+   permission to invent another model default. A top-level `budget` string
+   (`unlimited`, `large`, `medium`, or `small`) is setup metadata. It is not a
+   role. Ignore it when resolving models.
 2. A single choice is an object with `model` and optional `reasoning_effort`.
    A model string is also valid and leaves reasoning at the host default. A
    panel is a non-empty list of choices. Use exact keys from `models.json`;

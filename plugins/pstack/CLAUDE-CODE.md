@@ -66,7 +66,9 @@ work; Opus covers difficult reasoning and judgment. Panels use Opus, Sonnet, and
 Fable. These are Anthropic models, not independent providers, and these defaults
 are starting choices, not benchmark results.
 
-1. Use the exact 17 role keys in the defaults. A session's explicit choice wins;
+1. Use the exact 17 role keys in the defaults. Ignore a top-level `budget`
+   string (`unlimited`, `large`, `medium`, or `small`); it is setup metadata,
+   not a role. A session's explicit choice wins;
    otherwise an override replaces the whole bundled value for that role. Unnamed
    code/helpers use `feature, refactoring`, hard work uses `hardest tasks`, prose
    and Comment Sicko use `judgment and prose`, and history miners use `how explorer`.
