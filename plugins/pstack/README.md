@@ -1,6 +1,6 @@
 # pstack
 
-> Codex and Claude Code port of Lauren Tan's upstream PStack, pinned to `e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a` (v0.15.9). The original guide and author voice follow, with direct host adaptations described in [RUNTIME.md](./RUNTIME.md). This package stops at merge-ready; the user merges. Maintainers of the agent-kit repository repeat the sync with the repo skill [sync-pstack](../../.agents/skills/sync-pstack/SKILL.md). That skill is not part of this plugin.
+> Codex and Claude Code port of Lauren Tan's upstream PStack, pinned to `00b52d954a99ff67802cad428ff19218659f76fd` (v0.15.11). The original guide and author voice follow, with direct host adaptations described in [RUNTIME.md](./RUNTIME.md). This package stops at merge-ready; the user merges. Maintainers of the agent-kit repository repeat the sync with the repo skill [sync-pstack](../../.agents/skills/sync-pstack/SKILL.md). That skill is not part of this plugin.
 
 i'm [poteto](https://x.com/poteto). i'm not a president or ceo, but i've worked with millions of lines of code at Meta, Netflix, and Cursor. i'm also on the react core team where i help build and maintain react compiler.
 
@@ -52,7 +52,7 @@ two steps:
 1. run [`$setup-pstack`](./skills/setup-pstack/SKILL.md), pick a reasoning budget, and choose which models you want.
 2. use [`$poteto-mode`](./skills/poteto-mode/SKILL.md) whenever you're doing anything that requires rigor.
 
-new here? the [pstack guide](./docs/guide/README.md) walks you through a first real task, from setup and prompting through verification and overnight runs.
+new here? the [pstack guide](./docs/guide/README.md) walks you through a first real task, from setup and prompting through verification and overnight runs. stuck, or unsure which skill fits? ask [`$poteto-help`](./skills/poteto-help/SKILL.md).
 
 that's it. the other skills are situational; the mode reads them as needed.
 Codex defaults use Astra for hard reasoning and Sol for routine work, with
@@ -141,6 +141,7 @@ $interrogate review this pr.
 | skill | use it when |
 |---|---|
 | [`$poteto-mode`](./skills/poteto-mode/SKILL.md) | default entry point for any non-trivial task. |
+| [`$poteto-help`](./skills/poteto-help/SKILL.md) | you're new to pstack, or unsure which skill, playbook, or principle fits. finds out what you're trying to do, answers that part, and hands you a prompt to type. runs only when you type `$poteto-help` (Claude: `/pstack:poteto-help`). |
 | [`$how`](./skills/how/SKILL.md) | you want a walkthrough of how a subsystem works. |
 | [`$why`](./skills/why/SKILL.md) | you want to know why something was built this way. discovers available MCPs at run time and queries each evidence category in parallel (source control, issue tracker, long-form docs, real-time chat, infra observability, error tracking, analytics warehouse). |
 | [`$recall`](./skills/recall/SKILL.md) | you're starting or resuming work and want your recent context on a topic rebuilt from your own chat history and the shared record, handed back as a tight current-state brief. |
@@ -213,6 +214,7 @@ reflect:           $reflect that took too long. capture what we learned so the n
 correct:           $correct
 show-me-your-work: $show-me-your-work keep a decision trail i can review when i'm back.
 automate-me:       $automate-me
+help:              $poteto-help which skill should i use to review this branch?
 ```
 
 </details>
