@@ -38,7 +38,7 @@ $setup-pstack
 
 [`$setup-pstack`](../../skills/setup-pstack/SKILL.md) detects the models you have access to, asks for a reasoning budget, shows you each role (code delegates, judgment, the review panels), and asks what you want. Answer the questions. It writes optional `~/.codex/pstack-models.json` overrides that every pstack skill reads over the bundled [models.json](../../models.json). No global rule or main-chat model setting changes. The budget changes effort on those roles. It does not replace which model a role uses. The quality-first defaults use Astra with high effort for hard reasoning, xhigh for the hardest tasks, and Sol with high effort for routine work. Panels use Astra, Sol, and Terra with high effort; all three are OpenAI models.
 
-You only override what you care about. A role with no entry in the overrides keeps the bundled default. To restore a default later, delete that role's entry, or just run `$setup-pstack` again.
+You only override what you care about. A role with no entry in the overrides keeps the bundled default. To restore a default later, delete that role's entry, or just run `$setup-pstack` again. When a bundled default changes, an override written before the change still pins the old value, so delete that role's entry, or delete the file, then run `$setup-pstack` again.
 
 You might be wondering what happens if you use Auto. Set a role to `inherit-parent` or `auto` and pstack omits the subagent `model` field, so the subagent inherits your parent chat model. Both values mean the same thing, and neither is a model slug. For a panel role the value is a list, and one subagent runs per entry, so the list length sets the panel size. Setup also configures `swarm workers`, the default model for every `$swarm` worker unless a race names a model for each arm.
 
@@ -46,9 +46,20 @@ You might be wondering what happens if you use Auto. Set a role to `inherit-pare
 
 At the end of setup, `$setup-pstack` looks for a way to prove app behavior in your project, either a `verify-*` skill or an existing harness. If it finds neither, it offers once to generate one with [`$create-verification-skill`](../../skills/create-verification-skill/SKILL.md).
 
-Say yes and it writes `.agents/skills/verify-<app>/` on Codex or `.claude/skills/verify-<app>/` on Claude, a project-local skill that teaches agents to drive your app the way a user does. It proves the skill works once before handing it over. Say no and setup moves on. You can run `$create-verification-skill` yourself any time. [Verify and ship](./06-verify-and-ship.md#create-a-project-verification-skill) covers when it earns its place.
+Say yes and it writes `.agents/skills/verify-<app>/` on Codex or `.claude/skills/verify-<app>/` on Claude, a project-local skill that teaches agents to drive your app the way a user does. It proves the skill works once before handing it over. Say no and setup moves on. You can run `$create-verification-skill` yourself any time. [Verify and ship](./06-verify-and-ship.md#create-a-project-verification-skill) covers it in depth.
+
+If you're new to pstack, say yes. An agent that can check its own work keeps going until the check passes. An agent that can't hands every result back to you to check by hand. Of everything in this guide, the verification skill pays off the most.
 
 The next PStack invocation reads the updated model overrides. A new task is needed when installing or changing plugin files, not when editing this separate role configuration.
+
+## Keep the cost in check
+
+pstack spends extra tokens on subagents and review panels. That's the price of the rigor. To spend fewer:
+
+- Rerun `$setup-pstack` and pick a smaller reasoning budget or cheaper models. A strong model in the main chat with cheaper, faster models in the code roles is a good split.
+- Set a role to `auto` or `inherit-parent` so it runs on the chat's own model.
+- Shorten a panel list. Each entry runs one subagent.
+- Save `$poteto-mode` for work that needs rigor. A small, obvious edit doesn't.
 
 ## Run your first task
 

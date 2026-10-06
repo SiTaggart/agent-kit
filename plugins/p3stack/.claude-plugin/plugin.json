@@ -1,6 +1,6 @@
 {
   "name": "p3stack",
-  "version": "0.15.9",
+  "version": "0.15.15",
   "description": "PStack for T3 Code. Rigorous agent workflows with cross-provider model panels through T3's native delegation.",
   "author": {
     "name": "Lauren Tan"

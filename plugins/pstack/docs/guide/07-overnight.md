@@ -4,6 +4,17 @@ This is the payoff for everything before it. An agent you can trust to verify it
 
 ![She waves goodnight from the door while robots keep the factory running, one updating a DECISION LOG wall board under a BUILD LOOP ACTIVE sign.](./images/overnight.jpg)
 
+## Earn the trust before the loop
+
+A loop you don't trust just produces unchecked work faster, and the mess compounds with every iteration. Before you leave one running, check that it has earned it:
+
+- You've done the task once by hand, or watched an agent do it, so you know what good looks like.
+- The agent has the tools and signals you'd use yourself: the verification skill, the profiler, the logs.
+- Every stage proves its work and can stop the line when the work misses the bar.
+- You've read a few transcripts and turned the repeated failures into tools, skills, or checks.
+
+Make the loop autonomous only after all four hold. Until then, run it while you watch.
+
 ## The overnight contract
 
 A good handoff has the goal, the finish condition, permissions, and an escape hatch. It doesn't need to be long:
@@ -32,6 +43,8 @@ available. `/loop` and Cron tools require a live session and have a limited
 lifetime; they do not keep work running after Claude exits. User-only skills
 cannot be invoked by a timer. The adapter reports these limits before promising
 an unattended wake. See [Claude runtime guidance](../../CLAUDE-CODE.md).
+
+To stop a run on purpose, tell the agent to pause, or that you're about to go offline or restart the host. The [Pause safely playbook](../../skills/poteto-mode/playbooks/pause-safely.md) finishes or backs out of the current step, commits a work-in-progress checkpoint, and writes a resume note. A fresh chat picks the work up from that note through the Session pickup playbook. Saying "keep going" never triggers a pause.
 
 ## What the loop does all night
 
@@ -82,6 +95,32 @@ $poteto-mode autopilot these five changes but stack them, don't ship. i'll land 
 ```text
 $poteto-mode orchestrate the store migration. own it until every package is converted, verified, and merge-ready. i'll check in twice a day.
 ```
+
+## Run many projects in parallel
+
+Upstream runs each body of work in a Cursor Project: one coordinator agent with a persistent thread that directs cloud subagents. This port has no Project or cloud-subagent equivalent. Use one standing coordinator conversation per body of work instead. The coordinator doesn't write code. It directs local subagents, each in its own worktree. That's the shape the Orchestrate playbook expects. Start your prompts to the coordinator with `$poteto-mode`, and the subagents it spawns follow the playbooks. The work runs on your machine, so it stops when the host session stops.
+
+A few habits help:
+
+- Give each body of work its own coordinator conversation, such as a feature, a migration, a perf push, or a tech-debt cleanup. Several can run side by side.
+- Point the coordinator at related past conversations. `$recall` turns them into context.
+- Give each PR a verification swarm before it is merge-ready, and let Autopilot-stack or Autopilot-full carry the queue.
+- Ask the coordinator for a plan backed by data, and have it answer open questions with prototypes before it asks you.
+
+One prompt can carry a whole body of work, from research through execution:
+
+```text
+$poteto-mode refactor this repo so its architecture is more agent friendly. use $correct and $architect on past commits and review comments to find the mistakes agents make most here. use $recall for context from past chats. answer open questions with prototypes instead of asking me. come back with a plan backed by real data. once i approve it, run it with autopilot-stack or autopilot-full, and ask me which.
+```
+
+## Let loops start themselves
+
+Every loop above still waits for you to start it. A scheduled or event-driven automation removes that step. Software maintenance splits into stages that suit this well: triage a report, reproduce it, fix it, verify the fix. Two rules keep such a line trustworthy:
+
+- Every stage can stop the line. Triage can decide the report is expected behavior, repro can fail to reproduce it, and the fixer can judge the change too risky. Each of those outcomes is useful, because it keeps bad work from reaching the next stage, where it costs more to undo.
+- Every stage hands over evidence. Repro attaches screenshots and video of the broken state, and the fix attaches before-and-after proof. A human can then check that the agent fixed the right thing before reading a line of code.
+
+pstack ships this as a dormant [automation pack](../../automations/benny/README.md) for Slack issue reports. One automation triages each report. The other reproduces confirmed bugs and may prepare a small draft fix. Point an agent at its [`FOR_AGENTS.md`](../../automations/benny/FOR_AGENTS.md) and name the target repository to set it up. The pack stays dormant until its [host runtime preflight](../../automations/benny/RUNTIME.md) passes.
 
 **Pitfall:** a duration is not a finish condition. "work on this for 4 hours" gives the agent nothing to check, and you'll wake up to four hours of motion instead of a result. Give the goal a predicate that can pass or fail.
 
