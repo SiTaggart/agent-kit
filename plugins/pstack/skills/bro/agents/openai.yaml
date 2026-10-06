@@ -1,5 +1,0 @@
-interface:
-  display_name: Bro
-  short_description: 'PStack: Bro'
-policy:
-  allow_implicit_invocation: false
