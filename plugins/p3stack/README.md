@@ -30,8 +30,6 @@ codex plugin marketplace add SiTaggart/agent-kit
 codex plugin add p3stack@agent-kit
 ```
 
-Do not install P3Stack and the legacy PStack plugin together in Codex. They have the same skill names, and Codex does not add a plugin prefix.
-
 ## Use
 
 Start a rigorous task with `/p3stack:poteto-mode` in Claude Code, or `$poteto-mode` in Codex. The mode selects a playbook and runs the other skills when the steps need them. The [guide](./docs/guide/README.md) walks through a first task and describes the skills and playbooks. When you are not sure which skill fits, type `$poteto-help` with your question.

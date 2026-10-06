@@ -14,8 +14,6 @@ This skill belongs to the agent-kit repository at `.agents/skills/sync-p3stack/`
 
 P3Stack tracks Lauren Tan's PStack. A sync copies behavior that landed upstream after the pin, then adapts it so the package still runs as a T3 Code coordinator on Claude Code and Codex. The result is that delta, plus the adaptation required to keep the invariants.
 
-P3Stack is the only maintained port. `plugins/pstack/` is a legacy port that is frozen at its last pin and will be removed. Do not sync into it.
-
 ## Where the pin lives
 
 The recorded pin is the commit and version in the first blockquote of [plugins/p3stack/README.md](../../../plugins/p3stack/README.md). The package version in both plugin manifests and both marketplace catalogs tracks that upstream version.

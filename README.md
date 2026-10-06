@@ -14,21 +14,19 @@ switch command safeguards on or off separately.
   session research, and retained learnings.
 - **[Hooks](plugins/hooks/README.md)** — independently switchable command
   safeguards. Contains no skills.
-- **[P3Stack for T3 Code](plugins/p3stack/README.md)** — the maintained,
-  pinned adaptation of Lauren Tan's PStack, with its upstream skills,
+- **[P3Stack for T3 Code](plugins/p3stack/README.md)** — a pinned
+  adaptation of Lauren Tan's PStack, with its upstream skills,
   companions, and guide. It delegates each role to a Claude, Codex, or Grok
   model through T3 orchestration. See its README for requirements and
   attribution.
-- **[PStack for Codex and Claude Code](plugins/pstack/README.md)** — the legacy
-  port. It is frozen at v0.15.15 and will be removed. Use P3Stack instead.
 - **[LOX](plugins/lox/README.md)** — five explicitly invoked skills for PR
   descriptions, simplicity review, plans, adversarial review, and a local
   review/fix loop. Packaged separately for side-by-side trials.
 
 Engineering, Git, Knowledge, and Hooks support Claude Code, Codex, Cursor, and
-Grok. PStack and LOX support Codex and Claude Code; Cursor users can use the native
-upstream PStack plugin. P3Stack supports Codex and Claude Code threads inside
-T3 Code. No skill plugin includes hooks.
+Grok. LOX supports Codex and Claude Code. P3Stack supports Codex and Claude
+Code threads inside T3 Code; Cursor users can use the native upstream PStack
+plugin. No skill plugin includes hooks.
 
 ## Install
 
@@ -45,7 +43,6 @@ codex plugin add engineering@agent-kit
 codex plugin add git@agent-kit
 codex plugin add knowledge@agent-kit
 codex plugin add hooks@agent-kit
-codex plugin add pstack@agent-kit
 codex plugin add p3stack@agent-kit
 codex plugin add lox@agent-kit
 ```
@@ -64,7 +61,6 @@ use published repository content and do not include local edits.
 /plugin install git@agent-kit
 /plugin install knowledge@agent-kit
 /plugin install hooks@agent-kit
-/plugin install pstack@agent-kit
 /plugin install p3stack@agent-kit
 /plugin install lox@agent-kit
 ```
@@ -130,7 +126,6 @@ plugins/
   knowledge/                     Skills, manifests, README
   hooks/                         Hooks, manifests, README
   p3stack/                       T3 Code port of PStack, with its guide
-  pstack/                        Legacy Codex and Claude port, frozen
   lox/                           Selected Codex and Claude trial skills
 src/                             Marketplace validation CLI
 tests/                           Plugin and script checks
