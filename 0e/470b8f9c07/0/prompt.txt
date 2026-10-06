@@ -1,0 +1,9 @@
+Act as the review sub-agent for this task.
+
+P3Stack smoke test. Read-only: do not edit, create, or delete any file, and do not call delegate_task, t3_thread_launch, or create_threads.
+
+1. Read /Users/staggart/.t3/worktrees/agent-kit/t3code-1aabec1c/plugins/p3stack/RUNTIME.md in full.
+2. Reply with exactly three lines:
+   MODEL: <your provider and exact model id>
+   DEPTH: <the depth rule from the "Delegation rules" section, in one sentence>
+   CEILING: <the effort values the "Models" section says never to send>
