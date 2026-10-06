@@ -57,7 +57,7 @@ No role uses `max` reasoning. Grok always uses its fast model. A budget from `se
 
 ## What stays out
 
-The upstream `benny` automation pack and the Codex session indexer are not part of this package. T3 thread tools replace session history, and `schedule_task` and `watch_pull_request` replace event automations.
+The upstream `benny` automation pack is not part of this package. T3 thread tools give session history, and `schedule_task` and `watch_pull_request` replace event automations. For sessions outside T3, the poteto-mode `harness-sessions.py` script reads the Codex, Claude Code, and Grok Build session stores.
 
 ## Maintenance
 

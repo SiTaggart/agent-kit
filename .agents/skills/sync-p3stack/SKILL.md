@@ -46,7 +46,7 @@ New upstream skills get the runtime preamble that links `../../RUNTIME.md`, and 
 
 Upstream agent personas land in `references/agents/`. The plugin manifests stay. Only their version moves with the pin.
 
-Preserve port-local files that upstream does not have: `skills/setup-pstack/` (the T3 setup skill), `models.json`, and the bundled companions `browser-use`, `control-cli`, `deslop`, and `verify-this`. Do not add `CODEX.md`, `CLAUDE-CODE.md`, `models.claude.json`, `scripts/codex-sessions.py`, or the upstream `automations/` pack.
+Preserve port-local files that upstream does not have: `skills/setup-pstack/` (the T3 setup skill), `models.json`, `skills/poteto-mode/scripts/harness-sessions.py`, and the bundled companions `browser-use`, `control-cli`, `deslop`, and `verify-this`. Keep `skills/poteto-mode/scripts/worktree-audit.sh` reading all three harness session stores through `harness-sessions.py`. The coordinator, its delegates, and its lanes can each run in Codex, Claude Code, or Grok Build. Do not add `CODEX.md`, `CLAUDE-CODE.md`, `models.claude.json`, `scripts/codex-sessions.py`, or the upstream `automations/` pack.
 
 ## Proof
 
