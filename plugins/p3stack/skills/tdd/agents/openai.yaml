@@ -1,0 +1,5 @@
+interface:
+  display_name: Tdd
+  short_description: 'PStack: Tdd'
+policy:
+  allow_implicit_invocation: false

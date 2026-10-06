@@ -1,0 +1,5 @@
+interface:
+  display_name: Unslop
+  short_description: 'PStack: Unslop'
+policy:
+  allow_implicit_invocation: false

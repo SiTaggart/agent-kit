@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle outcome oriented execution
+  short_description: 'PStack: Principle outcome oriented execution'
+policy:
+  allow_implicit_invocation: false

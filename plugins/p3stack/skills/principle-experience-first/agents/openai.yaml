@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle experience first
+  short_description: 'PStack: Principle experience first'
+policy:
+  allow_implicit_invocation: false

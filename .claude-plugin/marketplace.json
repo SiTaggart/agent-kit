@@ -38,6 +38,12 @@
       "description": "PStack engineering workflows, principles, and model panels for Claude Code."
     },
     {
+      "name": "p3stack",
+      "source": "./plugins/p3stack",
+      "version": "0.15.9",
+      "description": "PStack workflows with cross-provider model panels for T3 Code."
+    },
+    {
       "name": "lox",
       "version": "0.1.0",
       "source": "./plugins/lox",

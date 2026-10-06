@@ -1,0 +1,5 @@
+interface:
+  display_name: Automate me
+  short_description: 'PStack: Automate me'
+policy:
+  allow_implicit_invocation: false

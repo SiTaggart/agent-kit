@@ -17,13 +17,17 @@ switch command safeguards on or off separately.
 - **[PStack for Codex and Claude Code](plugins/pstack/README.md)** — a pinned
   adaptation of Lauren Tan's PStack, with its upstream skills, companions, guide, and dormant
   automation pack. See its README for capability requirements and attribution.
+- **[P3Stack for T3 Code](plugins/p3stack/README.md)** — the PStack port for
+  T3 Code. It shares PStack's skills and delegates each role to a Claude,
+  Codex, or Grok model through T3 orchestration.
 - **[LOX](plugins/lox/README.md)** — five explicitly invoked skills for PR
   descriptions, simplicity review, plans, adversarial review, and a local
   review/fix loop. Packaged separately for side-by-side trials.
 
 Engineering, Git, Knowledge, and Hooks support Claude Code, Codex, Cursor, and
 Grok. PStack and LOX support Codex and Claude Code; Cursor users can use the native
-upstream PStack plugin. No skill plugin includes hooks.
+upstream PStack plugin. P3Stack supports Codex and Claude Code threads inside
+T3 Code. No skill plugin includes hooks.
 
 ## Install
 
@@ -41,6 +45,7 @@ codex plugin add git@agent-kit
 codex plugin add knowledge@agent-kit
 codex plugin add hooks@agent-kit
 codex plugin add pstack@agent-kit
+codex plugin add p3stack@agent-kit
 codex plugin add lox@agent-kit
 ```
 
@@ -59,6 +64,7 @@ use published repository content and do not include local edits.
 /plugin install knowledge@agent-kit
 /plugin install hooks@agent-kit
 /plugin install pstack@agent-kit
+/plugin install p3stack@agent-kit
 /plugin install lox@agent-kit
 ```
 
@@ -116,13 +122,14 @@ Hooks. Keeping the old plugin enabled can duplicate skills and safeguards.
 .agents/plugins/marketplace.json  Codex catalog
 .claude-plugin/marketplace.json   Claude catalog
 .cursor-plugin/marketplace.json   Cursor/Grok catalog
-.agents/skills/sync-pstack/       Repo-only skill for syncing the pstack port
+.agents/skills/sync-pstack/       Repo-only skill for syncing the pstack and p3stack ports
 plugins/
   engineering/                   Skills, manifests, README
   git/                           Skills, manifests, README
   knowledge/                     Skills, manifests, README
   hooks/                         Hooks, manifests, README
   pstack/                        Codex and Claude port and documentation
+  p3stack/                       T3 Code port that mirrors pstack's skills
   lox/                           Selected Codex and Claude trial skills
 src/                             Marketplace validation CLI
 tests/                           Plugin and script checks
@@ -158,4 +165,4 @@ plugins into a harness.
 
 ## License
 
-MIT. PStack retains its [upstream license](plugins/pstack/LICENSE).
+MIT. PStack and P3Stack retain their [upstream license](plugins/pstack/LICENSE).

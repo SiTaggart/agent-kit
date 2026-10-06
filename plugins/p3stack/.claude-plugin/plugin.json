@@ -1,0 +1,22 @@
+{
+  "name": "p3stack",
+  "version": "0.15.9",
+  "description": "PStack for T3 Code. Rigorous agent workflows with cross-provider model panels through T3's native delegation.",
+  "author": {
+    "name": "Lauren Tan"
+  },
+  "homepage": "https://github.com/cursor/plugins/tree/main/pstack",
+  "repository": "https://github.com/SiTaggart/agent-kit",
+  "license": "MIT",
+  "keywords": [
+    "pstack",
+    "p3stack",
+    "t3-code",
+    "poteto-mode",
+    "workflow",
+    "principles",
+    "subagents",
+    "cross-provider"
+  ],
+  "skills": "./skills/"
+}

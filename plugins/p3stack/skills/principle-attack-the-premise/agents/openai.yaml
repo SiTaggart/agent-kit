@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle attack the premise
+  short_description: 'PStack: Principle attack the premise'
+policy:
+  allow_implicit_invocation: false

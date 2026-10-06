@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle migrate callers then delete legacy apis
+  short_description: 'PStack: Principle migrate callers then delete legacy apis'
+policy:
+  allow_implicit_invocation: false

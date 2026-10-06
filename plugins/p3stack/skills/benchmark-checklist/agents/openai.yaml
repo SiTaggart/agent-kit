@@ -1,0 +1,5 @@
+interface:
+  display_name: Benchmark checklist
+  short_description: 'PStack: Benchmark checklist'
+policy:
+  allow_implicit_invocation: false

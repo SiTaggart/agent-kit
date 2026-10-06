@@ -8,9 +8,9 @@ const repoRoot = path.resolve(import.meta.dir, "..");
 const pluginRoot = path.join(repoRoot, "plugins/pstack");
 const read = (file: string) => readFileSync(path.join(pluginRoot, file), "utf8");
 
-test("Codex exposes the four focused plugins, PStack, and LOX separately", () => {
+test("Codex exposes the four focused plugins, PStack, P3Stack, and LOX separately", () => {
   const catalog = JSON.parse(readFileSync(path.join(repoRoot, ".agents/plugins/marketplace.json"), "utf8"));
-  expect(catalog.plugins.map((entry: { name: string }) => entry.name)).toEqual(["engineering", "git", "knowledge", "hooks", "pstack", "lox"]);
+  expect(catalog.plugins.map((entry: { name: string }) => entry.name)).toEqual(["engineering", "git", "knowledge", "hooks", "pstack", "p3stack", "lox"]);
   expect(catalog.plugins[0].source.path).toBe("./plugins/engineering");
   expect(catalog.plugins[4].source.path).toBe("./plugins/pstack");
   expect(catalog.plugins[4].policy.installation).toBe("AVAILABLE");

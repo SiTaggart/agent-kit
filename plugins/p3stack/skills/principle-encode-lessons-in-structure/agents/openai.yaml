@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle encode lessons in structure
+  short_description: 'PStack: Principle encode lessons in structure'
+policy:
+  allow_implicit_invocation: false
