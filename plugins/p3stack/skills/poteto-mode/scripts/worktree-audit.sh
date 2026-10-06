@@ -1,15 +1,14 @@
 #!/usr/bin/env bash
 # Read-only worktree prune audit. Classifies every git worktree by size, merge
-# state, uncommitted work, remote/PR state, and the most recent chat that
-# operated in it. Emits a table sorted by size with a suggested bucket. Never
+# state, uncommitted work, remote/PR state, and the most recent Codex, Claude
+# Code, or Grok Build session that operated in it. T3 Code runs every thread in
+# one of those harnesses, so all three are read whichever one is coordinating. Emits a table sorted by size with a suggested bucket. Never
 # deletes anything; buckets are evidence, never deletion authorization.
 #
-# Usage: worktree-audit.sh [repo-path] [codex|claude]
+# Usage: worktree-audit.sh [repo-path]
 set -u
 
 repo="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
-host="${2:-codex}"
-case "$host" in codex|claude) ;; *) echo "host must be codex or claude" >&2; exit 1 ;; esac
 [ -z "$repo" ] && { echo "not in a git repo; pass a repo path" >&2; exit 1; }
 cd "$repo" || exit 1
 
@@ -24,7 +23,7 @@ prs=$(mktemp)
 gh pr list --author "@me" --state all --limit 1000 \
 	--json number,state,headRefName 2>/dev/null > "$prs" || echo "[]" > "$prs"
 
-# Only session metadata for this repository's exact worktrees is selected.
+# Only session metadata for this repository's worktrees is selected.
 session_index=$(mktemp)
 trap 'rm -f "$prs" "$session_index"' EXIT
 session_args=()
@@ -32,11 +31,9 @@ while IFS= read -r workspace; do
     session_args+=(--workspace "$workspace")
 done < <(git worktree list --porcelain | sed -n 's/^worktree //p')
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
-if [ "$host" = codex ]; then
-    python3 "$script_dir/../../../scripts/codex-sessions.py" "${session_args[@]}" > "$session_index" || printf '[]\n' > "$session_index"
-else
-    printf '[]\n' > "$session_index"
-    echo "Claude session history is unknown; verify worktree usage separately." >&2
+if ! python3 "$script_dir/harness-sessions.py" "${session_args[@]}" > "$session_index"; then
+    printf '{"sessions":[],"unavailable":[]}\n' > "$session_index"
+    echo "Session history is unknown; verify worktree usage separately." >&2
 fi
 now=$(date +%s)
 
@@ -73,11 +70,13 @@ git worktree list --porcelain | sed -n 's/^worktree //p' | while IFS= read -r wt
 		'.[] | select(.headRefName==$b) | "#\(.number)/\(.state)"' "$prs" 2>/dev/null | head -1)
 	[ -z "$pr" ] && pr="-"
 
-	# Exact cwd matching avoids assigning a neighboring worktree's chat.
+	# The indexer assigns each session to its deepest worktree, so a neighbor's chat never counts.
 	last="unknown"; last_ts=0
-	last_ts=$(jq -r --arg wt "$wt" '[.[] | select(.cwd==$wt) | .mtime] | max // 0 | floor' "$session_index")
-	if [ "$last_ts" -gt 0 ] 2>/dev/null; then
-		last=$(date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null)
+	newest=$(jq -r --arg wt "$(cd "$wt" && pwd -P)" \
+		'[.sessions[] | select(.workspace==$wt)] | max_by(.mtime) // empty | "\(.mtime | floor) \(.harness)"' "$session_index")
+	if [ -n "$newest" ]; then
+		last_ts=${newest%% *}
+		last="$(date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null)/${newest#* }"
 	fi
 	recent=$([ "$last_ts" -gt 0 ] 2>/dev/null && [ $(( (now - last_ts) / 86400 )) -le 4 ] && echo yes || echo no)
 

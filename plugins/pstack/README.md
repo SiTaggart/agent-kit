@@ -1,6 +1,6 @@
 # pstack
 
-> Codex and Claude Code port of Lauren Tan's upstream PStack, pinned to `df581122cde17e6e27686b5a448bde23e4ad4318` (v0.15.15). The original guide and author voice follow, with direct host adaptations described in [RUNTIME.md](./RUNTIME.md). This package stops at merge-ready; the user merges. Maintainers of the agent-kit repository repeat the sync with the repo skill [sync-pstack](../../.agents/skills/sync-pstack/SKILL.md). That skill is not part of this plugin.
+> Codex and Claude Code port of Lauren Tan's upstream PStack, pinned to `df581122cde17e6e27686b5a448bde23e4ad4318` (v0.15.15). The original guide and author voice follow, with direct host adaptations described in [RUNTIME.md](./RUNTIME.md). This package stops at merge-ready; the user merges. This port is frozen at this pin and will be removed. [P3Stack](../p3stack/README.md) is the maintained port.
 
 i'm [poteto](https://x.com/poteto). i'm not a president or ceo, but i've worked with millions of lines of code at Meta, Netflix, and Cursor. i'm also on the react core team where i help build and maintain react compiler.
 

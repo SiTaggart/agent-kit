@@ -191,10 +191,20 @@ evidence. Thread summaries do not prove which tools ran. If no thread matches,
 use a labeled digest of the current session. Report that historical evidence is
 missing.
 
-For the worktree audit, run `scripts/worktree-audit.sh <repo> claude` from the
-installed poteto-mode skill. It marks chat history as unknown. Then use
-`t3_worktree_list` and `t3_thread_list` to find the threads that use each
-worktree. A worktree without a thread is not proof that it is unused.
+T3 Code runs each thread inside a Codex, Claude Code, or Grok Build harness, and
+a session started outside T3 is not a T3 thread. To find those sessions for a
+workspace, run `scripts/harness-sessions.py --workspace <path>` from the
+installed poteto-mode skill. It reads the session stores of all three harnesses
+(`$CODEX_HOME`, `$CLAUDE_CONFIG_DIR`, and `$GROK_HOME`, or their `~/.codex`,
+`~/.claude`, and `~/.grok` defaults). It returns paths and times, not message
+content, and names each store that is missing.
+
+For the worktree audit, run `scripts/worktree-audit.sh <repo>` from the
+installed poteto-mode skill. It reads all three harness session stores, whichever
+harness runs the coordinator, because delegates and lanes can run in the others.
+Then use `t3_worktree_list` and `t3_thread_list` to find the threads that use
+each worktree. A worktree without a session or a thread is not proof that it is
+unused.
 
 Use `schedule_task` only for a reminder, monitor, or recurring run that the user
 asked for. Report the cadence and the next run time. A skill with

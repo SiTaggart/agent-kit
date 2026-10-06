@@ -1,6 +1,6 @@
 # p3stack
 
-> T3 Code port of Lauren Tan's upstream PStack, pinned to `df581122cde17e6e27686b5a448bde23e4ad4318` (v0.15.15). It shares the skills, principles, playbooks, and personas of the [Codex and Claude Code port](https://github.com/SiTaggart/agent-kit/blob/main/plugins/pstack/README.md). Only the runtime differs. [RUNTIME.md](./RUNTIME.md) maps PStack to T3 Code orchestration. This package stops at merge-ready. The user merges.
+> T3 Code port of Lauren Tan's upstream PStack, pinned to `df581122cde17e6e27686b5a448bde23e4ad4318` (v0.15.15). It carries the upstream skills, principles, playbooks, personas, and guide. [RUNTIME.md](./RUNTIME.md) maps PStack to T3 Code orchestration. This package stops at merge-ready. The user merges.
 
 PStack makes an agent work like a careful engineering team. P3Stack keeps that system, and lets each role use the best model from any provider. The coordinator runs in a Claude Code or Codex thread in T3 Code. Delegates run on Claude, Codex, or Grok through T3's `delegate_task`.
 
@@ -30,11 +30,11 @@ codex plugin marketplace add SiTaggart/agent-kit
 codex plugin add p3stack@agent-kit
 ```
 
-Do not install P3Stack and PStack together in Codex. They have the same skill names, and Codex does not add a plugin prefix. Claude Code adds the prefix, so `/p3stack:how` and `/pstack:how` stay separate.
+Do not install P3Stack and the legacy PStack plugin together in Codex. They have the same skill names, and Codex does not add a plugin prefix.
 
 ## Use
 
-Start a rigorous task with `/p3stack:poteto-mode` in Claude Code, or `$poteto-mode` in Codex. The mode selects a playbook and runs the other skills when the steps need them. The [PStack README](https://github.com/SiTaggart/agent-kit/blob/main/plugins/pstack/README.md) and [guide](https://github.com/SiTaggart/agent-kit/blob/main/plugins/pstack/docs/guide/README.md) describe every skill and playbook.
+Start a rigorous task with `/p3stack:poteto-mode` in Claude Code, or `$poteto-mode` in Codex. The mode selects a playbook and runs the other skills when the steps need them. The [guide](./docs/guide/README.md) walks through a first task and describes the skills and playbooks. When you are not sure which skill fits, type `$poteto-help` with your question.
 
 ## Default models
 
@@ -57,11 +57,11 @@ No role uses `max` reasoning. Grok always uses its fast model. A budget from `se
 
 ## What stays out
 
-The PStack guide, the dormant `benny` automation pack, and the Codex session indexer are not part of this package. T3 thread tools replace session history.
+The upstream `benny` automation pack is not part of this package. T3 thread tools give session history, and `schedule_task` and `watch_pull_request` replace event automations. For sessions outside T3, the poteto-mode `harness-sessions.py` script reads the Codex, Claude Code, and Grok Build session stores.
 
 ## Maintenance
 
-The `sync-pstack` repository skill updates both ports from one upstream sync. The skill tree, personas, and licenses are copies of the PStack port, except `skills/setup-pstack/`. Tests enforce this.
+P3Stack is the maintained PStack port in this repository. The [`sync-p3stack`](../../.agents/skills/sync-p3stack/SKILL.md) repository skill merges each upstream release into it. That skill is not part of this plugin. `tests/p3stack-plugin.test.ts` checks the pin, the versions, the skill contracts, and the model defaults.
 
 ## License
 

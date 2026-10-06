@@ -14,12 +14,13 @@ switch command safeguards on or off separately.
   session research, and retained learnings.
 - **[Hooks](plugins/hooks/README.md)** — independently switchable command
   safeguards. Contains no skills.
-- **[PStack for Codex and Claude Code](plugins/pstack/README.md)** — a pinned
-  adaptation of Lauren Tan's PStack, with its upstream skills, companions, guide, and dormant
-  automation pack. See its README for capability requirements and attribution.
-- **[P3Stack for T3 Code](plugins/p3stack/README.md)** — the PStack port for
-  T3 Code. It shares PStack's skills and delegates each role to a Claude,
-  Codex, or Grok model through T3 orchestration.
+- **[P3Stack for T3 Code](plugins/p3stack/README.md)** — the maintained,
+  pinned adaptation of Lauren Tan's PStack, with its upstream skills,
+  companions, and guide. It delegates each role to a Claude, Codex, or Grok
+  model through T3 orchestration. See its README for requirements and
+  attribution.
+- **[PStack for Codex and Claude Code](plugins/pstack/README.md)** — the legacy
+  port. It is frozen at v0.15.15 and will be removed. Use P3Stack instead.
 - **[LOX](plugins/lox/README.md)** — five explicitly invoked skills for PR
   descriptions, simplicity review, plans, adversarial review, and a local
   review/fix loop. Packaged separately for side-by-side trials.
@@ -122,14 +123,14 @@ Hooks. Keeping the old plugin enabled can duplicate skills and safeguards.
 .agents/plugins/marketplace.json  Codex catalog
 .claude-plugin/marketplace.json   Claude catalog
 .cursor-plugin/marketplace.json   Cursor/Grok catalog
-.agents/skills/sync-pstack/       Repo-only skill for syncing the pstack and p3stack ports
+.agents/skills/sync-p3stack/      Repo-only skill for syncing the p3stack port
 plugins/
   engineering/                   Skills, manifests, README
   git/                           Skills, manifests, README
   knowledge/                     Skills, manifests, README
   hooks/                         Hooks, manifests, README
-  pstack/                        Codex and Claude port and documentation
-  p3stack/                       T3 Code port that mirrors pstack's skills
+  p3stack/                       T3 Code port of PStack, with its guide
+  pstack/                        Legacy Codex and Claude port, frozen
   lox/                           Selected Codex and Claude trial skills
 src/                             Marketplace validation CLI
 tests/                           Plugin and script checks
@@ -150,19 +151,19 @@ Run from the repository root:
 
 ```bash
 bun install --frozen-lockfile
-bun install --cwd plugins/pstack/skills/poteto-mode/scripts --frozen-lockfile
+bun install --cwd plugins/p3stack/skills/poteto-mode/scripts --frozen-lockfile
 bun run validate
 bun run test
 bun run lint
 bun run type-check
-bun run --cwd plugins/pstack/skills/poteto-mode/scripts typecheck
+bun run --cwd plugins/p3stack/skills/poteto-mode/scripts typecheck
 ```
 
 Validation checks the four maintained plugins, their marketplace sources and
 manifests, skill and hook ownership, and retired paths. Tests exercise scripts,
-packaging boundaries, and PStack's bundle contracts. These checks do not install
+packaging boundaries, and P3Stack's bundle contracts. These checks do not install
 plugins into a harness.
 
 ## License
 
-MIT. PStack and P3Stack retain their [upstream license](plugins/pstack/LICENSE).
+MIT. P3Stack and PStack retain their [upstream license](plugins/p3stack/LICENSE).
