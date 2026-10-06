@@ -1,0 +1,5 @@
+interface:
+  display_name: No comments
+  short_description: 'PStack: No comments'
+policy:
+  allow_implicit_invocation: false

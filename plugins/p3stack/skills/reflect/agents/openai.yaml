@@ -1,0 +1,5 @@
+interface:
+  display_name: Reflect
+  short_description: 'PStack: Reflect'
+policy:
+  allow_implicit_invocation: false

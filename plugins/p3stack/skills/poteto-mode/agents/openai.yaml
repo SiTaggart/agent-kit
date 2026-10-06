@@ -1,0 +1,5 @@
+interface:
+  display_name: Poteto mode
+  short_description: 'PStack: Poteto mode'
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,35 @@
+{
+  "feature, refactoring": {"providerInstanceId": "claudeAgent", "model": "claude-opus-5-5", "options": {"effort": "high"}},
+  "bug-fix": {"providerInstanceId": "codex", "model": "gpt-6.1-sol", "options": {"reasoningEffort": "high"}},
+  "perf-issue": {"providerInstanceId": "codex", "model": "gpt-6.1-sol", "options": {"reasoningEffort": "xhigh"}},
+  "hillclimb": {"providerInstanceId": "codex", "model": "gpt-6.1-sol", "options": {"reasoningEffort": "xhigh"}},
+  "judgment and prose": {"providerInstanceId": "claudeAgent", "model": "claude-fable-5-1", "options": {"effort": "high"}},
+  "hardest tasks": {"providerInstanceId": "codex", "model": "gpt-6-astra", "options": {"reasoningEffort": "high"}},
+  "how explorer": {"providerInstanceId": "grok", "model": "grok-4.7-build-fast", "options": {"reasoningEffort": "xhigh"}},
+  "how explainer": {"providerInstanceId": "claudeAgent", "model": "claude-opus-5-5", "options": {"effort": "high"}},
+  "why investigators": {"providerInstanceId": "grok", "model": "grok-4.7-build-fast", "options": {"reasoningEffort": "xhigh"}},
+  "why synthesizer": {"providerInstanceId": "claudeAgent", "model": "claude-opus-5-5", "options": {"effort": "high"}},
+  "reflect tooling": {"providerInstanceId": "codex", "model": "gpt-6.1-sol", "options": {"reasoningEffort": "high"}},
+  "reflect judgment, divergent, synthesizer": {"providerInstanceId": "codex", "model": "gpt-6.1-sol", "options": {"reasoningEffort": "high"}},
+  "swarm workers": {"providerInstanceId": "grok", "model": "grok-4.7-build-fast", "options": {"reasoningEffort": "xhigh"}},
+  "arena runners": [
+    {"providerInstanceId": "claudeAgent", "model": "claude-opus-5-5", "options": {"effort": "high"}},
+    {"providerInstanceId": "codex", "model": "gpt-6.1-sol", "options": {"reasoningEffort": "high"}},
+    {"providerInstanceId": "grok", "model": "grok-4.7-build-fast", "options": {"reasoningEffort": "xhigh"}}
+  ],
+  "arena cross-judge pool": [
+    {"providerInstanceId": "claudeAgent", "model": "claude-opus-5-5", "options": {"effort": "high"}},
+    {"providerInstanceId": "codex", "model": "gpt-6.1-sol", "options": {"reasoningEffort": "high"}},
+    {"providerInstanceId": "grok", "model": "grok-4.7-build-fast", "options": {"reasoningEffort": "xhigh"}}
+  ],
+  "architect runners": [
+    {"providerInstanceId": "claudeAgent", "model": "claude-fable-5-1", "options": {"effort": "high"}},
+    {"providerInstanceId": "codex", "model": "gpt-6-astra", "options": {"reasoningEffort": "high"}},
+    {"providerInstanceId": "grok", "model": "grok-4.7-build-fast", "options": {"reasoningEffort": "xhigh"}}
+  ],
+  "interrogate reviewers": [
+    {"providerInstanceId": "claudeAgent", "model": "claude-fable-5-1", "options": {"effort": "high"}},
+    {"providerInstanceId": "codex", "model": "gpt-6-astra", "options": {"reasoningEffort": "high"}},
+    {"providerInstanceId": "grok", "model": "grok-4.7-build-fast", "options": {"reasoningEffort": "xhigh"}}
+  ]
+}

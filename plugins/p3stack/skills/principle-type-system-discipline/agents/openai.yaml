@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle type system discipline
+  short_description: 'PStack: Principle type system discipline'
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle test behavior not implementation
+  short_description: 'PStack: Principle test behavior not implementation'
+policy:
+  allow_implicit_invocation: false

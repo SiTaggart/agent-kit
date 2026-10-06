@@ -1,0 +1,5 @@
+interface:
+  display_name: Interrogate
+  short_description: 'PStack: Interrogate'
+policy:
+  allow_implicit_invocation: false

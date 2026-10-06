@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle sequence verifiable units
+  short_description: 'PStack: Principle sequence verifiable units'
+policy:
+  allow_implicit_invocation: false

@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle separate before serializing shared state
+  short_description: 'PStack: Principle separate before serializing shared state'
+policy:
+  allow_implicit_invocation: false

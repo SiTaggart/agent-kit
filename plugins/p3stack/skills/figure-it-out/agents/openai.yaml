@@ -1,0 +1,5 @@
+interface:
+  display_name: Figure it out
+  short_description: 'PStack: Figure it out'
+policy:
+  allow_implicit_invocation: false

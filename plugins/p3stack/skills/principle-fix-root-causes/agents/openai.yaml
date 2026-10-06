@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle fix root causes
+  short_description: 'PStack: Principle fix root causes'
+policy:
+  allow_implicit_invocation: false

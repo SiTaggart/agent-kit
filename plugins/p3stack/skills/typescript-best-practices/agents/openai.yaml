@@ -1,0 +1,5 @@
+interface:
+  display_name: Typescript best practices
+  short_description: 'PStack: Typescript best practices'
+policy:
+  allow_implicit_invocation: false

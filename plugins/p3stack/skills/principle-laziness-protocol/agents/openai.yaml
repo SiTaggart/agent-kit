@@ -1,0 +1,5 @@
+interface:
+  display_name: Principle laziness protocol
+  short_description: 'PStack: Principle laziness protocol'
+policy:
+  allow_implicit_invocation: false

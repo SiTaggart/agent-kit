@@ -1,0 +1,5 @@
+interface:
+  display_name: Architect
+  short_description: 'PStack: Architect'
+policy:
+  allow_implicit_invocation: false
