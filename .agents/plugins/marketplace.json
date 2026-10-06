@@ -57,19 +57,6 @@
       "category": "Productivity"
     },
     {
-      "name": "pstack",
-      "source": {
-        "source": "local",
-        "path": "./plugins/pstack"
-      },
-      "version": "0.15.15",
-      "policy": {
-        "installation": "AVAILABLE",
-        "authentication": "ON_INSTALL"
-      },
-      "category": "Developer Tools"
-    },
-    {
       "name": "p3stack",
       "source": {
         "source": "local",

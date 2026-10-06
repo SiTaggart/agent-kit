@@ -32,12 +32,6 @@
       "description": "Independently switchable shell command safeguards."
     },
     {
-      "name": "pstack",
-      "source": "./plugins/pstack",
-      "version": "0.15.15",
-      "description": "PStack engineering workflows, principles, and model panels for Claude Code."
-    },
-    {
       "name": "p3stack",
       "source": "./plugins/p3stack",
       "version": "0.15.15",

@@ -6,7 +6,6 @@ import path from "node:path";
 
 const repoRoot = path.resolve(import.meta.dir, "..");
 const pluginRoot = path.join(repoRoot, "plugins/p3stack");
-const LEGACY_PSTACK_ROOT = path.join(repoRoot, "plugins/pstack") + path.sep;
 const read = (file: string) => readFileSync(path.join(pluginRoot, file), "utf8");
 
 // Mirrors the plugin .gitignore so local installs are not checked.
@@ -64,9 +63,7 @@ function expectLinksResolve(file: string): void {
   for (const link of read(file).matchAll(/\]\(([^)\s]+)\)/g)) {
     const target = link[1] ?? "";
     if (target.includes(":") || target.startsWith("#")) continue;
-    const resolved = path.resolve(pluginRoot, path.dirname(file), target.split("#")[0] ?? "");
-    expect(existsSync(resolved), `${file} -> ${target}`).toBe(true);
-    expect(resolved.startsWith(LEGACY_PSTACK_ROOT), `${file} links into the legacy PStack port`).toBe(false);
+    expect(existsSync(path.resolve(pluginRoot, path.dirname(file), target.split("#")[0] ?? "")), `${file} -> ${target}`).toBe(true);
   }
 }
 
@@ -101,7 +98,6 @@ test("every skill resolves the runtime adapter and keeps its activation policy",
   const skills = readdirSync(path.join(pluginRoot, "skills")).filter((name) => !IGNORED.has(name));
   expect(skills).toHaveLength(55);
   expect(skills).not.toContain("sync-p3stack");
-  expect(skills).not.toContain("sync-pstack");
 
   for (const skill of skills) {
     const file = `skills/${skill}/SKILL.md`;
@@ -126,10 +122,7 @@ test("every skill resolves the runtime adapter and keeps its activation policy",
 test("the guide and README ship with the plugin and resolve their links", () => {
   const pages = listFiles(pluginRoot, "docs/guide").filter((file) => file.endsWith(".md"));
   expect(pages).toHaveLength(11);
-  for (const file of ["README.md", ...pages]) {
-    expectLinksResolve(file);
-    expect(read(file), file).not.toMatch(/plugins\/pstack|CODEX\.md|CLAUDE-CODE\.md|models\.claude\.json|pstack-models\.json|\/pstack:/);
-  }
+  for (const file of ["README.md", ...pages]) expectLinksResolve(file);
 });
 
 test("the T3 setup skill resolves its links and keeps the effort ceiling", () => {

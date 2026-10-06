@@ -30,7 +30,7 @@ test("validator requires every supported plugin and rejects repository-root sour
 
     const claudeCatalogPath = path.join(root, claudeAdapter.marketplacePath);
     const claudeCatalog = await readText(claudeCatalogPath);
-    for (const id of ["pstack", "p3stack", "lox"]) {
+    for (const id of ["p3stack", "lox"]) {
       const missingPlugin = JSON.parse(claudeCatalog);
       missingPlugin.plugins = missingPlugin.plugins.filter((entry: { name: string }) => entry.name !== id);
       await writeText(claudeCatalogPath, JSON.stringify(missingPlugin));
