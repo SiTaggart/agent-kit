@@ -1,5 +1,0 @@
-interface:
-  display_name: Show me your work
-  short_description: 'PStack: Show me your work'
-policy:
-  allow_implicit_invocation: false
