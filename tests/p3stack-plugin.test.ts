@@ -9,15 +9,30 @@ const read = (file: string) => readFileSync(path.join(pluginRoot, file), "utf8")
 
 // Mirrors the plugin .gitignore so local installs do not count as drift.
 const IGNORED = new Set(["node_modules", ".DS_Store"]);
-const MIRRORED = ["skills", "references", "licenses", "LICENSE"];
+const MIRRORED = ["skills", "references", "licenses", "assets", "LICENSE"];
 const PORT_LOCAL_SKILL = "skills/setup-pstack/";
-const FORBIDDEN_EFFORTS = new Set(["max", "ultra", "ultracode", "ultrathink"]);
+const EFFORT_LADDER = ["low", "medium", "high", "xhigh"];
+const BUDGET_CAPS: Record<string, string> = { unlimited: "xhigh", large: "xhigh", medium: "high", small: "medium" };
+const EFFORT_KEYS: Record<string, string> = { claudeAgent: "effort", codex: "reasoningEffort", grok: "reasoningEffort" };
 
 interface Choice {
   providerInstanceId: string;
   model: string;
   options: Record<string, string>;
 }
+
+function expectValidChoice(choice: Choice, label: string, cap = "xhigh"): void {
+  expect(Object.keys(choice).sort(), label).toEqual(["model", "options", "providerInstanceId"]);
+  const key = EFFORT_KEYS[choice.providerInstanceId];
+  if (!key) throw new Error(`${label} uses unsupported provider ${choice.providerInstanceId}`);
+  expect(Object.keys(choice.options), label).toEqual([key]);
+  const rank = EFFORT_LADDER.indexOf(choice.options[key] ?? "");
+  expect(rank, label).toBeGreaterThanOrEqual(0);
+  expect(rank, label).toBeLessThanOrEqual(EFFORT_LADDER.indexOf(cap));
+  if (choice.providerInstanceId === "grok") expect(choice.model, label).toBe("grok-4.7-build-fast");
+}
+
+const pinOf = (readme: string) => readme.match(/pinned to `([0-9a-f]{40})` \((v[\d.]+)\)/)?.slice(1);
 
 function listFiles(root: string, relative: string): string[] {
   const absolute = path.join(root, relative);
@@ -52,6 +67,11 @@ test("both catalogs publish P3Stack with manifests that match its release", () =
     }
   }
   expect(codexEntry.version).toBe(claudeEntry.version);
+  const pstackManifest = JSON.parse(readFileSync(path.join(pstackRoot, ".claude-plugin/plugin.json"), "utf8"));
+  expect(claudeManifest.version).toBe(pstackManifest.version);
+  const pin = pinOf(read("README.md"));
+  expect(pin).toBeDefined();
+  expect(pin).toEqual(pinOf(readFileSync(path.join(pstackRoot, "README.md"), "utf8")));
   expect(existsSync(path.join(pluginRoot, codexManifest.interface.logo))).toBe(true);
 
   const cursor = JSON.parse(readFileSync(path.join(repoRoot, ".cursor-plugin/marketplace.json"), "utf8"));
@@ -74,33 +94,34 @@ test("the T3 setup skill resolves its links and keeps the effort ceiling", () =>
   expect(frontmatter).not.toHaveProperty("disable-model-invocation");
   expect(body).toContain("orchestrator_capabilities");
   expect(body).toContain("~/.agents/p3stack-models.json");
-  expect(body).toContain("Never write `max`, `ultra`, `ultracode`, or `ultrathink`");
+  const example = JSON.parse(body.split("```json\n")[1]?.split("```")[0] ?? "null");
+  const cap = BUDGET_CAPS[example.budget];
+  if (!cap) throw new Error(`setup example has unknown budget ${example.budget}`);
+  const pstackRoles = Object.keys(JSON.parse(readFileSync(path.join(pstackRoot, "models.json"), "utf8")));
+  for (const [role, value] of Object.entries(example)) {
+    if (role === "budget") continue;
+    expect(pstackRoles).toContain(role);
+    if (typeof value === "string") expect(["inherit-parent", "auto"]).toContain(value);
+    else for (const choice of [value].flat() as Choice[]) expectValidChoice(choice, `setup example ${role}`, cap);
+  }
   for (const link of body.matchAll(/\]\(([^)]+)\)/g)) {
     const target = link[1] ?? "";
     expect(existsSync(path.resolve(pluginRoot, PORT_LOCAL_SKILL, target))).toBe(true);
   }
 });
 
-test("model defaults cover every PStack role with delegate_task targets under the effort ceiling", () => {
+test("model defaults cover every PStack role with delegate_task targets on the effort ladder", () => {
   const models: Record<string, Choice | Choice[]> = JSON.parse(read("models.json"));
   const pstackRoles: Record<string, unknown> = JSON.parse(readFileSync(path.join(pstackRoot, "models.json"), "utf8"));
   expect(Object.keys(models).sort()).toEqual(Object.keys(pstackRoles).sort());
 
-  const effortKey: Record<string, string> = { claudeAgent: "effort", codex: "reasoningEffort", grok: "reasoningEffort" };
   for (const [role, value] of Object.entries(models)) {
     expect(Array.isArray(value)).toBe(Array.isArray(pstackRoles[role]));
     const choices = Array.isArray(value) ? value : [value];
     if (Array.isArray(value)) {
       expect(new Set(choices.map((choice) => choice.providerInstanceId)).size, role).toBe(choices.length);
     }
-    for (const choice of choices) {
-      expect(Object.keys(choice).sort()).toEqual(["model", "options", "providerInstanceId"]);
-      const key = effortKey[choice.providerInstanceId];
-      if (!key) throw new Error(`${role} uses unsupported provider ${choice.providerInstanceId}`);
-      expect(Object.keys(choice.options)).toEqual([key]);
-      expect(FORBIDDEN_EFFORTS.has(choice.options[key] ?? "")).toBe(false);
-      if (choice.providerInstanceId === "grok") expect(choice.model).toBe("grok-4.7-build-fast");
-    }
+    for (const choice of choices) expectValidChoice(choice, role);
   }
 });
 

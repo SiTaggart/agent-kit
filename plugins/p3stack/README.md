@@ -1,6 +1,6 @@
 # p3stack
 
-> T3 Code port of Lauren Tan's upstream PStack, pinned to `e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a` (v0.15.9). It shares the skills, principles, playbooks, and personas of the [Codex and Claude Code port](../pstack/README.md). Only the runtime differs. [RUNTIME.md](./RUNTIME.md) maps PStack to T3 Code orchestration. This package stops at merge-ready. The user merges.
+> T3 Code port of Lauren Tan's upstream PStack, pinned to `e43c7ee26e0038c6c1fa8380dd34ce86ff94cb2a` (v0.15.9). It shares the skills, principles, playbooks, and personas of the [Codex and Claude Code port](https://github.com/SiTaggart/agent-kit/blob/main/plugins/pstack/README.md). Only the runtime differs. [RUNTIME.md](./RUNTIME.md) maps PStack to T3 Code orchestration. This package stops at merge-ready. The user merges.
 
 PStack makes an agent work like a careful engineering team. P3Stack keeps that system, and lets each role use the best model from any provider. The coordinator runs in a Claude Code or Codex thread in T3 Code. Delegates run on Claude, Codex, or Grok through T3's `delegate_task`.
 
@@ -30,15 +30,15 @@ codex plugin marketplace add SiTaggart/agent-kit
 codex plugin add p3stack@agent-kit
 ```
 
-Do not install P3Stack and PStack in the same host. They have the same skill names.
+Do not install P3Stack and PStack together in Codex. They have the same skill names, and Codex does not add a plugin prefix. Claude Code adds the prefix, so `/p3stack:how` and `/pstack:how` stay separate.
 
 ## Use
 
-Start a rigorous task with `/p3stack:poteto-mode` in Claude Code, or `$poteto-mode` in Codex. The mode selects a playbook and runs the other skills when the steps need them. The [PStack README](../pstack/README.md) and [guide](../pstack/docs/guide/README.md) describe every skill and playbook.
+Start a rigorous task with `/p3stack:poteto-mode` in Claude Code, or `$poteto-mode` in Codex. The mode selects a playbook and runs the other skills when the steps need them. The [PStack README](https://github.com/SiTaggart/agent-kit/blob/main/plugins/pstack/README.md) and [guide](https://github.com/SiTaggart/agent-kit/blob/main/plugins/pstack/docs/guide/README.md) describe every skill and playbook.
 
 ## Default models
 
-No role uses `max` reasoning. Grok always uses its fast model.
+No role uses `max` reasoning. Grok always uses its fast model. A budget from `setup-pstack` caps effort when a delegate starts. It does not change the stored roles.
 
 | Role | Model | Effort |
 |---|---|---|

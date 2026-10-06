@@ -29,9 +29,12 @@ P3Stack needs the T3 Code MCP server. Tool names can have a host prefix, such as
 If the tools do not show in the first tool scan, call `orchestrator_capabilities`
 once by its known name before you decide that they are missing.
 
-If T3 tools are not available, do not use another provider's SDK or CLI. Use the
-host's native subagents, or do the passes in series. Tell the user that the
-result has no cross-provider independence.
+If that call fails and `T3_ACP_MCP_NODE` is set, call the same T3 tools through
+T3's supported terminal transport:
+`ELECTRON_RUN_AS_NODE=1 "$T3_ACP_MCP_NODE" ${T3_ACP_MCP_ENTRYPOINT:+"$T3_ACP_MCP_ENTRYPOINT"} acp-mcp-call <tool> '<json arguments>'`.
+If both paths fail, do not use another provider's SDK or CLI. Use the host's
+native subagents, or do the passes in series. Tell the user that the result has
+no cross-provider independence.
 
 ## Skills and references
 
@@ -89,25 +92,43 @@ Ask the user with the host's question tool. Plain chat is the fallback.
 - **One request ID per seat and round.** Set `clientRequestId` to a stable value,
   such as `<workflow>-<role>-<seat>-r<round>`. Use the same value when you retry
   that call. Set `title` to the role and the seat. Set `role` to the closest of
-  `implementation`, `research`, `review`, `design`, or `test`.
+  `implementation`, `research`, `review`, `design`, `test`, or `general`.
 - **Depth.** Only the coordinator delegates. Delegates have the T3 tools too, so
   every brief must say: "Do not call `delegate_task`, `t3_thread_launch`, or
   `create_threads`." A brief can permit nested delegation only when the workflow
   names a sub-coordinator. Then the brief must give a fan-out limit.
+- **Panels belong to the coordinator.** The poteto-agent persona can tell a
+  delegate to run a skill that starts a panel, such as `how`, `architect`, or
+  `interrogate`. A delegate without permission to delegate does not run that
+  panel. It stops at that step and reports which skill it needs and why. The
+  coordinator runs the panel and then gives the result to a fresh delegate.
 - **Permissions.** Leave `runtimeMode` and `interactionMode` to inherit. Do not
   raise permissions to make a workflow run. A runtime mode is not a sandbox.
   Write "read-only" in the brief when the delegate must not write.
 - **Writers.** A delegate runs in the coordinator's checkout. Two writers must
   never share a checkout.
   - For parallel writers in one workflow, such as arena candidates or swarm
-    slices, create a worktree for each writer with `git worktree add`. Put its
-    absolute path in the brief. The delegate works only in that path. The T3
-    thread binding does not change. This is expected.
+    slices, give each writer its own worktree. Use
+    `git worktree add --detach <unique absolute path> <base ref>`, or `-b` with a
+    branch name that is unique to the writer. The brief gives that path, says to
+    run every command from it, and says "Do not write under
+    `<coordinator checkout>`." The T3 thread binding does not change. This is
+    expected.
+  - After each writer returns, run `git status --porcelain` in the coordinator
+    checkout. A change that the coordinator did not make means that the writer
+    failed its brief. Do not use its result until you resolve the change.
   - For long lanes that own a branch or a PR, such as orchestrate and autopilot
-    tracks, use `t3_thread_launch` with
-    `{"type":"worktree","baseRef":...,"branch":...,"startFromOrigin":false}`.
-    Put the brief in `message`. Keep the returned `threadId`. Check
-    `t3_thread_list` before you retry a launch that failed.
+    tracks, use `t3_thread_launch`. Commit the base first, because uncommitted
+    changes are not copied. Send
+    `{"type":"worktree","baseRef":...,"branch":...,"startFromOrigin":false}` as
+    `workspaceStrategy`. Send the lane's resolved role as `modelSelection`, with
+    `instanceId` set to the role's `providerInstanceId`, plus `model` and
+    `options`. Without `modelSelection`, the lane runs on the coordinator's
+    model. Put the brief in `message`, and set `title`. Keep the returned
+    `threadId`. Follow the lane with `t3_thread_wait` and `t3_thread_read`. Stop
+    it with `t3_thread_interrupt`. Check `t3_thread_list` before you retry a
+    launch that failed. A launch needs a full-access or default coordinator. If
+    the coordinator does not have that, tell the user. Do not raise permissions.
   - Local delegates share this machine. Do not claim VM or credential isolation.
 - **Ownership.** You own every delegate's work. Read the diff or the artifact.
   Write your own summary. Agreement between models is evidence. It is not proof.
@@ -120,9 +141,12 @@ highest priority. An override replaces the whole bundled value for its role.
 
 1. **Shape.** A choice is a `delegate_task` target:
    `{"providerInstanceId": ..., "model": ..., "options": {...}}`. A panel is a
-   non-empty list of choices. `"inherit-parent"` means: omit `target`, so the
-   delegate uses the coordinator's provider and model. The override file can
-   also have a top-level `budget` string. It is setup data, not a role.
+   non-empty list of choices. `"inherit-parent"` and its synonym `"auto"` mean
+   the coordinator's provider and model. Resolve them to an explicit target from
+   `inheritedProviderInstanceId` and `inheritedModel` in
+   `orchestrator_capabilities`, with effort `high` and the rule 5 budget. Do not omit
+   `target`, because an omitted target also copies the coordinator's options.
+   The override file can also have a top-level `budget` string.
 2. **Roles.** Use the exact 17 role keys in `models.json`. Unnamed code and
    helpers use `feature, refactoring`. Difficult changes use `hardest tasks`.
    Prose, judgment, and Comment Sicko use `judgment and prose`. History and
@@ -133,18 +157,27 @@ highest priority. An override replaces the whole bundled value for its role.
    provider. Claude uses `effort`. Codex and Grok use `reasoningEffort`. Pass
    `options` exactly as written. Do not rename an option or put effort in the
    model ID.
-4. **Fallback.** If only an option value is not supported, use the highest value
-   below it and report the change. If the provider or model is not available, use
-   `inherit-parent` and report the change. Report a malformed override file, use
-   the bundled value for that role, and do not change the user's file.
-5. **Effort limit.** Never send `max`, `ultra`, `ultracode`, or `ultrathink`.
-   These values cost too much for this setup. Do not enable `fastMode` or a
-   priority `serviceTier`. Grok uses its fast model, `grok-4.7-build-fast`.
-6. **Panels.** Run one delegate for each entry. The list length sets the count.
+4. **Fallback.** If only an effort value is not supported, step down the ladder
+   in rule 5 to the next value that the model lists, and report the change. If
+   no value on the ladder is listed, omit the effort option and report it. If
+   the provider or model is not available, use `inherit-parent` and report the
+   change. Report a malformed override file, use the bundled value for that
+   role, and do not change the user's file.
+5. **Effort.** The ladder is `xhigh` > `high` > `medium` > `low`. Never send a
+   value that is not on the ladder, such as `max`, `ultra`, `ultracode`, or
+   `ultrathink`. These values cost too much for this setup. Apply the budget
+   when you send a delegate: `large` allows at most `xhigh`, `medium` at most
+   `high`, and `small` at most `medium`. `unlimited` or no budget keeps the
+   role's effort. A budget never raises effort. When the model lists
+   `serviceTier`, send `"default"`. When it lists `fastMode`, send `false`.
+6. **Grok.** Every Grok seat uses `grok-4.7-build-fast`, which is Grok's fast
+   model. Treat another Grok model in an override as unavailable.
+7. **Panels.** Run one delegate for each entry. The list length sets the count.
    For a cross-judge, select one entry from `arena cross-judge pool` whose
-   provider is different from the coordinator's provider. The coordinator's
-   provider is `inheritedProviderInstanceId` in `orchestrator_capabilities`.
-   Report the models that ran, each fallback, and any provider that is missing.
+   provider is different from the coordinator's provider. If no entry is
+   different, run the judge as a separate pass on the first entry, and report
+   that it has no provider independence. Report the models that ran, each
+   fallback, and any provider that is missing.
 
 Keep the current conversation model as the coordinator. Use `$setup-pstack` to
 change role assignments.
