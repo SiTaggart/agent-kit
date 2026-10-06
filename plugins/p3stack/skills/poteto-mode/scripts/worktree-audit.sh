@@ -76,7 +76,9 @@ git worktree list --porcelain | sed -n 's/^worktree //p' | while IFS= read -r wt
 		'[.sessions[] | select(.workspace==$wt)] | max_by(.mtime) // empty | "\(.mtime | floor) \(.harness)"' "$session_index")
 	if [ -n "$newest" ]; then
 		last_ts=${newest%% *}
-		last="$(date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null)/${newest#* }"
+		# BSD date reads an epoch with -r; GNU date reads it with -d @.
+		day=$(date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null || date -d "@$last_ts" '+%Y-%m-%d')
+		last="$day/${newest#* }"
 	fi
 	recent=$([ "$last_ts" -gt 0 ] 2>/dev/null && [ $(( (now - last_ts) / 86400 )) -le 4 ] && echo yes || echo no)
 
