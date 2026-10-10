@@ -45,6 +45,7 @@ codex plugin add knowledge@agent-kit
 codex plugin add hooks@agent-kit
 codex plugin add p3stack@agent-kit
 codex plugin add lox@agent-kit
+codex plugin add design-guide@agent-kit
 ```
 
 Start a new task after installing. Use `/plugins` to toggle an installed plugin.
@@ -63,6 +64,7 @@ use published repository content and do not include local edits.
 /plugin install hooks@agent-kit
 /plugin install p3stack@agent-kit
 /plugin install lox@agent-kit
+/plugin install design-guide@agent-kit
 ```
 
 Install only the plugins you want. Choose project scope in the install prompt.
@@ -127,6 +129,7 @@ plugins/
   hooks/                         Hooks, manifests, README
   p3stack/                       T3 Code port of PStack, with its guide
   lox/                           Selected Codex and Claude trial skills
+  design-guide/                  Design guidance MCP server and skill
 src/                             Marketplace validation CLI
 tests/                           Plugin and script checks
 AGENTS.md                        Repository contributor instructions
@@ -154,8 +157,8 @@ bun run type-check
 bun run --cwd plugins/p3stack/skills/poteto-mode/scripts typecheck
 ```
 
-Validation checks the four maintained plugins, their marketplace sources and
-manifests, skill and hook ownership, and retired paths. Tests exercise scripts,
+Validation checks every marketplace plugin, its catalog entry and manifest,
+skill and hook ownership, and retired paths. Tests exercise scripts,
 packaging boundaries, and P3Stack's bundle contracts. These checks do not install
 plugins into a harness.
 

@@ -42,6 +42,12 @@
       "version": "0.1.0",
       "source": "./plugins/lox",
       "description": "Five selected Lox engineering skills for explicit trials."
+    },
+    {
+      "name": "design-guide",
+      "version": "0.1.0",
+      "source": "./plugins/design-guide",
+      "description": "UI, accessibility, component, and design-system guidance."
     }
   ]
 }
