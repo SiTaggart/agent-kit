@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "design-guide": {
+      "type": "http",
+      "url": "https://design-guide.me-2c5.workers.dev/mcp"
+    }
+  }
+}

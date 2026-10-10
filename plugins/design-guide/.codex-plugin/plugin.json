@@ -1,0 +1,25 @@
+{
+  "name": "design-guide",
+  "version": "0.1.0",
+  "description": "UI, accessibility, component, and design-system guidance.",
+  "author": {
+    "name": "Simon Taggart",
+    "email": "me@simontaggart.com"
+  },
+  "homepage": "https://github.com/SiTaggart/agent-kit",
+  "repository": "https://github.com/SiTaggart/agent-kit",
+  "license": "MIT",
+  "keywords": [
+    "design",
+    "mcp"
+  ],
+  "skills": "./skills/",
+  "mcpServers": "./.mcp.json",
+  "interface": {
+    "displayName": "Design Guide",
+    "shortDescription": "UI, accessibility, component, and design-system guidance.",
+    "developerName": "Simon Taggart",
+    "category": "Productivity",
+    "websiteURL": "https://github.com/SiTaggart/agent-kit"
+  }
+}

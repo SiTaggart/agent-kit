@@ -1,5 +1,5 @@
 export const MARKETPLACE_ID = "agent-kit";
-const SHARED_PLUGIN_IDS = ["engineering", "git", "knowledge", "hooks"] as const;
+const SHARED_PLUGIN_IDS = ["engineering", "git", "knowledge", "hooks", "design-guide"] as const;
 export const PLUGIN_IDS = [...SHARED_PLUGIN_IDS, "p3stack", "lox"] as const;
 export type PluginId = typeof PLUGIN_IDS[number];
 export type ManifestKind = "cursor-plugin" | "claude-plugin" | "codex-plugin";

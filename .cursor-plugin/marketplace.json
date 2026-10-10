@@ -31,6 +31,12 @@
       "source": "./plugins/hooks",
       "version": "0.2.1",
       "description": "Independently switchable shell command safeguards."
+    },
+    {
+      "name": "design-guide",
+      "source": "./plugins/design-guide",
+      "version": "0.1.0",
+      "description": "UI, accessibility, component, and design-system guidance."
     }
   ]
 }
