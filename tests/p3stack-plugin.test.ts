@@ -96,7 +96,7 @@ test("both catalogs publish P3Stack with manifests that match its release", () =
 
 test("every skill resolves the runtime adapter and keeps its activation policy", () => {
   const skills = readdirSync(path.join(pluginRoot, "skills")).filter((name) => !IGNORED.has(name));
-  expect(skills).toHaveLength(55);
+  expect(skills).toHaveLength(56);
   expect(skills).not.toContain("sync-p3stack");
 
   for (const skill of skills) {
@@ -284,6 +284,7 @@ test("the worktree audit reports the newest session from any harness", () => {
     };
     git("init", "--initial-branch=main", repository);
     git("-C", repository, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.com", "-c", "commit.gpgsign=false", "commit", "--allow-empty", "-m", "fixture");
+    git("-C", repository, "update-ref", "refs/remotes/origin/main", "HEAD");
     for (const tree of [codexTree, grokTree, idleTree]) git("-C", repository, "worktree", "add", "--detach", tree);
 
     const old = new Date("2026-01-02T12:00:00Z");
@@ -300,7 +301,7 @@ test("the worktree audit reports the newest session from any harness", () => {
     const today = spawnSync("date", ["+%Y-%m-%d"], { encoding: "utf8" }).stdout.trim();
     expect(result.stdout).toContain(`\t${today}/claude\tverify-recent-chat\t${codexTree}`);
     expect(result.stdout).toContain(`\t${today}/grok\tverify-recent-chat\t${grokTree}`);
-    expect(result.stdout).toContain(`\tunknown\treview\t${idleTree}`);
+    expect(result.stdout).toContain(`\tunknown\treview-merged\t${idleTree}`);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }
