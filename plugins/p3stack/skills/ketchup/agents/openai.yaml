@@ -1,0 +1,5 @@
+interface:
+  display_name: Ketchup
+  short_description: 'PStack: Ketchup'
+policy:
+  allow_implicit_invocation: false
