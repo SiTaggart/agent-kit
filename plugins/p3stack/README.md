@@ -2,12 +2,12 @@
 
 > T3 Code port of Lauren Tan's upstream PStack, pinned to `1b6d44ff26d4e242f4e8f68c391e6d2f7ca16def` (v0.15.20). It carries the upstream skills, principles, playbooks, personas, and guide. [RUNTIME.md](./RUNTIME.md) maps PStack to T3 Code orchestration. This package stops at merge-ready. The user merges.
 
-PStack makes an agent work like a careful engineering team. P3Stack keeps that system, and lets each role use the best model from any provider. The coordinator runs in a Claude Code or Codex thread in T3 Code. Delegates run on Claude, Codex, or Grok through T3's `delegate_task`.
+PStack makes an agent work like a careful engineering team. P3Stack keeps that system, and lets each role use the best model from any provider. The coordinator runs in a Claude Code or Codex thread in T3 Code. Delegates run on Claude, Codex, or Muse through T3's `delegate_task`.
 
 ## Requirements
 
 - T3 Code with the `t3-code` MCP server. P3Stack uses `delegate_task`, `t3_thread_launch`, `watch_pull_request`, `schedule_task`, and the thread, preview, and device tools.
-- The providers in [models.json](./models.json), signed in to T3 Code: Claude, Codex, and Grok. Run `setup-pstack` to replace any provider that you do not have.
+- The providers in [models.json](./models.json), signed in to T3 Code: Claude, Codex, and Muse. Run `setup-pstack` to replace any provider that you do not have.
 
 Delegates do not need P3Stack installed. Each brief gives absolute paths to the skill files that the delegate must read.
 
@@ -36,7 +36,7 @@ Start a rigorous task with `/p3stack:poteto-mode` in Claude Code, or `$poteto-mo
 
 ## Default models
 
-No role uses `max` reasoning. Grok always uses its fast model. A budget from `setup-pstack` caps effort when a delegate starts. It does not change the stored roles.
+No role uses `max` reasoning. If you pick Grok in `setup-pstack`, it always uses its fast model. A budget from `setup-pstack` caps effort when a delegate starts. It does not change the stored roles.
 
 | Role | Model | Effort |
 |---|---|---|
@@ -47,9 +47,9 @@ No role uses `max` reasoning. Grok always uses its fast model. A budget from `se
 | hardest tasks | GPT-6 Astra | high |
 | how explainer, why synthesizer | Claude Opus 5.5 | high |
 | reflect tooling; reflect judgment, divergent, synthesizer | GPT-6.1 Sol | high |
-| how explorer, why investigators, swarm workers | Grok 4.7 Fast | xhigh |
-| arena runners, arena cross-judge pool | Opus 5.5, GPT-6.1 Sol, Grok 4.7 Fast | high, high, xhigh |
-| architect runners, interrogate reviewers | Fable 5.1, GPT-6 Astra, Grok 4.7 Fast | high, high, xhigh |
+| how explorer, why investigators, swarm workers | Muse Wonder 1.0 | high |
+| arena runners, arena cross-judge pool | Opus 5.5, GPT-6.1 Sol, Muse Wonder 1.0 | high, high, high |
+| architect runners, interrogate reviewers | Fable 5.1, GPT-6 Astra, Muse Wonder 1.0 | high, high, high |
 
 `setup-pstack` reads the live T3 model catalog and writes your changes to `~/.agents/p3stack-models.json`.
 

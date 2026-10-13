@@ -154,7 +154,7 @@ highest priority. An override replaces the whole bundled value for its role.
 3. **Validate.** Call `orchestrator_capabilities` once per workflow. A choice is
    valid when its provider has `canRunChildTask: true`, the provider lists the
    model, and the model lists each option ID and value. Option IDs differ by
-   provider. Claude uses `effort`. Codex and Grok use `reasoningEffort`. Pass
+   provider. Claude uses `effort`. Codex, Grok, and Muse use `reasoningEffort`. Pass
    `options` exactly as written. Do not rename an option or put effort in the
    model ID.
 4. **Fallback.** If only an effort value is not supported, step down the ladder

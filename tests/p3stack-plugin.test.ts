@@ -30,7 +30,7 @@ const SINGLE_ROLES = [
 ];
 const EFFORT_LADDER = ["low", "medium", "high", "xhigh"];
 const BUDGET_CAPS: Record<string, string> = { unlimited: "xhigh", large: "xhigh", medium: "high", small: "medium" };
-const EFFORT_KEYS: Record<string, string> = { claudeAgent: "effort", codex: "reasoningEffort", grok: "reasoningEffort" };
+const EFFORT_KEYS: Record<string, string> = { claudeAgent: "effort", codex: "reasoningEffort", grok: "reasoningEffort", muse: "reasoningEffort" };
 
 interface Choice {
   providerInstanceId: string;
@@ -87,7 +87,9 @@ test("both catalogs publish P3Stack with manifests that match its release", () =
   }
   expect(codexEntry.version).toBe(claudeEntry.version);
   const pin = pinOf(read("README.md"));
-  expect(pin?.[1]).toBe(`v${claudeManifest.version}`);
+  // A port-only release adds a -N suffix to the upstream version.
+  expect(claudeManifest.version).toMatch(/^\d+\.\d+\.\d+(-\d+)?$/);
+  expect(pin?.[1]).toBe(`v${claudeManifest.version.replace(/-\d+$/, "")}`);
   expect(existsSync(path.join(pluginRoot, codexManifest.interface.logo))).toBe(true);
 
   const cursor = JSON.parse(readFileSync(path.join(repoRoot, ".cursor-plugin/marketplace.json"), "utf8"));

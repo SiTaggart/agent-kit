@@ -15,7 +15,7 @@ The override file holds two kinds of data. `budget` is a cap that the runtime ap
 
 ### 1. Detect available models
 
-Call `orchestrator_capabilities`. It is the only source of truth. Keep each provider that has `canRunChildTask: true`. For each model, record its option IDs and allowed values. Option IDs differ by provider: Claude uses `effort`, and Codex and Grok use `reasoningEffort`. If no provider can run a child task, stop and tell the user. `inherit-parent` and its synonym `auto` are always valid.
+Call `orchestrator_capabilities`. It is the only source of truth. Keep each provider that has `canRunChildTask: true`. For each model, record its option IDs and allowed values. Option IDs differ by provider: Claude uses `effort`, and Codex, Grok, and Muse use `reasoningEffort`. If no provider can run a child task, stop and tell the user. `inherit-parent` and its synonym `auto` are always valid.
 
 ### 2. Load current state
 
