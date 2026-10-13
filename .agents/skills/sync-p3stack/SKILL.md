@@ -16,7 +16,7 @@ P3Stack tracks Lauren Tan's PStack. A sync copies behavior that landed upstream 
 
 ## Where the pin lives
 
-The recorded pin is the commit and version in the first blockquote of [plugins/p3stack/README.md](../../../plugins/p3stack/README.md). The package version in both plugin manifests and both marketplace catalogs tracks that upstream version.
+The recorded pin is the commit and version in the first blockquote of [plugins/p3stack/README.md](../../../plugins/p3stack/README.md). The package version in both plugin manifests and both marketplace catalogs tracks that upstream version. A port-only release, such as a model change, adds a `-N` suffix to the upstream version, for example `0.15.20-1`. A sync sets the version to the new upstream version and removes the suffix.
 
 Today the upstream tree is `pstack/` on `main` of `https://github.com/cursor/plugins`. Its version is in `pstack/.cursor-plugin/plugin.json`. If that changes, follow the upstream repository.
 

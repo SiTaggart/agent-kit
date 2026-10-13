@@ -66,7 +66,7 @@ Reach for it when parallelism buys coverage or lets independent checks race. `$a
 $interrogate the whole branch, but skeptically. no nitpicks unless it's an actual bug or regression.
 ```
 
-[`$interrogate`](../../skills/interrogate/SKILL.md) sends the same diff, intent, and rubric to several reviewers on different available models. Model diversity is the point. Different models have different blind spots, so agreement is useful evidence to verify. The bundled panel runs one Claude, one Codex, and one Grok model, so each review has cross-provider independence when all three providers are signed in. The lead sorts everything into `Act on`, `Consider`, `Noted`, and `Dismissed`, with a reason for each dismissal, and applies nothing automatically.
+[`$interrogate`](../../skills/interrogate/SKILL.md) sends the same diff, intent, and rubric to several reviewers on different available models. Model diversity is the point. Different models have different blind spots, so agreement is useful evidence to verify. The bundled panel runs one Claude, one Codex, and one Muse model, so each review has cross-provider independence when all three providers are signed in. The lead sorts everything into `Act on`, `Consider`, `Noted`, and `Dismissed`, with a reason for each dismissal, and applies nothing automatically.
 
 Read the dismissals too. The lead is a pragmatic senior engineer, not an oracle, and you can override it.
 

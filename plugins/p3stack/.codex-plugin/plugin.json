@@ -1,6 +1,6 @@
 {
   "name": "p3stack",
-  "version": "0.15.20",
+  "version": "0.15.20-1",
   "description": "PStack for T3 Code. Rigorous agent workflows with cross-provider model panels through T3's native delegation.",
   "author": {
     "name": "Lauren Tan"
@@ -22,7 +22,7 @@
   "interface": {
     "displayName": "P3Stack",
     "shortDescription": "PStack workflows with cross-provider panels in T3 Code.",
-    "longDescription": "T3 Code port of Lauren Tan’s PStack. Shares the PStack port's skills, principles, and playbooks, and delegates each role to its Claude, Codex, or Grok model through T3 Code orchestration.",
+    "longDescription": "T3 Code port of Lauren Tan’s PStack. Shares the PStack port's skills, principles, and playbooks, and delegates each role to its Claude, Codex, or Muse model through T3 Code orchestration.",
     "developerName": "Lauren Tan · T3 Code adaptation",
     "category": "Developer Tools",
     "websiteURL": "https://github.com/cursor/plugins/tree/main/pstack",
