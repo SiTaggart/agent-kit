@@ -5,13 +5,16 @@ description: Look up grounded UI, accessibility, component, and design-system gu
 
 # Design guide
 
-Call `search_design_guidance` for UI, accessibility, component, or design-system guidance.
+Call `search_design_guidance` for a UI, accessibility, component, or design-system question.
 
-Cite each hit.
+Pass the user's question as `query` in plain language. Keep the words that name what the user wants, such as "error messages after form submission".
 
-- Quote a short part of `passage`.
-- Link `url`.
-- Name `system` when the hit includes it.
-- You may name `source`. `score` does not replace the link.
+Set `system` only when the user names a design system. Use that system's id from the tool schema. If the user does not name a design system, leave `system` unset so the results span every system.
 
-When the tool returns `{"results": []}`, say that no grounded guidance was found. Do not invent guidance.
+Leave `k` unset for a broad best-practice question. Pass a small `k` only when the user wants a quick single answer.
+
+Read each hit. Keep a hit only when its text answers the question. A `score` only ranks the list. Cite each kept hit with its `source` and its `url`. Prefer a guidance page over a props table, an API table, or a token table.
+
+If no hits are left, say that there is no grounded guidance in the indexed design systems. Leave near-misses out of the answer.
+
+When the kept hits come from more than one system, state where those systems agree and where they differ.

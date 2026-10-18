@@ -51,5 +51,9 @@ test("design-guide install files point Claude and Codex at one remote http serve
   const frontmatter = Bun.YAML.parse(skill.split("---")[1] ?? "");
   expect(frontmatter).toMatchObject({ name: "design-guide" });
   expect(skill).toContain("search_design_guidance");
-  expect(skill).toContain('{"results": []}');
+  expect(skill).toContain("error messages after form submission");
+  expect(skill).toContain("leave `system` unset");
+  expect(skill).toContain("Leave `k` unset");
+  expect(skill).toContain("A `score` only ranks the list.");
+  expect(skill).toContain("no grounded guidance in the indexed design systems");
 });
