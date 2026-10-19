@@ -10,7 +10,7 @@ Read [PStack runtime guidance](../../RUNTIME.md) before this workflow. It define
 
 Explore the codebase to answer "how does X work?" questions. Produce architectural explanations at the level of a senior engineer onboarding onto a subsystem, enough to build a working mental model, not so much that it reads like annotated source code.
 
-Resolve the `how explorer` and `how explainer` roles per RUNTIME.md. Every spawn is read-only. Use the tools available to the child. Do not change its sandbox to obtain MCP access.
+Resolve the `how explorer` and `how explainer` roles per RUNTIME.md. Every spawn is read-only. Use the tools available to the child. Do not change its sandbox to obtain MCP access. Pick each subagent's reasoning level for the job, per the Subagents section of `$poteto-mode`.
 
 ## 1. Assess complexity
 

@@ -1,0 +1,5 @@
+interface:
+  display_name: In your own words
+  short_description: 'PStack: In your own words'
+policy:
+  allow_implicit_invocation: false
