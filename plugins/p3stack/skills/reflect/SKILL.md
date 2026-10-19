@@ -18,7 +18,7 @@ Use the host history workflow in RUNTIME.md. Identify this project and the exact
 
 ## 2. Spawn three reviewers in parallel
 
-One message, three native subagent calls, a general-purpose native subagent, explicit `model:` on each, a read-only brief. Use the tools exposed to the child; the parent applies edits.
+One message, three native subagent calls, a general-purpose native subagent, explicit `model:` on each, a read-only brief. Use the tools exposed to the child; the parent applies edits. Pick each subagent's reasoning level for the job, per the Subagents section of `$poteto-mode`.
 
 | Lens | `model` | Prompt template |
 |---|---|---|

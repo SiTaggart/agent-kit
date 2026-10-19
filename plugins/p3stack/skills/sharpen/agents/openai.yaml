@@ -1,0 +1,5 @@
+interface:
+  display_name: Sharpen
+  short_description: 'PStack: Sharpen'
+policy:
+  allow_implicit_invocation: false

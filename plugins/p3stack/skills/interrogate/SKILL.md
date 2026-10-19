@@ -32,7 +32,7 @@ and the same prompt and rubric. Pass model and reasoning separately using the
 adapter's fork and fallback rules. Record actual models used and missing diversity.
 Do not change configuration or open a PR merely because a model is unavailable.
 
-Read `references/reviewer-prompt.md` and fill in the same template for every reviewer with the stated intent, the diff or file contents, the rubric from `references/rubric.md`, and the code-quality lens from `references/code-quality-review.md`.
+Read `references/reviewer-prompt.md` and fill in the same template for every reviewer with the stated intent, the diff or file contents, the rubric from `references/rubric.md`, and the code-quality lens from `references/code-quality-review.md`. Pick each subagent's reasoning level for the job, per the Subagents section of `$poteto-mode`.
 
 ## Step 4, Synthesize
 

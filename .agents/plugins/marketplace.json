@@ -62,7 +62,7 @@
         "source": "local",
         "path": "./plugins/p3stack"
       },
-      "version": "0.15.20-1",
+      "version": "0.15.28",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"

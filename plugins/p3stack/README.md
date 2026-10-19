@@ -1,6 +1,6 @@
 # p3stack
 
-> T3 Code port of Lauren Tan's upstream PStack, pinned to `1b6d44ff26d4e242f4e8f68c391e6d2f7ca16def` (v0.15.20). It carries the upstream skills, principles, playbooks, personas, and guide. [RUNTIME.md](./RUNTIME.md) maps PStack to T3 Code orchestration. This package stops at merge-ready. The user merges.
+> T3 Code port of Lauren Tan's upstream PStack, pinned to `d457567332aa6989e753ea289f30ea2bfbc80bc0` (v0.15.28). It carries the upstream skills, principles, playbooks, personas, and guide. [RUNTIME.md](./RUNTIME.md) maps PStack to T3 Code orchestration. This package stops at merge-ready. The user merges.
 
 PStack makes an agent work like a careful engineering team. P3Stack keeps that system, and lets each role use the best model from any provider. The coordinator runs in a Claude Code or Codex thread in T3 Code. Delegates run on Claude, Codex, or Muse through T3's `delegate_task`.
 

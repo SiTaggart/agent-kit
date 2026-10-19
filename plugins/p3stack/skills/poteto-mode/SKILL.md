@@ -12,6 +12,8 @@ When explicitly invoked, keep this mode active for the current conversation unti
 the user opts out. Apply it when a new task matches a playbook or needs rigor;
 stay out of casual turns. Installation alone does not activate it.
 
+Bundled skills live at `../<name>/SKILL.md` from this file. Put this file's absolute path in every poteto-agent brief so the delegate can resolve them.
+
 ## Non-negotiables
 
 The Principles section below grounds every trigger. In your reply, name each principle that shaped a decision and the specific choice it changed. Cite only principles whose leaf SKILL.md you read this session.
@@ -46,7 +48,7 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 - **Laziness Protocol.** Refactoring, sizing a diff, or tempted to add abstractions, layers, or signal threading. Bias to deletion and the smallest change that solves the problem.
 - **Foundational Thinking.** Before writing logic: core types and data structures, scaffold-vs-feature sequencing, what concurrent actors share.
 - **Redesign from First Principles.** Integrating a new requirement into an existing design. Redesign as if it had been foundational from day one.
-- **Attack the Premise.** Two or more fixes that share one premise have failed the same gate. Take a census of which actors hold the imbalance before the next fix, then question the premise instead of writing another fix that assumes it.
+- **Attack the Premise.** Two or more fixes that share one premise have failed the same gate. Write the premise down and test it directly before you write another fix that assumes it.
 - **Subtract Before You Add.** Sequencing an addition, refactor, or rewrite. Remove dead weight first, then build on the simpler base.
 - **Minimize Reader Load.** Reviewing or shaping code that's hard to trace. Count layers and hidden state, collapse one-caller wrappers, shrink mutable scope.
 - **Outcome-Oriented Execution.** Planned rewrites and migrations with explicit phase boundaries. Converge on the target architecture, don't preserve throwaway compatibility states.
@@ -66,9 +68,9 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 **Verification**
 
 - **Prove It Works.** After a task, before declaring done. Verify against the real artifact, not a proxy or "it compiles".
-- **Fix Root Causes.** Debugging. Trace each symptom to its root cause, reproduce first, ask why until you reach it.
+- **Fix Root Causes.** Debugging. Trace each symptom back to the first place the system went wrong and fix it there. A guard is a fix only when the state it handles is legitimate.
 - **Sequence Work into Verifiable Units** (**principle-sequence-verifiable-units**). Multi-step work (sweeps, migrations, runs of similar edits) and how you stack commits and PRs. Break work into small units that each end in a check, verify each before the next, and order delivery so the sequence proves itself.
-- **Test Behavior, Not Implementation.** Writing, changing, or keeping a test. Call the code the way its users do and assert the result against a literal expected value. If the test would still pass when every imported function returns `undefined`, rewrite the assertion or delete the test.
+- **Test Behavior, Not Implementation.** Writing, changing, or keeping a test. Assert what the code's users can observe, so the test fails when that behavior breaks and keeps passing when only the internals change.
 - **Explain the Number.** Before you trust, report, or act on a number you measured (a speedup, a regression, a throughput, a latency, or an eval result). Find what limits it, and rule out that it measured something other than the work you think.
 
 **Delegation**
@@ -95,6 +97,8 @@ Read the leaf skill in full for any principle you apply. Each entry names when i
 **Use the poteto-agent persona for any subagent you spawn inside a playbook step** (code-writing delegates, ad-hoc helpers). The chat that receives `$poteto-mode` runs the playbook. Never spawn a poteto-agent to run the playbook itself. Resolve `../../references/agents/poteto-agent.md` from this skill and pass its absolute path plus RUNTIME.md in every brief. Tell the child to read the persona before working. `$poteto-mode` and that persona route through the same instructions. Routed workflow skills (`how`, `why`, `interrogate`, `reflect`, `swarm`) set their own reviewer prompts. Respect what the skill prescribes, don't override to poteto-agent.
 
 **Defaults for every native subagent call.** Non-blocking spawning, available tools without changing sandbox permissions, file pointers not inlined bulk context, explicit model per role from the selected adapter’s model defaults and optional `$setup-pstack` overrides. Follow [RUNTIME.md](../../RUNTIME.md) for separate reasoning settings, fresh-context briefs, capability checks, and user overrides. Code delegates tier by difficulty. The hardest changes (cross-cutting design, gnarly concurrency, subtle algorithms) go to the `hardest tasks` role, whether they need judgment or precisely specified instruction following. Trivial mechanical edits use `feature, refactoring`. Prose and judgment use `judgment and prose`. Routed skills keep their specific roles. `inherit-parent` and `auto` omit model and reasoning overrides. Keep the parent conversation's selected model as coordinator.
+
+**Match the effort to the job.** Before each spawn, start from the role resolved per RUNTIME.md. The `$setup-pstack` budget is a ceiling, and it never raises effort. Lower the effort one step on the ladder for judgment work and two or more steps for routine work. Do not raise effort above the role's stored value, and never send `max` or a fast-mode slug. The hardest work uses the `hardest tasks` role. Verification stays on the `swarm workers` role. Keep the family the role names, so a diverse panel stays diverse. `inherit-parent` and `auto` stay on the coordinator model.
 
 You own every subagent's work. Review the diff and write your own summary, don't pass through what it said. A second opinion is the same prompt against a different model. Agreement is high-signal.
 
