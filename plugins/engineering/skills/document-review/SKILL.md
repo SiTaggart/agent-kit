@@ -1,6 +1,6 @@
 ---
 name: document-review
-description: Review requirements, PRDs, kickoff docs, and implementation plans with taste. Use after ce-plan for markdown plans, before ce-plan for requirements docs that need a quality pass, or whenever a written project artifact needs sharper scope, coherence, and reader utility.
+description: Review requirements, PRDs, kickoff docs, and technical plans for clarity, grounding, and reader usefulness. Use when a written project artifact needs sharper scope, coherent direction, or a focused check before handoff.
 argument-hint: "[mode:headless] [path/to/document.md]"
 ---
 
@@ -11,9 +11,8 @@ is a document-quality pass, not a work review and not a compliance gauntlet.
 
 ## Loop Role
 
-Use `document-review` for requirements docs, PRDs, kickoff docs, and
-implementation plans. In the planning loop it runs after `ce-plan` for markdown
-plans and can run before `ce-plan` for requirements docs that need tightening.
+Use `document-review` when a requirements doc, PRD, kickoff doc, or technical
+plan needs a focused pass for clarity, grounding, and scope.
 
 Use `ce-review` only after work exists as a branch, PR, or local diff.
 
@@ -38,10 +37,9 @@ Preserve the artifact's job.
 
 - Requirements docs answer **what and why**. Do not push implementation detail
   into them unless the requirement is explicitly technical.
-- Plans give technical direction for accepted intent. Judge completeness by
-  scope, without requiring a template, IDs, or implementation units. Do not
-  relitigate settled product direction unless the plan contradicts its origin
-  or would make implementation fail.
+- Plans give the implementer the context, constraints, and technical direction
+  needed to deliver the accepted outcome. Check that the direction is grounded
+  and preserves product intent.
 - Kickoff docs and PRDs answer **who, why, what changes, and how we know**.
   Keep them clear enough for planning without turning them into engineering
   plans.
@@ -185,7 +183,7 @@ Options:
 
 1. Apply proposed fixes
 2. Walk through decisions
-3. Append unresolved decisions to Open Questions
+3. Record unresolved decisions in the document
 4. Report only
 5. Proceed to the next loop
 
