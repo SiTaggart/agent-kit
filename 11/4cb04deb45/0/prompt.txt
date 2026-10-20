@@ -1,0 +1,729 @@
+# AGENTS.md instructions for /Users/staggart/.codex/worktrees/a2fc/agent-kit
+
+<INSTRUCTIONS>
+# Hi, I'm Simon
+
+- I'm a senior Design Engineer specializing in TypeScript and React.
+- My background is in design and development, and I care about solving user problems and building products that are easy to use and maintain.
+- I value clean, maintainable code and modern coding practices. Consult official documentation when needed.
+
+## Talking to me
+
+- Use dyslexia-friendly formatting: lead with the answer, short sentences, short paragraphs, generous white space, one idea at a time.
+- Use clear action headings such as `Fix now`, `Investigate`, and `Leave alone` when they make the answer easier to scan.
+- Avoid walls of text, dense tables, long nested lists, and unexplained jargon.
+- For code comments and other documentation, follow ASD-STE100 Simplified Technical English.
+- Do not use “not just X, but Y” constructions. State the actual point directly.
+
+## Reading my prompts
+
+- I often dictate my prompts. Focus on what I mean, even when the wording is rough.
+- For consequential or ambiguous requests, use the `prompt-check` skill to normalize the user's raw prompt before acting. See `skills/prompt-check/SKILL.md`.
+
+## Context Surfaces
+
+This machine has context tools that see more than the checkout in front of you.
+
+- **qmd** — search over ~12k local markdown docs: wikis, specs, past decisions, and session retros. For non-trivial work, run the `qmd-knowledge-base` preflight after identifying the repository and product area. Search when prior decisions, product intent, ownership, conventions, expected behavior, or known failures could change the correct solution; uncertainty is enough. Mechanical work fully defined by live source can proceed without it.
+  When QMD MCP tools are available, you must use them for status, search, and document retrieval. Use the CLI only when MCP tools are unavailable. A CLI failure does not mean QMD is unavailable.
+- **RepoPromptCE** — token-efficient codebase exploration: `file_search`, `get_file_tree`, `read_file`, `get_code_structure`, `context_builder`, and `manage_selection`. Beats `rg` plus file reads whenever the task spans more than a couple of already-known files. `context_builder` can build full implementation context for a task on its own. CLI fallback: `rpce-cli`.
+- `rg` **and direct reads** — right for exact, small, already-located scopes.
+- **Repository agent configuration** — when `docs/agents/` exists, read its configuration files before using engineering workflow skills.
+
+An answer, plan, or review that rests only on memory of the code is a guess. Ground it on one of these surfaces first, and verify drift-prone details at the live source.
+
+## Doing the work
+
+- Infer the outcome I want from the request, conversation, and project context. Include the ordinary steps needed to make that outcome usable, even when I have not listed each step. Keep this within the requested scope.
+- Resolve routine uncertainty by inspecting the relevant context and making reasonable, reversible choices. Ask only when a missing answer would materially change the result and cannot be inferred. Continue independent work while waiting.
+- Aim for the smallest _resulting_ system, not the smallest diff. Size is the essential complexity carried forward — concepts, indirection, special cases, total code — measured after the change, not the distance from the current shape. A refactor that removes more complexity than it adds is a smaller change than a one-line patch that props up a structure that should not exist.
+- Treat the current shape as a candidate, not a constraint. Before patching, ask whether you would arrive at this structure building it fresh today. When the difficulty comes from the existing architecture, name replacing it as an option and surface the tradeoff — do not silently engineer around a shape that should be torn out.
+- Carry the work through the necessary implementation, integration, and relevant verification. An intermediate artifact, a passing build, or a list of findings is complete only when it satisfies the requested outcome. Keep explanations concise without shortening the work.
+- Remove filler. Comments explain why, not what.
+
+## Verification
+
+- Verify the result I’ll actually use, and be clear about anything you haven’t tested.
+- Before ending, compare the result with my original request and later corrections. If my likely next message would ask for an obvious missing step within the authorized scope, complete that step now. If something remains blocked, state exactly what is unfinished and what prevents completion.
+
+## Code Shape
+
+For TypeScript and React code — architecture boundaries, typed contracts, helpers, effects, IO, testing seams — use the `code-taste` skill before choosing an implementation approach. For Spade Python services, use `spade-python-taste`. Those skills own the code-shape rules; this file does not repeat them.
+
+## Non-Negotiables
+
+- For work associated with a Linear issue, retrieve and use Linear's exact branch name before editing. Rename the current branch if necessary; do not synthesize a replacement or keep an agent-generated branch name. If the exact Linear branch name is unavailable, ask before making changes.
+- Never commit `.env`, secrets, API keys, credentials, or private tokens.
+- Never push directly to `main` or `master`.
+- Never delete, weaken, or skip tests to make a change pass.
+- Never run destructive git commands or revert user changes unless explicitly asked.
+- Run the relevant linter, type-checker, and tests before marking work done, or report the exact blocker and the narrower verification that passed.
+
+## Phase Skills
+
+- Discover/context: `qmd-knowledge-base`, `ce-sessions`, `ce-slack-research`, `repoprompt`.
+- Frame: `ce-brainstorm`; `ce-grill` for branchy or strategic ambiguity; `document-review` for requirements docs.
+- Plan: `ce-plan`; `document-review` for markdown plans.
+- Work: `ce-work`, then `ce-quality-gate`. Taste skills (`code-taste`, `spade-python-taste`) route code-shape decisions before implementation and are part of the completion gate for touched code; `frontend-design` for UI; `vercel-react-best-practices` for any React/Next change.
+- Review: `ce-review`; `ce-simplify-code` for cleanup; `security-review` only for real trust-boundary asks.
+- Ship/feedback: `git-commit`, `git-commit-push-pr`, `gh-fix-ci`, `resolve-pr-feedback`.
+- Remember: `ce-compound` and `ce-compound-refresh` for durable `.ai` knowledge.
+
+--- project-doc ---
+
+# AGENTS.md
+
+Global instructions for coding agents. Project-level `AGENTS.md` or `CLAUDE.md`
+files add local context and override only overlapping instructions.
+
+## Context Surfaces
+
+This machine has context tools that see more than the checkout in front of you.
+
+- **qmd** — search over ~12k local markdown docs: wikis, specs, past decisions,
+  and session retros. For non-trivial work, run the `qmd-knowledge-base`
+  preflight after identifying the repository and product area. Search when
+  prior decisions, product intent, ownership, conventions, expected behavior,
+  or known failures could change the correct solution; uncertainty is enough.
+  Mechanical work fully defined by live source can proceed without it.
+  When QMD MCP tools are available, you must use them for status, search, and
+  document retrieval. Use the CLI only when MCP tools are unavailable. A CLI
+  failure does not mean QMD is unavailable.
+- **RepoPromptCE** — token-efficient codebase exploration: `file_search`,
+  `get_file_tree`, `read_file`, `get_code_structure`, `context_builder`, and
+  `manage_selection`. Beats `rg` plus file reads whenever the task spans more
+  than a couple of already-known files. `context_builder` can build full
+  implementation context for a task on its own. CLI fallback: `rpce-cli`.
+- **`rg` and direct reads** — right for exact, small, already-located scopes.
+- **Repository agent configuration** — when `docs/agents/` exists, read its
+  configuration files before using engineering workflow skills.
+
+An answer, plan, or review that rests only on memory of the code is a guess.
+Ground it on one of these surfaces first, and verify drift-prone details at the
+live source.
+
+## Working Style
+
+- Work with a senior Design Engineer specializing in TypeScript and React.
+- Aim for the smallest *resulting* system, not the smallest diff. Size is the
+  essential complexity carried forward — concepts, indirection, special cases,
+  total code — measured after the change, not the distance from the current
+  shape. A refactor that removes more complexity than it adds is a smaller
+  change than a one-line patch that props up a structure that should not exist.
+- Treat the current shape as a candidate, not a constraint. Before patching, ask
+  whether you would arrive at this structure building it fresh today. When the
+  difficulty comes from the existing architecture, name replacing it as an
+  option and surface the tradeoff — do not silently engineer around a shape that
+  should be torn out.
+- Wake up smarter than yesterday. Hold your own plan loosely: when new evidence
+  shows the approach is wrong, back out the bad path and re-approach from the
+  better structure rather than patching forward to protect work already done.
+  Sunk effort is not a reason to ship a worse design.
+- Understand the business reason before optimizing the code shape.
+- Find root causes. Do not ship temporary fixes unless explicitly asked.
+- Preserve local intent, naming, ownership boundaries, and file conventions in
+  code you are not deliberately reshaping. Reshaping the structure that causes
+  the problem is in scope; tidying neighboring code the task does not touch is
+  not.
+- Remove filler. Comments explain why, not what.
+
+## Communication Style
+
+- Use dyslexia-friendly formatting: lead with the answer, short sentences,
+  short paragraphs, generous white space, one idea at a time.
+- Use clear action headings such as `Fix now`, `Investigate`, and `Leave alone`
+  when they make the answer easier to scan.
+- Avoid walls of text, dense tables, long nested lists, and unexplained jargon.
+- For code comments and other documentation, follow ASD-STE100 Simplified
+  Technical English.
+- Do not use “not just X, but Y” constructions. State the actual point directly.
+
+## Product Contract
+
+- For consequential or ambiguous requests, use the `prompt-check` skill to
+  normalize the user's raw prompt before acting. See
+  `plugins/engineering/skills/prompt-check/SKILL.md`.
+- Before editing, identify the contract being changed: user action, UI state,
+  backend payload, URL state, persisted state, rendered output, command behavior,
+  or published artifact.
+- Identify the owner boundary that should contain the change.
+- Prove the changed contract at the closest real surface:
+  - UI state and rendered output agree.
+  - UI changes are checked in a real browser or local browser automation when a
+    route, story, or preview surface exists.
+  - Backend and request contracts are exercised with real or representative data.
+  - Docs are updated in the canonical destination and read back.
+  - Touched files are clean for relevant lint, format, type, test, and
+    applicable taste-skill gates.
+- State what was proven and what was not. Do not let passing commands stand in
+  for user-facing verification.
+
+### Refactors and Rewrites
+
+- For implementation-authorized behavior-preserving work, define the preserved
+  contract before editing and prove it afterward with representative real
+  inputs. Name the regression tests and coverage gaps; add missing coverage
+  before calling the work done.
+- Measure a refactor against its stated goal using resulting complexity:
+  concepts, indirection, special cases, and total code. If it changes behavior,
+  adds hot-path work, or misses the goal, flag that before continuing.
+
+## Scope
+
+- Completeness means fully solving the accepted product contract, not expanding
+  the contract.
+- The contract is a ceiling as much as a floor. Useful, thorough, and possible
+  are not aliases for necessary.
+- Boil the ocean inside the agreed boundary: finish the accepted task, with tests
+  and proof, without drifting into neighboring workflows.
+- Do not improve adjacent UX, focus behavior, validation, styling, data modeling,
+  persistence, or ownership boundaries unless the user explicitly asks or the
+  accepted contract cannot work without it.
+
+## Code Shape
+
+For TypeScript and React code — architecture boundaries, typed contracts,
+helpers, effects, IO, testing seams — use the `code-taste` skill before
+choosing an implementation approach. For Spade Python services, use
+`spade-python-taste`. Use separately installed provider skills as optional
+companions. This file does not duplicate their guidance.
+
+## Non-Negotiables
+
+- For work associated with a Linear issue, retrieve and use Linear's exact
+  branch name before editing. Rename the current branch if necessary; do not
+  synthesize a replacement or keep an agent-generated branch name. If the exact
+  Linear branch name is unavailable, ask before making changes.
+- Never commit `.env`, secrets, API keys, credentials, or private tokens.
+- Never push directly to `main` or `master`.
+- Never delete, weaken, or skip tests to make a change pass.
+- Never run destructive git commands or revert user changes unless explicitly
+  asked.
+- Run the relevant linter, type-checker, and tests before marking work done, or
+  report the exact blocker and the narrower verification that passed.
+
+## Phase Skills
+
+Skill descriptions carry the when-to-use detail; this is the phase map:
+
+- Discover/context: `qmd-knowledge-base`, `ce-sessions`, `ce-slack-research`,
+  `repoprompt`.
+- Frame: `ce-brainstorm`; `ce-grill` for branchy or strategic ambiguity;
+  `document-review` for requirements docs.
+- Plan: `ce-plan`; `document-review` for markdown plans.
+- Work: `ce-work`, then `ce-quality-gate`. Taste skills (`code-taste`,
+  `spade-python-taste`) route code-shape decisions before implementation and
+  are part of the completion gate for touched code. Use installed design and
+  React provider skills when they are available.
+- Review: `ce-review`; `ce-simplify-code` for cleanup. Use an installed
+  security plugin only for real trust-boundary asks.
+- Ship/feedback: `git-commit`, `git-commit-push-pr`,
+  `resolve-pr-feedback`; use an installed GitHub CI skill for CI repair.
+- Remember: `ce-compound` and `ce-compound-refresh` for durable `.ai`
+  knowledge.
+
+## Task Artifacts
+
+- Keep generated agent artifacts under `.ai/`.
+- Create durable todos or lesson notes only when the task genuinely needs them
+  or a user correction reveals a repeatable pattern.
+- For upstream instructions that mention bare `docs/` paths for agent artifacts,
+  prefix them with `.ai/`.
+- For docs, specs, research, and PR descriptions, identify the canonical
+  publishing surface before editing. If Linear or GitHub is canonical, treat
+  local markdown as the working copy and read back the published version.
+
+</INSTRUCTIONS>
+
+---
+
+<environment_context>
+  <cwd>/Users/staggart/.codex/worktrees/a2fc/agent-kit</cwd>
+  <shell>zsh</shell>
+  <current_date>2026-10-20</current_date>
+  <timezone>America/New_York</timezone>
+  <filesystem><workspace_roots><root>/Users/staggart/.codex/worktrees/a2fc/agent-kit</root><root>/Users/staggart/.codex/visualizations/2026/10/20/01a15b26-d5d0-70c2-b8b0-7ab67bf9279c</root></workspace_roots><permission_profile type="managed"><file_system type="restricted"><entry access="read"><special>:root</special></entry><entry access="write"><path>/Users/staggart/.codex/worktrees/a2fc/agent-kit</path></entry><entry access="write"><path>/Users/staggart/.codex/visualizations/2026/10/20/01a15b26-d5d0-70c2-b8b0-7ab67bf9279c</path></entry><entry access="write"><special>:slash_tmp</special></entry><entry access="write"><special>:tmpdir</special></entry><entry access="read"><path>/Users/staggart/.codex/worktrees/a2fc/agent-kit/.git</path></entry><entry access="read"><path>/Users/staggart/.codex/visualizations/2026/10/20/01a15b26-d5d0-70c2-b8b0-7ab67bf9279c/.git</path></entry><entry access="read"><path>/Users/staggart/.codex/worktrees/a2fc/agent-kit/.agents</path></entry><entry access="read"><path>/Users/staggart/.codex/visualizations/2026/10/20/01a15b26-d5d0-70c2-b8b0-7ab67bf9279c/.agents</path></entry><entry access="read"><path>/Users/staggart/.codex/worktrees/a2fc/agent-kit/.codex</path></entry><entry access="read"><path>/Users/staggart/.codex/visualizations/2026/10/20/01a15b26-d5d0-70c2-b8b0-7ab67bf9279c/.codex</path></entry><entry access="read"><path>/Users/staggart/.codex/worktrees/a2fc/agent-kit/.aws</path></entry><entry access="read"><path>/Users/staggart/.codex/visualizations/2026/10/20/01a15b26-d5d0-70c2-b8b0-7ab67bf9279c/.aws</path></entry></file_system></permission_profile></filesystem>
+</environment_context>
+
+---
+
+# Diff comments:
+
+## User Comment 1
+File: plugins/engineering/skills/ce-plan/SKILL.md
+Workspace: /Users/staggart/.codex/worktrees/a2fc/agent-kit
+Side: R
+Lines: 4
+Diff hunk:
+```diff
+@@ -1,275 +1,102 @@
+ ---
+ name: ce-plan
+-description: "Create structured plans for multi-step tasks once the goal is clear enough to plan. Use after ce-brainstorm or ce-grill, or directly for clear planning requests. If the request has branchy product/scope ambiguity, run ce-grill first."
+-argument-hint: "[optional: feature description, requirements doc path, plan path to deepen, or any task to plan] [output:html]"
++description: "Write a short steering brief for a capable engineer. Use for planning requests or to revise an existing plan once the goal is clear enough. Preserve intent and real constraints while leaving implementation choices open."
++argument-hint: "[task, requirements doc, or existing plan] [output:md|html]"
+ ---
+ 
+-# Create Technical Plan
+-
+-`ce-brainstorm` defines **WHAT** to build. `ce-plan` defines **HOW** to build it. `ce-work` executes the plan. A prior brainstorm is useful context but never required — `ce-plan` works from any input: a requirements doc, a bug report, a feature idea, or a rough description.
+-
+-If invoked, plan; ask rather than exit. This workflow produces a durable implementation plan. It does **not** implement code, run tests, or learn from execution-time results — if the answer depends on changing code and seeing what happens, that belongs in `ce-work`.
+-
+-## Loop Contract
+-
+-1. **Clarify with `ce-grill` when needed** — branchy, strategically important, or product-shaky input that would produce materially different plans. One or two ordinary missing facts are asked inside this workflow instead.
+-2. **Plan with `ce-plan`** — produce the technical implementation plan.
+-3. **Review with `document-review`** — markdown plans run the headless document-review gate before handoff (see `references/plan-handoff.md`).
+-
+-Use `ce-review` only after work exists as a branch, PR, or local diff — it reviews work, not plans.
+-
+-For UI work, use an installed design companion when available while planning states, layout ownership, accessibility, responsive behavior, and browser proof. When prior context could change the plan, use `qmd-knowledge-base` before treating missing background as an assumption. Build curated codebase context with RepoPromptCE `context_builder` (see the `repoprompt` skill) before finalizing a non-trivial plan; do not let it widen the accepted product contract.
+-
+-## Interaction Method
+-
+-When asking the user a question, use the platform's blocking question tool (see `../ce-conventions/SKILL.md`). Ask one question at a time; prefer a concise single-select choice when natural options exist.
+-
+-## Feature Description
+-
+-<feature_description> #$ARGUMENTS </feature_description>
+-
+-**If the feature description above is empty, ask the user:** "What would you like to plan? Describe the task, goal, or project you have in mind." Then wait for their response before continuing.
+-
+-All file references in plan content are repo-relative (`src/models/user.rb`), never absolute — absolute paths break portability across machines, worktrees, and teammates.
+-
+-## Core Principles
+-
+-1. **Use requirements as the source of truth** — if `ce-brainstorm` produced a requirements document, build from it rather than re-inventing behavior.
+-2. **Decisions, not code** — capture approach, boundaries, files, dependencies, risks, and test scenarios. Do not pre-write implementation code or shell choreography. Pseudo-code sketches or DSL grammars that communicate high-level design are welcome when framed as directional guidance, not implementation specification.
+-3. **Research before structuring** — explore the codebase, institutional learnings, and external guidance when warranted before finalizing the plan.
+-4. **Right-size the artifact** — small work gets a compact plan; large work gets more structure. The philosophy stays the same at every depth.
+-5. **Separate planning from execution discovery** — resolve planning-time questions here; explicitly defer execution-time unknowns to implementation.
+-6. **Keep the plan portable** — a living document, review artifact, or issue body without tool-specific executor instructions.
+-7. **Carry execution posture lightly when it matters** — if test-first or characterization-first posture is clearly implied, reflect it as a lightweight signal, not choreography.
+-8. **Honor user-named resources** — a named CLI, MCP server, URL, file, or prior artifact is authoritative input. Discover it before assuming it's unavailable; if it fails, say so rather than silently substituting.
+-9. **The current architecture is a candidate, not a constraint** — the global candidate-not-constraint principle applies to planning: aim for the smallest resulting system, keep replacement of a problematic structure on the table, and surface the reframe and tradeoff rather than choosing unilaterally.
+-
+-## Plan Quality Bar
+-
+-Every plan should contain: a clear problem frame and scope boundary; requirements traceability back to the request or origin document; repo-relative file paths; explicit test file paths for feature-bearing units; decisions with rationale; existing patterns to follow; enumerated test scenarios specific enough that an implementer knows exactly what to test; clear dependencies and sequencing.
+-
+-A plan is ready when an implementer can start confidently without needing the plan to write the code for them.
+-
+-## Workflow
+-
+-### Phase 0: Resume, Source, and Scope
+-
+-#### 0.0 Resolve Output Mode
+-
+-Output mode is exclusive — the plan is written as either markdown (`.md`) OR HTML (`.html`), never both.
+-
+-**Read config (pre-resolved at skill load):**
+-!`cat "$(git rev-parse --show-toplevel 2>/dev/null)/.compound-engineering/config.local.yaml" 2>/dev/null || echo '__NO_CONFIG__'`
+-
+-Resolve `OUTPUT_FORMAT` per `../ce-conventions/SKILL.md` §"Output-mode resolution": `output:` arg > active `plan_output:` config key above > `md`; pipeline and sub-step invocations force `md`. Strip consumed flag tokens from the arguments before treating the remainder as the feature description.
+-
+-Load the format-rendering reference for the resolved value — `../ce-conventions/references/markdown-rendering.md` or `../ce-conventions/references/html-rendering.md`. Both pair with `references/plan-sections.md`, which describes what the plan contains regardless of format.
+-
+-#### 0.1 Resume Existing Plan Work When Appropriate
+-
+-If the user references an existing plan file or there is an obvious recent matching plan in `.ai/plans/`: read it, confirm update-in-place vs new plan, and revise only the still-relevant sections. Plans carry no per-unit progress state — progress is derived from git by `ce-work`.
+-
+-**Deepen intent:** "deepen" targets a plan in `.ai/plans/` and triggers the deepening fast path. Deepen = a holistic strengthening pass on an existing plan; confirm when ambiguous, and treat section-specific editing requests ("strengthen the risk section") as normal edits, not deepening.
+-
+-Once the plan is identified and complete (`status: active`), route by file extension first, then frontmatter:
+-
+-- **`.html` plan:** short-circuit to Phase 5.3 in **interactive mode** (HTML plans are always software plans — the html-rendering invariant forbids YAML frontmatter, so its absence is not a non-software signal).
+-- **`.md` plan WITH YAML frontmatter:** short-circuit to Phase 5.3 in **interactive mode**.
+-- **`.md` plan WITHOUT frontmatter** (non-software plans use `# Title` + `Created:` instead): route to `references/universal-planning.md`.
+-
+-**Resume preserves the existing artifact's format**, except: an explicit `output:` argument overrides, and pipeline mode always forces `md` (writing the markdown to the parallel `<plan-basename>.md`, leaving the original `.html` untouched).
+-
+-#### 0.1a Recognize Approach-Altitude Requests
+-
+-Some requests are better answered one level up: a grounded **approach-plan** for *how the deliverable will be made*, held at a checkpoint. Runs after 0.1's fast paths, before 0.1b's domain split.
+-
+-- **Explicit (always honored):** "plan for a plan", "plan the approach", "don't do it yet — just plan how you'd approach it" → enter approach altitude; do not begin the deliverable.
+-- **Proactive (rare):** offer an approach-plan only when the method itself is genuinely unsettled AND the deliverable is expensive to redo. When in doubt, just plan — the failure mode to avoid is opening every turn with "want me to plan the approach first?". The offer is a single dismissible line, never a blocking question.
+-
+-On entry, read `references/approach-altitude.md` and follow it. Otherwise continue.
+-
+-#### 0.1b Classify Task Domain
+-
+-If the task builds, modifies, refactors, deploys, or architects software (code, schemas, infrastructure), continue to Phase 0.2. Classify by task-type, not topic: investigating or analyzing code is an answer-seeking question, not software work. If genuinely ambiguous, ask before routing. Otherwise read `references/universal-planning.md` and follow that workflow instead, skipping all subsequent phases.
+-
+-#### 0.2 Find Upstream Requirements Document
+-
+-Search `.ai/brainstorms/` for `*-requirements.md` or `*-requirements.html` that semantically matches the feature description, is recent (~30 days, judgment overrides), and covers the same user problem. If multiple match, ask which one to use.
+-
+-#### 0.3 Use the Source Document as Primary Input
+-
+-If a relevant requirements document exists: read it thoroughly, announce it as the origin document, and carry forward the problem frame; Actors/Key Flows/Acceptance Examples (A/F/AE-IDs) as constraints when present; requirements and success criteria; scope boundaries (including "Deferred for later" and "Outside this product's identity"); key decisions and rationale; dependencies; and outstanding questions with their blocking/deferred status. Reference carried decisions with `(see origin: <source-path>)`. Do not silently omit source content — before finalizing, scan each origin section to verify nothing was dropped.
+-
+-#### 0.4 Planning Bootstrap (No Requirements Doc or Unclear Input)
+-
+-If the request is already clear enough, continue to Phase 0.5. If the ambiguity is mainly product framing, recommend `ce-brainstorm` while always offering to continue here. Otherwise run a brief bootstrap establishing: problem frame, intended behavior, scope boundaries, success criteria, and blocking questions or assumptions. If major product questions remain, recommend `ce-brainstorm` again; if the user continues anyway, require explicit assumptions.
+-
+-Route-outs the bootstrap may surface:
+-
+-- **Bug-shaped prompt** (broken behavior, error message, regression): offer `ce-debug` alongside continuing, whenever the bug surface is reachable locally. When the bug lives at another local path, announce the target repo and where plan outputs will land (default: the target repo's `.ai/plans/`) before cross-repo investigation, then offer the same ce-debug choice. Stay silently in `ce-plan` when the named code can't be found anywhere local. Headless mode skips the suggestion menu and continues with `ce-plan`.
+-- **Clear task ready to execute** (known root cause, no architectural decisions): suggest `ce-work` as a faster alternative. The user decides.
+-
+-#### 0.5 Classify Outstanding Questions Before Planning
+-
+-For `Resolve Before Planning` questions in the origin document: reclassify into planning-owned work only if genuinely technical/architectural/research; keep as blockers if they would change product behavior, scope, or success criteria. If true product blockers remain, ask whether to resume `ce-brainstorm` or convert them into explicit assumptions — do not plan past unresolved blockers.
+-
+-#### 0.6 Assess Plan Depth
+-
+-Classify as **Lightweight** (small, bounded, low ambiguity), **Standard** (normal feature with decisions to document), or **Deep** (cross-cutting, strategic, high-risk, or highly ambiguous). If unclear, ask one targeted question.
+-
+-#### 0.7 Solo-Mode Scoping Synthesis
+-
+-Surface the forks where user input materially changes the plan — before Phase 1 research is spent. Fires only in solo invocation: no upstream doc (0.2), stayed in ce-plan (0.4), no unresolved blockers (0.5), and not on a 0.1 fast path. Brainstorm-sourced invocations defer to Phase 5.1.5 instead.
+-
+-Read `references/synthesis-summary.md` and follow the solo variant: compose the internal three-bucket draft, derive call-outs via the keep and detail tests, and emit the scope claim with confirmation gate. Auto-proceed (announce and continue) only for Lightweight depth with zero call-outs. In headless mode, compose the internal draft only and continue — Inferred bets route to `## Assumptions` at plan-write.
+-
+-### Phase 1: Gather Context
+-
+-#### 1.1 Local Research (Always Runs)
+-
+-Prepare a concise planning context summary (a paragraph or two): origin-document problem frame and decisions when present, otherwise the feature description; relevant `STRATEGY.md` pieces when that file exists; and `CONCEPTS.md` vocabulary when present (plan with the canonical terms).
+-
+-Gather, in parallel, the information the plan needs — repo technology/architecture/patterns (`repo-research-analyst`; its prompt's first line must be the literal scope syntax, e.g. `Scope: technology, architecture, patterns`) and institutional learnings from `.ai/solutions/` (`learnings-researcher`) are the usual research personas. Each is a standalone skill: dispatch per `../ce-conventions/SKILL.md` §Sub-agent dispatch — a sub-agent that loads it, or reads its SKILL.md by absolute path when the platform's sub-agents cannot load skills. Adjust the set to the task. Collect: stack and versions; architectural patterns and conventions; relevant files, modules, and tests; AGENTS.md guidance that materially affects the plan; institutional learnings; and strategy alignment flags when `STRATEGY.md` is present.
+-
+-**Slack context** is opt-in per `../ce-conventions/SKILL.md`. When tools are available but unrequested, note once that Slack search is available; when requested but unavailable, say so.
+-
+-#### 1.1b Detect Execution Posture Signals
+-
+-If the user, origin document, or research clearly signals test-first, characterization-first, or similar posture (e.g., legacy weakly-tested target area), carry it forward silently in the relevant units. Ask only if the posture would materially change sequencing or risk and cannot be responsibly inferred.
+-
+-#### 1.2 Decide on External Research
+-
+-Judgment, not a gauntlet:
+-
+-- **An explicit ask wins.** If the user or origin doc points outside the repo (competitor comparison, "best practices", "official docs", a named external technology), external research is required — key on the signal, not exact phrases. Only an explicit opt-out ("skip external research") overrides; honor it and note it. When a settled local choice already exists, narrow the research to that choice's current docs and pitfalls rather than re-surveying options.
+-- **Classify the intent** so 1.3 routes correctly: *implementation-guidance* (approach settled; how to build it well), *landscape* (what options or prior art exist), or *mixed*.
+-- **Otherwise use the implicit signals:** lean toward research for high-risk topics (security, payments, migrations, compliance), thin or absent local patterns (including adjacent-domain-only matches — frame the query around the domain gap), unfamiliar territory, or a genuinely external unsettled option set that materially shapes the plan. Skip when strong recent local patterns exist, the user knows the intended shape, or external context adds little. Use repo-research-analyst's technology summary to sharpen the call (exact versions → pass to `docs-researcher`; monorepo → scope to the relevant service).
+-
+-Announce the decision and intent in one line.
+-
+-#### 1.3 External Research (Conditional)
+-
+-Dispatch by intent per `../ce-conventions/SKILL.md` §Sub-agent dispatch; each researcher below is a skill the sub-agent loads, and when sub-agents are unavailable, run the selected researcher inline rather than skipping it. **Implementation-guidance:** `docs-researcher` with the planning context summary and exact frameworks/versions. **Landscape:** `web-researcher` with a focus hint plus the planning context summary (no codebase content — it operates externally); for code-host scans, name the discovery dimensions (activity, UX shape, docs, issue themes, license — star counts are weak signal). **Mixed:** sequential — `web-researcher` maps the landscape and shortlists, then `docs-researcher` covers shortlisted technologies only when their details materially shape the plan.
+-
+-Never block on missing tools: if a researcher fails or web tools are unavailable, warn, proceed, and carry the gap into 1.4 so the plan records it honestly.
+-
+-#### 1.4 Consolidate Research
+-
+-Summarize: codebase patterns and file paths; QMD findings that changed a decision; institutional learnings; Slack context if gathered; external references if gathered; related issues/PRs; and constraints that materially shape the plan.
+-
+-**Land external findings in decisions, not an appendix** — KTD rationale, Alternatives, Risks, or Sources. If a finding shaped nothing, drop it. **Mark whether external research was load-bearing** (materially shaped a KTD, Alternative, Scope boundary, or Risk) — Phase 5.3.2 reads this flag. **Record requested-but-unavailable research** as an assumption or open question rather than presenting the plan as externally grounded.
+-
+-#### 1.4b Reclassify Depth on External Contract Surfaces
+-
+-If a Lightweight plan turns out to touch external contract surfaces — env vars consumed elsewhere, exported public APIs or CLI contracts, CI/CD config, shared types with downstream consumers, externally linked docs — reclassify to Standard and announce it briefly.
+-
+-#### 1.5 Flow and Edge-Case Analysis (Conditional)
+-
+-For Standard or Deep plans, or when flow completeness is unclear, dispatch a sub-agent that reads `references/spec-flow-analyzer.md` — expanded to an absolute path by the parent, per `../ce-conventions/SKILL.md` §Sub-agent dispatch — and applies it to the planning context and research findings. Use the output to close edge-case and handoff gaps and tighten requirements trace — add only what materially improves the plan.
+-
+-### Phase 2: Resolve Planning Questions
+-
+-Build the question list from origin-doc deferrals, research gaps, and required technical decisions. Resolve during planning what is knowable from repo context, documentation, or user choice; defer to implementation what depends on code changes or runtime behavior. Ask the user only when the answer materially affects architecture, scope, sequencing, or risk and cannot be responsibly inferred. Do not run tests or probe runtime behavior here.
+-
+-### Phase 3: Structure the Plan
+-
+-#### 3.1 Title and File Naming
+-
+-Draft a searchable conventional title (`feat: Add user authentication`), determine the type (`feat`/`fix`/`refactor`), and build the filename: `.ai/plans/YYYY-MM-DD-NNN-<type>-<descriptive-name>-plan.md` — create `.ai/plans/` if missing, derive the next zero-padded sequence number from today's existing files, keep the name concise kebab-case.
+-
+-#### 3.2 Stakeholder Awareness
+-
+-For Standard/Deep plans, briefly consider who is affected — users, developers, operations, other teams — and note affected parties in System-Wide Impact for cross-cutting work.
+-
+-#### 3.3 Break Work into Implementation Units
+-
+-Each unit is one meaningful change an implementer could land as an atomic commit: focused on one component or seam, touching a small cluster of related files, dependency-ordered, concrete without pre-writing code. Avoid micro-steps, multi-concern units, and units so vague the implementer must re-plan.
+-
+-**U-ID stability (authoritative statement).** Each unit carries a stable plan-local U-ID (`U1`, `U2`, …). Once assigned, never renumbered: reordering preserves IDs in their new order, splitting keeps the original ID on the original concept and assigns the next unused number, deletion leaves gaps. This lets `ce-work` reference units unambiguously across plan edits; deepening is the most likely accidental-renumber vector.
+-
+-#### 3.4 High-Level Technical Design
+-
+-Include an HTD section when the approach has shape prose doesn't carry well — architecture across components, sequencing, state machines, branching gates, lifecycles, quantitative comparisons. Pick the medium that lands fastest (see `references/plan-sections.md` and the format-rendering reference for how visualizations render). Skip it when prose conveys the approach directly — HTD should earn its keep. Plan diagrams are authoritative content; do not add hedging captions.
+-
+-#### 3.4b Output Structure (Optional)
+-
+-For greenfield plans creating 3+ files in a new directory hierarchy where the layout is itself a design decision, include an `## Output Structure` file tree as a scope declaration (not a constraint — per-unit `**Files:**` lists stay authoritative). Skip when only modifying existing files.
+-
+-#### 3.5 Define Each Implementation Unit
+-
+-Each unit is a level-3 heading `### U1. [Name]` — never a checkbox list item (flush-left fields terminate list continuation and fragment in every standard renderer; headings render everywhere and give anchor links).
+-
+-For each unit include:
+-
+-- **Goal** — what this unit accomplishes
+-- **Requirements** — R-IDs advanced (and A/F/AE IDs when origin supplies them)
+-- **Dependencies** — cite by U-ID
+-- **Files** — repo-relative paths to create, modify, or test
+-- **Approach** — key decisions, data flow, boundaries, integration notes
+-- **Execution note** — optional, only for non-default posture (e.g., `Start with a failing integration test for the request/response contract.`). Never expand into RED/GREEN/REFACTOR substeps.
+-- **Technical design** — optional pseudo-code or diagram when the approach is non-obvious; directional guidance, not specification
+-- **Patterns to follow** — existing code or conventions to mirror
+-- **Test scenarios** — enumerate the specific cases, right-sized to complexity and risk, covering every applicable category: happy paths, edge cases (boundaries, empty/nil, concurrency), error and failure paths, and integration scenarios that mocks alone won't prove (callbacks, middleware, multi-layer). Each scenario names input, action, and expected outcome. Non-behavioral units use `Test expectation: none -- [reason]`. When a scenario directly enforces an origin Acceptance Example, prefix `Covers AE<N>.` — sparse by design; don't force links onto finer-grained tests.
+-- **Verification** — completion expressed as observable outcomes, not shell scripts
+-
+-Every feature-bearing unit includes its test file path in **Files**.
+-
+-#### 3.6 Keep Planning-Time and Implementation-Time Unknowns Separate
+-
+-If something is important but not knowable yet (exact helper names, final SQL, runtime behavior, refactors that may become unnecessary), record it explicitly under deferred implementation notes rather than pretending to resolve it.
+-
+-#### 3.7 Anti-Expansion
+-
+-Known-but-tangential work noticed during planning — adjacent refactors, "while we're here" cleanups, scope-adjacent nice-to-haves — routes to `### Deferred to Follow-Up Work` in Scope Boundaries, not active units. The user's explicit ask overrides (a requested refactor is in scope).
+-
+-### Phase 4: Write the Plan
+-
+-**NEVER CODE during this skill.**
+-
+-Depth changes the amount of detail, not the planning/execution boundary: **Lightweight** — compact, usually 2-4 units, omit low-value optional sections. **Standard** — full core template, usually 3-6 units, include risks/deferred/system-wide impact when relevant. **Deep** — core template plus warranted analysis sections, usually 4-8 units, phase-grouped when clearer.
+-
+-**Optional Deep extensions** (only when they genuinely help, never boilerplate): Alternative Approaches Considered, Success Metrics, Dependencies/Prerequisites, Risk Analysis & Mitigation, Phased Delivery, Documentation Plan, Operational/Rollout Notes, Future Considerations. **Alternatives vary the HOW** — architecture, sequencing, boundaries, rollout. Tiny implementation variants belong in KTDs; product-shape alternatives belong upstream in `ce-brainstorm`.
+-
+-**Section contract and rendering.** Compose from `references/plan-sections.md` (the section contract: hard floor, include-when-material catalog, agency escape hatch, ID/content rules) plus the format-rendering reference loaded at Phase 0.0. Omit immaterial sections — placeholder prose is worse than omission.
+-
+-**Planning rules:** horizontal rules between top-level sections in Standard/Deep plans; repo-relative paths (state the target repo once when planning for another repo); prefer path+pattern references over line numbers; no implementation code (directional pseudo-code/DSL sketches allowed, framed as such); mermaid diagrams encouraged where they clarify; no git commands or test command recipes; no fake certainty about execution-time questions.
+-
+-### Phase 5: Final Review, Write File, and Handoff
+-
+-#### 5.1 Review Before Writing
+-
+-Check that: the plan invents no product behavior that belonged in `ce-brainstorm`; major decisions are grounded in origin or research; units are concrete, dependency-ordered, and implementation-ready; posture signals carry forward as Execution notes; every feature-bearing unit has real test scenarios from each applicable category (the `none` annotation is only valid for non-feature-bearing units); deferred items are explicit; U-IDs follow the stability rule; and a visual aid is present where it would beat prose.
+-
+-If the plan originated from a requirements document, re-read it and verify: the approach still matches product intent; scope boundaries and success criteria are preserved; blockers were resolved, assumed, or sent back; no origin section was silently dropped; origin R/F/AE IDs that affect implementation are referenced or explicitly deferred (preservation of intent, not ID spam); and a Deep-product origin's three-way scope split is preserved verbatim.
+-
+-#### 5.1.5 Brainstorm-Sourced Scoping Synthesis
+-
+-The latest cheap moment to catch plan-time scope errors, before 5.2 commits the plan to disk. Fires only when Phase 0.2 found an upstream requirements doc and not on 0.1 fast paths (solo invocations handled this at 0.7).
+-
+-Read `references/synthesis-summary.md` and follow the brainstorm-sourced variant: internal three-bucket draft, call-outs via the keep and detail tests, two-paragraph summary (brainstorm restatement + plan-specific scoping decisions), confirmation gate. Auto-proceed only for Lightweight with zero call-outs. Headless: internal draft only; Inferred bets route to `## Assumptions`.
+-
+-#### 5.2 Write Plan File
+-
+-**Write the plan file to disk before presenting any options**: `.ai/plans/YYYY-MM-DD-NNN-<type>-<descriptive-name>-plan.<md|html>` (extension follows `OUTPUT_FORMAT`; sequence counts both extensions). Compose from `references/plan-sections.md` plus the loaded rendering reference. **Write tight** per the prose-economy discipline in plan-sections — before declaring it written, run the named test there.
+-
+-Confirm with the absolute path so the reference is clickable: `Plan written to <absolute path>`.
+-
+-**CONCEPTS.md gap-fill** (only if the file exists): add missing definitions for domain terms the plan uses — domain entities, named processes, status concepts only; follow existing entry format; apply silently.
+-
+-#### 5.3 Confidence Check and Deepening
+-
+-After writing, evaluate whether the plan needs strengthening. Two modes: **auto** (default during generation — findings synthesize directly into the plan) and **interactive** (the 0.1 re-deepen fast path — findings are reviewed with the user before integration). Pipeline runs are always auto.
+-
+-`document-review` checks clarity, coherence, and scope; this confidence check strengthens rationale, sequencing, risk treatment, and grounding — both run.
+-
+-**5.3.1 Classify:** confirm plan depth and build a risk profile (auth/security, payments, migrations and persistent data, external APIs, privacy/compliance, cross-surface parity, significant rollout/operational concerns are high-risk signals).
+-
+-**5.3.2 Gate:** Lightweight plans usually skip deepening unless high-risk; Standard plans deepen when important sections look thin; Deep or high-risk plans usually benefit. Two overrides always send the plan to scoring: **thin local grounding** (1.2 triggered research because local patterns were thin — unfamiliar-territory claims are more likely assumptions) and **load-bearing external research** (the 1.4 flag — external findings can shape what local code cannot verify). If no deepening is needed, report "Confidence check passed — no sections need strengthening" and go directly to 5.3.8.
+-
+-**5.3.3–5.3.7:** when deepening is warranted, read `references/deepening-workflow.md` and execute it, then return here.
+-
+-#### 5.3.8–5.4 Document Review, Final Checks, and Handoff
+-
+-Load `references/plan-handoff.md` for 5.3.8 (document review — mandatory for markdown plans regardless of the confidence check; HTML plans skip it per the format gate there), 5.3.9 (final checks and cleanup), and 5.4 (post-generation menu, routing, and Issue Creation).
+-
+-This skill is complete only when the post-generation menu has been presented, the user selected an action, and the routed action was fired — not merely announced. Pipeline runs skip the menu and return to the caller after plan write + confidence check + headless document-review.
++# Plan the Work
++
++Give the implementing engineer enough intent, context, and direction to make
++good decisions. A plan can be a few paragraphs. More consequential work may
++need more explanation, but complexity does not require a larger template.
++
++This skill produces a plan. It does not implement the change, create tickets,
++or publish artifacts unless the user has also requested those actions.
++
++## Ground the brief
++
++Read the request, applicable project guidance, and any named source or existing
++plan. Use a relevant requirements document as the source of product intent.
++Resolve ordinary uncertainty from the available context. Ask only when a
++missing answer would materially change scope or safety/correctness and cannot
++be inferred. Use `ce-grill` when the user needs to resolve competing goals.
++
++Inspect enough of the current system and its direct consumers to understand
++what already works, what must remain true, and which capabilities can help.
++Use `repoprompt` for broad codebase context and `qmd-knowledge-base` when prior
++decisions could change the approach. Use current official sources when an
++external contract matters. Research should inform direction; routine discovery
++can continue during implementation. State a material evidence gap honestly.
++
++## Write to steer
++
++Outcome, constraints, useful context, and direction are ingredients, not
++required headings or quotas. Choose prose, bullets, or a diagram when it helps
++the reader. Make the intended change and its reason clear early.
++
++Preserve explicit user requirements and real contracts imposed by consumers,
++storage, protocols, or other external boundaries. Keep them distinct from
++recommendations and unknowns. An agent's assumption does not become a
++requirement because it appears in a plan. Link to the origin when useful
++instead of copying its entire requirements list. Retain source IDs where
++needed for traceability; do not invent IDs for new requirements or work units.
++
++Explain the current capabilities and constraints that change the engineer's
++choices. A few decisive references are enough. Avoid exhaustive file lists,
++repeated code links, and research transcripts. Detailed evidence can live in a
++separate note when it will be useful later; the brief should stand on its own.
++
++Offer direction and its reason without fixing helper names, types, modules,
++file edits, or implementation units in advance. Leave routine investigation,
++implementation details, sequencing, and appropriate verification to the
++implementer. Include a specific proof obligation only when it protects a real
++contract or addresses a consequential uncertainty.
++
++Treat the current architecture and any proposed replacement as candidates.
++Where feasibility is unproven, say so. Do not make adopting a proposed design
++an acceptance criterion. Keep unresolved choices only when they change scope
++or safety/correctness; ordinary engineering choices need no question catalog,
++investigation-strategy section, or decision-criteria framework.
++
++Keep concrete migration constraints when this change needs them: for example,
++old readers may need to read new writes during a mixed-version deployment.
++Do not add generic rollout, rollback, stakeholder, or approval sections. A
++specific operational dependency can be stated directly without a new framework.
++
++## Revise and review
++
++When revising or deepening a plan, improve its usefulness rather than adding
++layers. Replace superseded text in place. Remove repetition and stale review
++history. Preserve agreed scope and externally referenced identifiers in older
++plans; do not silently change their meaning.
++
++Check the brief against the request and its sources. Can a capable engineer
++tell what must be true, why it matters, and where judgment remains open?
++Remove content that does not change their decisions.
++
++Use `document-review` when requested or when an independent document pass would
++resolve a material concern. Review findings are advice: verify them and retain
++only what changes the accepted outcome, a real constraint, or consequential
++uncertainty. Do not append every concern as a permanent requirement or add
++sections merely to satisfy a review rubric. Report a scope-changing decision
++to the user rather than silently settling it.
++
++## Save and hand off
++
++For a repository planning request, save the brief in `.ai/plans/` unless the
++user requested chat-only output or another destination. Update a named plan
++in place. Read [plan-sections.md](references/plan-sections.md) for file naming,
++format selection, and compatibility with existing plans. Read the result back
++before reporting it ready.
++
++Finish with the path and any consequential unresolved choice or evidence gap.
++Planning is complete when the usable brief is delivered. A next-step menu,
++approval checkpoint, automatic deepening pass, or implementation handoff is
++not required. If the user already asked to continue into implementation, pass
++the brief to `ce-work`; otherwise leave that decision with the user.
++
++For non-code planning, use the same judgment with a form suited to the task,
++such as an itinerary or research brief. If the user asks for an answer, inspect
++the relevant sources and answer instead of saving a planning scaffold. If they
++ask only for an approach before doing the work, deliver that approach and hold
++at the requested boundary.
+```
+Comment:
+I don't want to focus on revising plans, this is to make plans good in the first place. I also want to keep the loop refernce with brainstorm and grill references for needing more detail on the plan if it's not settled or clear yet.
+
+I'm not sure I'm in love with the term "steering brief" either, this is still a plan, it's just not a detailed plan. Also don't focus on the short part, I don't want to limit the plan, if it's a big feature we don't need to artificaily make the plan short, it need to include as much information as possible
+
+## My request:
+
+---
+
+# Response annotations:
+Each item contains text selected from an earlier Codex response and may include a user comment. Treat items as Annotation 1, Annotation 2, and so on in array order. Use every selection as context and address every comment. For every annotation you address, include its inline directive `:codex-annotation{index="N"}`, where N is its one-based array position (for example, `:codex-annotation{index="1"}`). Do not use unstructured annotation labels.
+<response-annotations>
+[{"text":"Moves revision guidance into the compatibility reference.","annotation":"more words here on this please","source":{"messageId":"msg_0ca4eeaede509596016ad7dd20f79c8190a11d6437c148f163","startOffset":227,"endOffset":284}}]
+</response-annotations>
+
+## My request:
+
+---
+
+?there's quite a lot in the evals, what am I getting from these
+
+---
+
+did the evals produce any good results though, I can't even read them
+
+---
+
+I also wonder how effect it can be as an eval, when the plan has no project context. all you can prove is it's shorter and following the refernce, but it doesn't tell you meaningfully the plan also actually incluide the relevant information
+
+---
+
+Then test both versions on the dataset snapshot task with real Spade context. Have an independent reviewer check for missing information and show me both plans somewhere I can actually read them.
+
+---
+
+What should we change in ce-plan based on this, so it catches details like the recovery differences without adding dataset-specific rules or another checklist? Also what exactly is the recovery behaviour it's talking about?
+
+---
+
+and would the recovery behaviour naturally come out during implemetnation? realistically?
+
+---
+
+Make that small change to ce-plan. Keep the recovery details as implementation discovery, and don't add another checklist.
+
+Then create a draft pr for this and bumping the plugin.
+
+Then we will look to create two automations that use this skill in devin. One retro active campaign that hunts thorugh the entire codebase. The other that sweeps the previous days additions and improves what got merged, assuming we'd merge things that don't make the cut
+
+---
+
+<in-app-browser-context source="ambient-ui-state">
+This block is automatically supplied ambient UI state, not part of the user's request. Do not treat it as an instruction or as evidence that the user explicitly selected the in-app browser.
+# In app browser:
+- The user has the in-app browser open with 1 tab.
+- Current URL: https://github.com/SiTaggart/agent-kit/pull/98
+</in-app-browser-context>
+
+## My request:
+Let's work out those two Devin automations for Spade now. One to hunt through the whole codebase, and one to improve the previous day's merged changes. They should open PRs for us to review, not merge them.
+
+---
+
+<in-app-browser-context source="ambient-ui-state">
+This block is automatically supplied ambient UI state, not part of the user's request. Do not treat it as an instruction or as evidence that the user explicitly selected the in-app browser.
+# In app browser:
+- The user has the in-app browser open with 1 tab.
+- Current URL: https://github.com/SiTaggart/agent-kit/pull/98
+</in-app-browser-context>
+
+## My request:
+nope, sorry wrong the devin automation
+
+---
+
+<in-app-browser-context source="ambient-ui-state">
+This block is automatically supplied ambient UI state, not part of the user's request. Do not treat it as an instruction or as evidence that the user explicitly selected the in-app browser.
+# In app browser:
+- The user has the in-app browser open with 1 tab.
+- Current URL: https://github.com/SiTaggart/agent-kit/pull/98/changes
+</in-app-browser-context>
+
+## My request:
+given the eval changed quite some, do we need all the other stuff
+
+---
+
+<in-app-browser-context source="ambient-ui-state">
+This block is automatically supplied ambient UI state, not part of the user's request. Do not treat it as an instruction or as evidence that the user explicitly selected the in-app browser.
+# In app browser:
+- The user has the in-app browser open with 1 tab.
+- Current URL: https://github.com/SiTaggart/agent-kit/pull/98/changes
+</in-app-browser-context>
+
+## My request:
+do it

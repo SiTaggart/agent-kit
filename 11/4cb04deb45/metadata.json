@@ -1,0 +1,27 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "114cb04deb45",
+  "strategy": "manual-commit",
+  "branch": "codex/ce-plan-grounded-planning",
+  "checkpoints_count": 1,
+  "files_touched": [
+    "plugins/engineering/skills/ce-work/SKILL.md",
+    "plugins/engineering/skills/document-review/SKILL.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/11/4cb04deb45/0/metadata.json",
+      "transcript": "/11/4cb04deb45/0/full.jsonl",
+      "compact_transcript": "/11/4cb04deb45/0/transcript.jsonl",
+      "content_hash": "/11/4cb04deb45/0/content_hash.txt",
+      "prompt": "/11/4cb04deb45/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 461004,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 26794368,
+    "output_tokens": 109707,
+    "api_call_count": 157
+  }
+}
