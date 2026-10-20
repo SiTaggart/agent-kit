@@ -78,6 +78,14 @@ to an absolute path by the parent; run inline when sub-agents are unavailable:
 
 Read the prompt, relevant plan or issue, recent conversation, and current repository state. A plan document is context, not an execution script — preserve its scope boundaries without mechanically mirroring every section as a task. For a bare request, infer the likely files and behavior from the repository; ask only when the answer would materially change product behavior, ownership boundary, data model, or risk. State the contract and owner boundary before editing when the change affects product behavior.
 
+Accept plans without a required body template, including older structured
+plans. Preserve explicit requirements and real external contracts. Treat proposed designs as
+recommendations unless the user has fixed the choice; verify assumptions as
+you work. Choose the investigation, implementation, sequence, and verification
+needed for the task. Missing headings, IDs, or frontmatter are not blockers.
+Read the content and any `execution` marker to distinguish code from non-code
+work.
+
 ## Step 2: Find Prior Art
 
 Use local knowledge and repository context in this order:
@@ -148,14 +156,16 @@ Invoke `ce-review` only when the change is substantial, risky, or the user asks 
 If the input was a plan artifact and the accepted work is complete, update the
 plan status before reporting:
 
-- Markdown plans: change the YAML frontmatter field from `status: active` to
+- Markdown plans with a status field: change YAML `status: active` to
   `status: completed`.
-- HTML plans: change the visible `<span class="status">active</span>` value to
+- HTML plans with a status marker: change `<span class="status">active</span>` to
   `completed`.
 - Do not edit plan body content, implementation units, checkboxes, or
   retrospective notes as part of this flip.
 - Do not mark a plan completed when work is blocked, partially shipped, or
   intentionally deferred to the user.
+- If no status marker exists, report completion without adding metadata or
+  restructuring the plan.
 
 Finish with a concise report: what changed, what product contract is now true, what checks or proof passed, what was not verified and why, and any narrow follow-up genuinely outside the accepted contract.
 

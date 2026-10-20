@@ -1,0 +1,39 @@
+{
+  "skill_name": "ce-plan",
+  "purpose": "Smoke-test use of supplied context and planning instructions. Does not assess repository discovery or completeness against a real project.",
+  "setup": "Use fresh sessions with the skill and one frozen fixture. Copy the legacy fixture before revising it. Save outputs in isolated scratch directories. Do not provide this rubric to the planning agent. No implementation, external writes, or production inspection.",
+  "grading": "Assess preservation of supplied facts, explicit requirements, honest uncertainty, useful direction, and invented constraints against the fixture. Headings and word counts are not pass criteria. The fixture already selects relevant context; passing does not establish that an agent can discover the right context, identify omitted project constraints, or produce a feasible architecture in a real repository.",
+  "evals": [
+    {
+      "id": "small-change",
+      "fixture": "fixtures/small-change.md",
+      "expected": "A useful plan preserves the exact requested error text and current export behavior. It uses existing capabilities as context at the depth needed, without designing helpers, enumerating routine tests, or creating process stages."
+    },
+    {
+      "id": "dataset-ownership",
+      "fixture": "fixtures/dataset-ownership.md",
+      "expected": "Preserves one freshness authority, request identity, wire contracts, and compact storage. Distinguishes these requirements from the unproven shared lifecycle idea. Retains consequential publication/cursor/storage hazards without converting all review suggestions into requirements or prescribing implementation units. Does not assert that the architecture is feasible without evidence."
+    },
+    {
+      "id": "mixed-version",
+      "fixture": "fixtures/mixed-version.md",
+      "expected": "Retains the concrete requirement that old workers can read new writes while deployment overlaps, and queued jobs remain readable. Does not use brevity to drop this migration constraint or invent a removal date. Leaves the detailed compatibility implementation open."
+    },
+    {
+      "id": "legacy-revision",
+      "fixture": "fixtures/legacy-plan.md",
+      "prompt": "Simplify this existing plan in place. External ticket links refer to R4 and U3. Preserve the accepted behavior and those references. The RetryController is only a proposal. Planning only.",
+      "expected": "Retains status/origin and the meaning of R4/U3 without new IDs. Removes duplication and unaccepted process suggestions. Keeps RetryController optional or removes the suggestion. The resulting plan remains usable by ce-work and document-review."
+    },
+    {
+      "id": "large-feature",
+      "fixture": "fixtures/large-feature.md",
+      "expected": "Plans the complete accepted feature and retains each material behavior and source contract, including permissions, recipients, schedule semantics, rendering, cancellation, preview, history, and delivery uncertainty. Explains existing capabilities, cross-system dependencies, and consequential correctness concerns. Does not omit useful detail to meet a length target or replace the accepted scope with a smaller pilot. Proposed implementation remains direction rather than invented acceptance criteria."
+    },
+    {
+      "id": "unsettled-scope",
+      "fixture": "fixtures/unsettled-scope.md",
+      "expected": "Uses ce-brainstorm for product exploration or ce-grill for the named unsettled choices, asks a focused question, and resumes planning only from clarified decisions. Does not invent audience or permission requirements. Clear tasks can still go directly to ce-plan; the whole loop is not mandatory."
+    }
+  ]
+}

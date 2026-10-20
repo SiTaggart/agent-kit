@@ -1,5 +1,9 @@
 # HTML Rendering
 
+For ce-plan plans, use `../../ce-plan/references/plan-sections.md`.
+Its HTML guidance replaces this catalog for plans; do not add sections,
+ID schemes, or layout elements to fit the examples below.
+
 This is a format-rendering reference — it describes how to render any
 artifact in HTML, independent of which skill is producing it.
 
@@ -13,8 +17,7 @@ output mode is exclusive (markdown OR HTML, never both). Downstream
 consumers that read HTML today (`ce-work`, human readers) do so directly;
 the agent-consumability rules below make that work. `document-review` is
 *not* currently an HTML consumer — its editing mechanics are markdown-only,
-so the ce-plan handoff gates the 5.3.8 doc-review pass to `OUTPUT_FORMAT=md`
-runs and skips it for HTML.
+so automatic document-review edits apply only to Markdown.
 
 ## Hard invariants
 

@@ -69,6 +69,7 @@ offer to run it. Always include a "Done for now" option. Route by judgment:
 never offer shipping routes while behavior is unproven, and never offer
 commit/checkout routes for targets reviewed remotely. Skip the menu entirely
 when invoked as a sub-step from another skill — return results to the caller.
+`ce-plan` completes on delivery of the plan and does not require this menu.
 
 ## Output-mode resolution (document-producing skills)
 

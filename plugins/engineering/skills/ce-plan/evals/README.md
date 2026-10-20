@@ -1,14 +1,20 @@
-# ce-plan output-mode resolution evals
+# ce-plan evaluations
 
-Guards Phase 0.0's format-resolution contract through the context-engineering
-cleanup: `output:` arg > active `plan_output:` config > `md` default, pipeline
-always md, commented YAML never matched, `feat:`-style prefixes never consumed.
+`evals.json` retains the output-mode regression suite: argument/config/default
+precedence, inactive comments, pipeline Markdown, unknown values, and literal
+conventional-commit prefixes. Run it in a scratch repository with each declared
+config. See `grader.md` for grading and limits.
 
-The Phase 0.0 prose (including the YAML-comment warning and the
-`output:pdf` edge case) may be compressed to a few judgment-level lines; this
-suite is the durable regression test for the behaviors that prose guarded.
+`plans.json` contains instruction-following smoke tests with supplied synthetic
+context. The fixtures already select the relevant capabilities and hazards.
+Give a fresh planning agent the skill and one fixture, without the grading
+expectations. Inspect the saved plan against the rubric. Assess simple work,
+consequential architecture, concrete migration constraints, larger features,
+unresolved scope, and legacy revision.
+Assess coverage of the supplied fixture. Do not reward brevity, a particular heading
+set, a word quota, or the absence of useful detail.
 
-Run via the skill-creator framework like `skills/ce-sessions/evals/`, in a
-scratch repo. Each eval declares its `setup_config` for
-`.compound-engineering/config.local.yaml` (null = ensure the file is absent).
-Grading is programmatic (file extension + note presence) — see `grader.md`.
+Keep generated reports under `.ai/evals/`. Record which cases actually ran,
+what artifacts were inspected, and what remains untested. Fixtures establish
+use of supplied context. They do not test discovery of project context,
+completeness against a real repository, or architectural feasibility.
