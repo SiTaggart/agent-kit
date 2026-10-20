@@ -1,0 +1,60 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "41371c55023c",
+  "session_id": "01a15b26-d5d0-70c2-b8b0-7ab67bf9279c",
+  "strategy": "manual-commit",
+  "created_at": "2026-10-20T22:26:31.841089Z",
+  "branch": "codex/ce-plan-grounded-planning",
+  "checkpoints_count": 3,
+  "save_step_count": 1,
+  "files_touched": [
+    "plugins/engineering/skills/ce-conventions/references/html-rendering.md",
+    "plugins/engineering/skills/ce-conventions/references/markdown-rendering.md",
+    "plugins/engineering/skills/ce-decompose/SKILL.md",
+    "plugins/engineering/skills/ce-plan/evals/README.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/dataset-ownership.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/large-feature.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/legacy-plan.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/mixed-version.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/small-change.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/unsettled-scope.md",
+    "plugins/engineering/skills/ce-plan/evals/plans.json",
+    "plugins/engineering/skills/ce-work/SKILL.md",
+    "plugins/engineering/skills/document-review/SKILL.md"
+  ],
+  "agent": "Codex",
+  "model": "gpt-6.1-sol",
+  "turn_id": "6c2e3b46a9bb",
+  "compact_transcript_start": 0,
+  "token_usage": {
+    "input_tokens": 438021,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 24978048,
+    "output_tokens": 103509,
+    "api_call_count": 144
+  },
+  "session_metrics": {
+    "turn_count": 11
+  },
+  "initial_attribution": {
+    "calculated_at": "2026-10-20T22:26:31.63383Z",
+    "agent_lines": 0,
+    "agent_removed": 0,
+    "human_added": 0,
+    "human_modified": 23,
+    "human_removed": 252,
+    "total_committed": 0,
+    "total_lines_changed": 275,
+    "agent_percentage": 0,
+    "metric_version": 2
+  },
+  "prompt_attributions": [
+    {
+      "checkpoint_number": 2,
+      "user_lines_added": 0,
+      "user_lines_removed": 0,
+      "agent_lines_added": 2922,
+      "agent_lines_removed": 0
+    }
+  ]
+}

@@ -1,0 +1,38 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "41371c55023c",
+  "strategy": "manual-commit",
+  "branch": "codex/ce-plan-grounded-planning",
+  "checkpoints_count": 3,
+  "files_touched": [
+    "plugins/engineering/skills/ce-conventions/references/html-rendering.md",
+    "plugins/engineering/skills/ce-conventions/references/markdown-rendering.md",
+    "plugins/engineering/skills/ce-decompose/SKILL.md",
+    "plugins/engineering/skills/ce-plan/evals/README.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/dataset-ownership.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/large-feature.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/legacy-plan.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/mixed-version.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/small-change.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/unsettled-scope.md",
+    "plugins/engineering/skills/ce-plan/evals/plans.json",
+    "plugins/engineering/skills/ce-work/SKILL.md",
+    "plugins/engineering/skills/document-review/SKILL.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/41/371c55023c/0/metadata.json",
+      "transcript": "/41/371c55023c/0/full.jsonl",
+      "compact_transcript": "/41/371c55023c/0/transcript.jsonl",
+      "content_hash": "/41/371c55023c/0/content_hash.txt",
+      "prompt": "/41/371c55023c/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 438021,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 24978048,
+    "output_tokens": 103509,
+    "api_call_count": 144
+  }
+}
