@@ -1,0 +1,52 @@
+{
+  "cli_version": "0.8.42",
+  "checkpoint_id": "f4590ec36167",
+  "strategy": "manual-commit",
+  "branch": "codex/ce-plan-grounded-planning",
+  "checkpoints_count": 8,
+  "files_touched": [
+    ".claude-plugin/marketplace.json",
+    ".cursor-plugin/marketplace.json",
+    "plugins/engineering/.claude-plugin/plugin.json",
+    "plugins/engineering/.codex-plugin/plugin.json",
+    "plugins/engineering/.cursor-plugin/plugin.json",
+    "plugins/engineering/skills/ce-conventions/SKILL.md",
+    "plugins/engineering/skills/ce-conventions/references/html-rendering.md",
+    "plugins/engineering/skills/ce-conventions/references/markdown-rendering.md",
+    "plugins/engineering/skills/ce-decompose/SKILL.md",
+    "plugins/engineering/skills/ce-plan/SKILL.md",
+    "plugins/engineering/skills/ce-plan/evals/README.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/dataset-ownership.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/large-feature.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/legacy-plan.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/mixed-version.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/small-change.md",
+    "plugins/engineering/skills/ce-plan/evals/fixtures/unsettled-scope.md",
+    "plugins/engineering/skills/ce-plan/evals/plans.json",
+    "plugins/engineering/skills/ce-plan/references/approach-altitude.md",
+    "plugins/engineering/skills/ce-plan/references/deepening-workflow.md",
+    "plugins/engineering/skills/ce-plan/references/plan-handoff.md",
+    "plugins/engineering/skills/ce-plan/references/plan-sections.md",
+    "plugins/engineering/skills/ce-plan/references/spec-flow-analyzer.md",
+    "plugins/engineering/skills/ce-plan/references/synthesis-summary.md",
+    "plugins/engineering/skills/ce-plan/references/universal-planning.md",
+    "plugins/engineering/skills/ce-work/SKILL.md",
+    "plugins/engineering/skills/document-review/SKILL.md"
+  ],
+  "sessions": [
+    {
+      "metadata": "/f4/590ec36167/0/metadata.json",
+      "transcript": "/f4/590ec36167/0/full.jsonl",
+      "compact_transcript": "/f4/590ec36167/0/transcript.jsonl",
+      "content_hash": "/f4/590ec36167/0/content_hash.txt",
+      "prompt": "/f4/590ec36167/0/prompt.txt"
+    }
+  ],
+  "token_usage": {
+    "input_tokens": 406078,
+    "cache_creation_tokens": 0,
+    "cache_read_tokens": 23130880,
+    "output_tokens": 96161,
+    "api_call_count": 126
+  }
+}
