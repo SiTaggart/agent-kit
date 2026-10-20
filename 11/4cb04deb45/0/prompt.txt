@@ -727,3 +727,59 @@ This block is automatically supplied ambient UI state, not part of the user's re
 
 ## My request:
 do it
+
+---
+
+can we tidy up the localk diff then too pls
+
+---
+
+# Diff comments:
+
+## User Comment 1
+File: plugins/engineering/skills/ce-work/SKILL.md
+Workspace: /Users/staggart/.codex/worktrees/a2fc/agent-kit
+Side: R
+Lines: 81-84
+Diff hunk:
+```diff
+@@ -78,6 +78,10 @@ to an absolute path by the parent; run inline when sub-agents are unavailable:
+ 
+ Read the prompt, relevant plan or issue, recent conversation, and current repository state. A plan document is context, not an execution script — preserve its scope boundaries without mechanically mirroring every section as a task. For a bare request, infer the likely files and behavior from the repository; ask only when the answer would materially change product behavior, ownership boundary, data model, or risk. State the contract and owner boundary before editing when the change affects product behavior.
+ 
++Accept plans with or without the older template. Missing headings, IDs, or
++frontmatter are not blockers. Read the content and any `execution` marker to
++distinguish code from non-code work.
++
+ ## Step 2: Find Prior Art
+ 
+ Use local knowledge and repository context in this order:
+```
+Comment:
+is work skill written in such a way that still requires these ids? I'd rather it be made compatible with the new plan skill, and not have to have a note in it
+
+## User Comment 2
+File: plugins/engineering/skills/document-review/SKILL.md
+Workspace: /Users/staggart/.codex/worktrees/a2fc/agent-kit
+Side: R
+Lines: 41-44
+Diff hunk:
+```diff
+@@ -38,8 +38,10 @@ Preserve the artifact's job.
+ 
+ - Requirements docs answer **what and why**. Do not push implementation detail
+   into them unless the requirement is explicitly technical.
+-- Plans answer **how**. Do not relitigate settled product direction unless the
+-  plan contradicts its origin or would make implementation fail.
++- Plans give technical direction for accepted intent. Judge completeness by
++  scope, without requiring a template, IDs, or implementation units. Do not
++  relitigate settled product direction unless the plan contradicts its origin
++  or would make implementation fail.
+ - Kickoff docs and PRDs answer **who, why, what changes, and how we know**.
+   Keep them clear enough for planning without turning them into engineering
+   plans.
+```
+Comment:
+same here, the doc review skill should be written with the new plan skill in mind not have an excuse inserted
+
+## My request:
