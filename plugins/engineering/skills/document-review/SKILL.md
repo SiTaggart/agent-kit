@@ -38,13 +38,10 @@ Preserve the artifact's job.
 
 - Requirements docs answer **what and why**. Do not push implementation detail
   into them unless the requirement is explicitly technical.
-- Plans steer implementation with intent, real constraints, useful context,
-  and direction. Assess completeness for the work's scope; length alone is not
-  a quality problem. Do not require headings, requirement IDs, implementation
-  units, file inventories, or routine test
-  scenarios. Review older structured plans without forcing a format conversion.
-  Do not relitigate settled product direction unless the plan contradicts its
-  origin or would make implementation fail.
+- Plans give technical direction for accepted intent. Judge completeness by
+  scope, without requiring a template, IDs, or implementation units. Do not
+  relitigate settled product direction unless the plan contradicts its origin
+  or would make implementation fail.
 - Kickoff docs and PRDs answer **who, why, what changes, and how we know**.
   Keep them clear enough for planning without turning them into engineering
   plans.
@@ -81,8 +78,7 @@ Technical English.
 - required behavior hidden in nice-to-have sections
 - goals that contradict the requested outcome or have no clear meaning
 - unresolved choices that change scope or safety/correctness
-- recommendations or assumptions presented as requirements, including an
-  unproven design used as an acceptance criterion
+- assumptions or proposed designs presented as requirements
 - over-specified future work that distracts from the current contract
 
 ### Feasibility And Handoff
@@ -91,8 +87,7 @@ Technical English.
 - promised outcomes that cannot be assessed
 - dependencies, data sources, or ownership boundaries that are named but not
   resolved enough for the next loop
-- missing evidence for a consequential feasibility claim; routine investigation
-  and verification choices can remain with the implementer
+- unsupported feasibility claims that materially affect the direction
 
 ### Product And Design
 
@@ -108,8 +103,8 @@ screen, dashboard, or interaction.
 ### Security And Data Boundaries
 
 Review only concrete trust-boundary issues. Do not add generic rollout,
-support, or compliance concerns. A relevant topic such as migrations or
-persisted data is not itself a finding; name the concrete failure and contract.
+support, or compliance concerns unless the document changes auth, permissions,
+payments, privacy, credentials, external APIs, migrations, or persisted data.
 
 ## Fix Policy
 
@@ -130,9 +125,6 @@ After edits, read back the changed lines.
 
 Keep findings few and high-signal. Drop style preferences and anything that
 does not affect a reader's next action.
-
-Suggest replacing or removing weak text before adding more. A reviewer concern
-does not become a permanent plan requirement merely because it was raised.
 
 Use these buckets:
 

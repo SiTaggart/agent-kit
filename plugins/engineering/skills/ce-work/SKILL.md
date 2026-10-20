@@ -78,13 +78,9 @@ to an absolute path by the parent; run inline when sub-agents are unavailable:
 
 Read the prompt, relevant plan or issue, recent conversation, and current repository state. A plan document is context, not an execution script — preserve its scope boundaries without mechanically mirroring every section as a task. For a bare request, infer the likely files and behavior from the repository; ask only when the answer would materially change product behavior, ownership boundary, data model, or risk. State the contract and owner boundary before editing when the change affects product behavior.
 
-Accept plans without a required body template, including older structured
-plans. Preserve explicit requirements and real external contracts. Treat proposed designs as
-recommendations unless the user has fixed the choice; verify assumptions as
-you work. Choose the investigation, implementation, sequence, and verification
-needed for the task. Missing headings, IDs, or frontmatter are not blockers.
-Read the content and any `execution` marker to distinguish code from non-code
-work.
+Accept plans with or without the older template. Missing headings, IDs, or
+frontmatter are not blockers. Read the content and any `execution` marker to
+distinguish code from non-code work.
 
 ## Step 2: Find Prior Art
 

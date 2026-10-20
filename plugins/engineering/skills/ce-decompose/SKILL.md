@@ -85,7 +85,7 @@ Find the seams **twice, independently, then reconcile:**
 
 **Massage the units into the right *general* shape.** Agents will very often make units too specific to the shape the diff happened to take — pinned to incidental file names, the diff's accidental ordering, or one-off helpers. Re-derive units from the change's durable boundaries, not its incidental layout. The unit list should read like it describes the *feature*, not the diff.
 
-Capture the result as an ordered list of units with one-line goals and explicit dependencies (cite units by name). Hand off to `ce-plan` when the set needs a durable plan. Pass the decomposition as supporting context; ce-plan need not copy its units or add IDs and per-unit file lists.
+Capture the result as an ordered list of units with one-line goals and explicit dependencies (cite units by name). Hand off to `ce-plan` when the set needs a durable plan, passing the units as supporting context.
 
 ### Step 4a: Split Into A Reviewable Stack (keep path)
 

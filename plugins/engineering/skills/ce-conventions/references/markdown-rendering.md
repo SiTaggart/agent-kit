@@ -1,8 +1,7 @@
 # Markdown Rendering
 
-For ce-plan plans, use `../../ce-plan/references/plan-sections.md`.
-The section and ID examples below describe structured artifacts; they do not
-require a plan to have those sections or identifiers.
+For ce-plan, use `../../ce-plan/references/plan-sections.md`; the section and
+ID examples below are optional for plans.
 
 This is a format-rendering reference — it describes how to render any
 artifact in markdown, independent of which skill is producing it.

@@ -1,8 +1,7 @@
 # HTML Rendering
 
-For ce-plan plans, use `../../ce-plan/references/plan-sections.md`.
-Its HTML guidance replaces this catalog for plans; do not add sections,
-ID schemes, or layout elements to fit the examples below.
+For ce-plan, use `../../ce-plan/references/plan-sections.md` instead of the
+section and layout catalog below.
 
 This is a format-rendering reference — it describes how to render any
 artifact in HTML, independent of which skill is producing it.
