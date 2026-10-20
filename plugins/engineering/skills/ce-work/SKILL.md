@@ -76,7 +76,16 @@ to an absolute path by the parent; run inline when sub-agents are unavailable:
 
 ## Step 1: Understand The Task
 
-Read the prompt, relevant plan or issue, recent conversation, and current repository state. A plan document is context, not an execution script — preserve its scope boundaries without mechanically mirroring every section as a task. For a bare request, infer the likely files and behavior from the repository; ask only when the answer would materially change product behavior, ownership boundary, data model, or risk. State the contract and owner boundary before editing when the change affects product behavior.
+Read the prompt, relevant plan or issue, recent conversation, and current
+repository state. Establish the intended outcome, agreed scope, requirements,
+and constraints. Use the plan's context and technical direction to guide your
+investigation; verify assumptions and choose implementation details from the
+current system.
+
+For a bare request, infer the likely files and behavior from the repository.
+Ask only when the answer would materially change product behavior, ownership,
+data model, or risk. State the contract and owner boundary before editing when
+the change affects product behavior.
 
 ## Step 2: Find Prior Art
 
@@ -145,17 +154,16 @@ Invoke `ce-review` only when the change is substantial, risky, or the user asks 
 
 ## Step 8: Finish Clearly
 
-If the input was a plan artifact and the accepted work is complete, update the
-plan status before reporting:
+After completing the accepted work, update the source plan's status marker
+when present:
 
-- Markdown plans: change the YAML frontmatter field from `status: active` to
+- Markdown plans with a status field: change YAML `status: active` to
   `status: completed`.
-- HTML plans: change the visible `<span class="status">active</span>` value to
+- HTML plans with a status marker: change `<span class="status">active</span>` to
   `completed`.
-- Do not edit plan body content, implementation units, checkboxes, or
-  retrospective notes as part of this flip.
-- Do not mark a plan completed when work is blocked, partially shipped, or
-  intentionally deferred to the user.
+
+Limit this update to the status. Leave it unchanged when work is blocked,
+partially shipped, or intentionally deferred to the user.
 
 Finish with a concise report: what changed, what product contract is now true, what checks or proof passed, what was not verified and why, and any narrow follow-up genuinely outside the accepted contract.
 
