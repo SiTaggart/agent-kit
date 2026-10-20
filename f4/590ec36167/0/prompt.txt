@@ -671,3 +671,11 @@ What should we change in ce-plan based on this, so it catches details like the r
 ---
 
 and would the recovery behaviour naturally come out during implemetnation? realistically?
+
+---
+
+Make that small change to ce-plan. Keep the recovery details as implementation discovery, and don't add another checklist.
+
+Then create a draft pr for this and bumping the plugin.
+
+Then we will look to create two automations that use this skill in devin. One retro active campaign that hunts thorugh the entire codebase. The other that sweeps the previous days additions and improves what got merged, assuming we'd merge things that don't make the cut
