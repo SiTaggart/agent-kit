@@ -45,7 +45,7 @@
     },
     {
       "name": "design-guide",
-      "version": "0.1.0",
+      "version": "0.1.1",
       "source": "./plugins/design-guide",
       "description": "UI, accessibility, component, and design-system guidance."
     }

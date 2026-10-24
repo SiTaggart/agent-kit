@@ -88,7 +88,7 @@
         "source": "local",
         "path": "./plugins/design-guide"
       },
-      "version": "0.1.0",
+      "version": "0.1.1",
       "policy": {
         "installation": "AVAILABLE",
         "authentication": "ON_INSTALL"

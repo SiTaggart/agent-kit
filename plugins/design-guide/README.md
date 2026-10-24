@@ -16,11 +16,10 @@ Codex:
 codex plugin add design-guide@agent-kit
 ```
 
-When you run `codex exec` with `approval_policy` set to `never`, set
-`default_tools_approval_mode` to `approve` for this server. `--full-auto`
-does not approve its tool calls. `codex plugin add` already registers the
-server. Run this command to create the config block in `~/.codex/config.toml`,
-then add this line inside that block.
+`codex plugin add` registers the server. You need `codex mcp add`, and the
+approval key, only for headless `codex exec` when `approval_policy` is
+`never`. `--full-auto` does not approve its tool calls. Run this command
+to create the config block in `~/.codex/config.toml`. Add this line inside that block.
 
 ```bash
 codex mcp add design-guide --url https://design-guide.me-2c5.workers.dev/mcp
