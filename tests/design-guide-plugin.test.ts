@@ -60,9 +60,12 @@ test("design-guide install files point Claude and Codex at one remote http serve
   expect(skill).toContain("Leave `k` unset");
   expect(skill).toContain("A `score` only ranks the list.");
   expect(skill).toContain("no grounded guidance in the indexed design systems");
+  expect(skill).toContain("Keep only hits that answer the question.");
+  expect(skill).toContain("You may judge a hit by its passage or by opening that hit's own `url`.");
+  expect(skill).toContain("Cite only the `source` and `url` of hits you kept");
+  expect(skill).not.toContain("only when its text answers the question");
   expect(skill).toContain("Do not cite a url the tool did not return.");
   expect(skill).toContain("Paste points to the ARIA APG");
-  expect(skill).toContain("You may fetch a url that those hits returned.");
   expect(skill).toContain("A later turn searches again and cites only that turn's hits.");
   expect(skill).toContain("a fact that comes only from model memory");
   expect(skill.replaceAll("Do not web-search for more sources.", "")).not.toContain("web-search");
@@ -74,6 +77,7 @@ test("design-guide install files point Claude and Codex at one remote http serve
     'default_tools_approval_mode = "approve"',
   ]);
   expect(readme).toContain("only for headless `codex exec`");
-  expect(readme).toContain("inside that block");
-  expect(readme).not.toContain("[mcp_servers.design-guide]");
+  expect(readme).toContain("under the `url =` line");
+  expect(readme).toContain("still leave one server");
+  expect(readme).not.toMatch(/\[mcp_servers\.["']?design-guide/);
 });

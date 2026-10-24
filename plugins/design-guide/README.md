@@ -19,7 +19,7 @@ codex plugin add design-guide@agent-kit
 `codex plugin add` registers the server. You need `codex mcp add`, and the
 approval key, only for headless `codex exec` when `approval_policy` is
 `never`. `--full-auto` does not approve its tool calls. Run this command
-to create the config block in `~/.codex/config.toml`. Add this line inside that block.
+to create the config block in `~/.codex/config.toml`. Put this line under the `url =` line that command writes. `codex plugin add` and then these steps still leave one server.
 
 ```bash
 codex mcp add design-guide --url https://design-guide.me-2c5.workers.dev/mcp
