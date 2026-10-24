@@ -62,4 +62,6 @@ test("design-guide install files point Claude and Codex at one remote http serve
   const readme = await readText(path.join(pluginRoot, "README.md"));
   expect(readme).toContain("codex mcp add design-guide --url https://design-guide.me-2c5.workers.dev/mcp");
   expect(readme).toContain('default_tools_approval_mode = "approve"');
+  expect(readme).toContain("inside that block");
+  expect(readme).not.toContain("[mcp_servers.design-guide]");
 });
