@@ -16,6 +16,20 @@ Codex:
 codex plugin add design-guide@agent-kit
 ```
 
+When you run `codex exec` with `approval_policy` set to `never`, set
+`default_tools_approval_mode` to `approve` for this server. `--full-auto`
+does not approve its tool calls. Add the server, then add this block to
+`~/.codex/config.toml`.
+
+```bash
+codex mcp add design-guide --url https://design-guide.me-2c5.workers.dev/mcp
+```
+
+```toml
+[mcp_servers.design-guide]
+default_tools_approval_mode = "approve"
+```
+
 Claude Code:
 
 ```text

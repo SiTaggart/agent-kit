@@ -56,4 +56,10 @@ test("design-guide install files point Claude and Codex at one remote http serve
   expect(skill).toContain("Leave `k` unset");
   expect(skill).toContain("A `score` only ranks the list.");
   expect(skill).toContain("no grounded guidance in the indexed design systems");
+  expect(skill).toContain("Do not cite a url the tool did not return.");
+  expect(skill).toContain("Paste points to the ARIA APG");
+
+  const readme = await readText(path.join(pluginRoot, "README.md"));
+  expect(readme).toContain("codex mcp add design-guide --url https://design-guide.me-2c5.workers.dev/mcp");
+  expect(readme).toContain('default_tools_approval_mode = "approve"');
 });
