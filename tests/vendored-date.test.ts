@@ -9,7 +9,7 @@ const dateCopies = [
   "plugins/p3stack/skills/poteto-mode/scripts/lib/date.sh",
 ];
 
-test("vendored date.sh copies are byte-identical", async () => {
+test("only the listed date.sh copies exist", async () => {
   const copies = (await pluginScripts(path.join(repoRoot, "plugins")))
     .filter((file) => file.endsWith(`${path.sep}scripts${path.sep}lib${path.sep}date.sh`))
     .map((file) => path.relative(repoRoot, file))
@@ -31,25 +31,52 @@ test("no plugin script calls date -r or date -d outside scripts/lib/date.sh", as
       continue;
     }
     const body = await readFile(script, "utf8");
-    if (/date\s+-[rd]\b/.test(body)) {
+    if (body.split("\n").some((line) => flagsEpochDate(line))) {
       offenders.push(path.relative(repoRoot, script));
     }
   }
   expect(offenders).toEqual([]);
 });
 
-test("epoch_to_iso prints the UTC day for an epoch second", () => {
+test("epoch date scans catch combined and long flags", () => {
+  for (const line of ["date -d @0", "date -r 0", "date -u -d @0", "date --date=@0", "date -ud @0", "date --reference=0"]) {
+    expect(flagsEpochDate(line), line).toBe(true);
+  }
+  for (const line of ["date -u +%Y-%m-%dT%H:%M:%SZ", "date +%s", "date --version", "candidate"]) {
+    expect(flagsEpochDate(line), line).toBe(false);
+  }
+});
+
+test("epoch_to_iso prints the UTC day with GNU date", () => {
+  expectUtcDay();
+});
+
+test("epoch_to_iso prints the UTC day with the BSD date shim", () => {
+  expectUtcDay(path.join(repoRoot, "tests/fixtures/date/bsd"));
+});
+
+test("epoch_to_iso prints the UTC day with the BusyBox date shim", () => {
+  expectUtcDay(path.join(repoRoot, "tests/fixtures/date/busybox"));
+});
+
+function expectUtcDay(pathPrefix?: string): void {
   const epoch = 1_700_000_000;
   const expected = new Date(epoch * 1000).toISOString().slice(0, 10);
   const script = path.join(repoRoot, dateCopies[0] ?? "");
+  const env = { ...process.env, TZ: "UTC" };
+  if (pathPrefix) env.PATH = `${pathPrefix}${path.delimiter}${env.PATH ?? ""}`;
   const actual = spawnSync(
     "bash",
     ["-c", 'source "$1" && epoch_to_iso "$2"', "bash", script, String(epoch)],
-    { encoding: "utf8", cwd: tmpdir(), env: { ...process.env, TZ: "UTC" } },
+    { encoding: "utf8", cwd: tmpdir(), env },
   );
   expect(actual.status, actual.stderr).toBe(0);
   expect(actual.stdout.trim()).toBe(expected);
-});
+}
+
+function flagsEpochDate(line: string): boolean {
+  return /date\s+-[rd]\b/.test(line);
+}
 
 async function pluginScripts(directory: string): Promise<string[]> {
   const found: string[] = [];
