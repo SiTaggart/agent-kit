@@ -7,20 +7,19 @@ import path from "node:path";
 const repoRoot = path.resolve(import.meta.dir, "..");
 const dateCopies = [
   "plugins/p3stack/skills/poteto-mode/scripts/lib/date.sh",
-  "plugins/p3stack/skills/show-me-your-work/scripts/lib/date.sh",
 ];
 
 test("vendored date.sh copies are byte-identical", async () => {
-  for (const relative of dateCopies) {
-    expect(await Bun.file(path.join(repoRoot, relative)).exists(), relative).toBe(true);
-  }
-  const bodies = await Promise.all(dateCopies.map(async (relative) => {
-    return await readFile(path.join(repoRoot, relative));
-  }));
+  const copies = (await pluginScripts(path.join(repoRoot, "plugins")))
+    .filter((file) => file.endsWith(`${path.sep}scripts${path.sep}lib${path.sep}date.sh`))
+    .map((file) => path.relative(repoRoot, file))
+    .sort();
+  expect(copies).toEqual([...dateCopies].sort());
+  const bodies = await Promise.all(copies.map(async (relative) => readFile(path.join(repoRoot, relative))));
   const [first, ...rest] = bodies;
   expect(first).toBeDefined();
   for (const body of rest) {
-    expect(Buffer.compare(first ?? Buffer.alloc(0), body)).toBe(0);
+    expect(body.equals(first ?? Buffer.alloc(0))).toBe(true);
   }
 });
 
@@ -39,18 +38,17 @@ test("no plugin script calls date -r or date -d outside scripts/lib/date.sh", as
   expect(offenders).toEqual([]);
 });
 
-test("epoch_to_iso matches GNU date for an epoch second", () => {
-  const epoch = "1700000000";
-  const expected = spawnSync("date", ["-d", `@${epoch}`, "+%Y-%m-%d"], { encoding: "utf8" });
-  expect(expected.status, expected.stderr).toBe(0);
+test("epoch_to_iso prints the UTC day for an epoch second", () => {
+  const epoch = 1_700_000_000;
+  const expected = new Date(epoch * 1000).toISOString().slice(0, 10);
   const script = path.join(repoRoot, dateCopies[0] ?? "");
   const actual = spawnSync(
     "bash",
-    ["-c", 'source "$1" && epoch_to_iso "$2"', "bash", script, epoch],
-    { encoding: "utf8", cwd: tmpdir() },
+    ["-c", 'source "$1" && epoch_to_iso "$2"', "bash", script, String(epoch)],
+    { encoding: "utf8", cwd: tmpdir(), env: { ...process.env, TZ: "UTC" } },
   );
   expect(actual.status, actual.stderr).toBe(0);
-  expect(actual.stdout.trim()).toBe(expected.stdout.trim());
+  expect(actual.stdout.trim()).toBe(expected);
 });
 
 async function pluginScripts(directory: string): Promise<string[]> {
