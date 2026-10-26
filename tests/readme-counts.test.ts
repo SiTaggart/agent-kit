@@ -1,8 +1,10 @@
 import { expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { readdir } from "node:fs/promises";
+import { readdir, readFile } from "node:fs/promises";
 import path from "node:path";
+import { run } from "../src/gen-counts";
 import { pathExists, readText } from "../src/fs";
+import { makeTempRoot, removeTempRoot, writeText } from "./helpers";
 
 const repoRoot = path.resolve(import.meta.dir, "..");
 const START = "<!-- counts:start -->";
@@ -36,6 +38,41 @@ test("README counts match the skill tree and gen:counts", async () => {
     encoding: "utf8",
   });
   expect(check.status, check.stderr).toBe(0);
+});
+
+test("gen:counts --check rejects a stale block and write mode rewrites only that block", async () => {
+  const root = await makeTempRoot("agent-kit-counts-");
+  const readmePath = path.join(root, "README.md");
+  const before = [
+    "# Fixture",
+    "",
+    "keep this intro",
+    "",
+    "<!-- counts:start -->",
+    "- demo: 0 skills",
+    "<!-- counts:end -->",
+    "",
+    "keep this ending",
+    "",
+  ].join("\n");
+  try {
+    await writeText(readmePath, before);
+    await writeText(path.join(root, "plugins/demo/skills/one/SKILL.md"), "---\nname: one\n---\n");
+
+    const check = await run(root, { check: true });
+    expect(check).not.toBe(0);
+    expect(await readFile(readmePath, "utf8")).toBe(before);
+
+    const write = await run(root, { check: false });
+    expect(write).toBe(0);
+    const after = await readFile(readmePath, "utf8");
+    expect(after.startsWith("# Fixture\n\nkeep this intro\n\n")).toBe(true);
+    expect(after.endsWith("\n\nkeep this ending\n")).toBe(true);
+    expect(after).toContain("<!-- counts:start -->\n- demo: 1 skill\n<!-- counts:end -->");
+    expect(after).not.toContain("- demo: 0 skills");
+  } finally {
+    await removeTempRoot(root);
+  }
 });
 
 function countsBlock(readme: string): string {

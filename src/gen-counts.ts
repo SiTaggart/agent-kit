@@ -10,7 +10,7 @@ interface PluginSkillCount {
   count: number;
 }
 
-async function countPluginSkills(repoRoot: string): Promise<PluginSkillCount[]> {
+export async function count(repoRoot: string): Promise<PluginSkillCount[]> {
   const pluginsDir = path.join(repoRoot, "plugins");
   const entries = await readdir(pluginsDir, { withFileTypes: true });
   const counts: PluginSkillCount[] = [];
@@ -21,7 +21,7 @@ async function countPluginSkills(repoRoot: string): Promise<PluginSkillCount[]> 
     }
 
     const skillsDir = path.join(pluginsDir, entry.name, "skills");
-    let count = 0;
+    let skillCount = 0;
     if (await pathExists(skillsDir)) {
       const skills = await readdir(skillsDir, { withFileTypes: true });
       for (const skill of skills) {
@@ -29,19 +29,19 @@ async function countPluginSkills(repoRoot: string): Promise<PluginSkillCount[]> 
           continue;
         }
         if (await pathExists(path.join(skillsDir, skill.name, "SKILL.md"))) {
-          count += 1;
+          skillCount += 1;
         }
       }
     }
 
-    counts.push({ plugin: entry.name, count });
+    counts.push({ plugin: entry.name, count: skillCount });
   }
 
   counts.sort((left, right) => left.plugin.localeCompare(right.plugin));
   return counts;
 }
 
-function renderCountsBlock(counts: readonly PluginSkillCount[]): string {
+export function render(counts: readonly PluginSkillCount[]): string {
   const lines = counts.map((row) => {
     const noun = row.count === 1 ? "skill" : "skills";
     return `- ${row.plugin}: ${row.count} ${noun}`;
@@ -49,7 +49,7 @@ function renderCountsBlock(counts: readonly PluginSkillCount[]): string {
   return `${START}\n${lines.join("\n")}\n${END}`;
 }
 
-function replaceCountsBlock(readme: string, block: string): string {
+export function replace(readme: string, block: string): string {
   const start = readme.indexOf(START);
   const end = readme.indexOf(END);
   if (start < 0 || end < start) {
@@ -59,22 +59,28 @@ function replaceCountsBlock(readme: string, block: string): string {
   return `${readme.slice(0, start)}${block}${readme.slice(end + END.length)}`;
 }
 
-async function main(): Promise<void> {
-  const repoRoot = path.resolve(import.meta.dir, "..");
-  const readmePath = path.join(repoRoot, "README.md");
+export async function run(root: string, options: { check: boolean }): Promise<number> {
+  const readmePath = path.join(root, "README.md");
   const current = await readText(readmePath);
-  const next = replaceCountsBlock(current, renderCountsBlock(await countPluginSkills(repoRoot)));
+  const next = replace(current, render(await count(root)));
   if (next === current) {
-    return;
+    return 0;
   }
 
-  if (process.argv.includes("--check")) {
+  if (options.check) {
     console.error("README skill counts differ from plugins/*/skills/*/SKILL.md. Run bun run gen:counts.");
-    process.exitCode = 1;
-    return;
+    return 1;
   }
 
   await writeFile(readmePath, next);
+  return 0;
+}
+
+async function main(): Promise<void> {
+  const code = await run(path.resolve(import.meta.dir, ".."), {
+    check: process.argv.includes("--check"),
+  });
+  process.exitCode = code;
 }
 
 if (import.meta.main) {
