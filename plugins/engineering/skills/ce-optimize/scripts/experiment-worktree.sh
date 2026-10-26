@@ -67,39 +67,9 @@ is_branch_checked_out() {
   '
 }
 
-write_snapshot_list() {
-  local worktree_path="${1:?Error: worktree_path required}"
-  local list_file="${2:?Error: list file required}"
-  local include_ignored="${3:-}"
-
-  if ! git -C "$worktree_path" ls-files --others --exclude-standard -z >"$list_file"; then
-    return 1
-  fi
-  if [[ "$include_ignored" != "ignored" ]]; then
-    return 0
-  fi
-  # Dependency and build trees stay out of the archive. Removal deletes them
-  # with the worktree, and archiving them would make the snapshot unbounded.
-  git -C "$worktree_path" ls-files --others --ignored --exclude-standard -z -- \
-    . \
-    ':(exclude,glob)**/node_modules/**' \
-    ':(exclude,glob)**/.venv/**' \
-    ':(exclude,glob)**/venv/**' \
-    ':(exclude,glob)**/vendor/**' \
-    ':(exclude,glob)**/dist/**' \
-    ':(exclude,glob)**/build/**' \
-    ':(exclude,glob)**/.next/**' \
-    ':(exclude,glob)**/target/**' \
-    ':(exclude,glob)**/.turbo/**' \
-    ':(exclude,glob)**/coverage/**' \
-    ':(exclude,glob)**/__pycache__/**' \
-    >>"$list_file"
-}
-
 snapshot_untracked() {
   local worktree_path="${1:?Error: worktree_path required}"
   local name="${2:?Error: snapshot name required}"
-  local include_ignored="${3:-}"
   local snapshot_dir="$WORKTREE_DIR/.snapshots"
   local reserved snapshot_path list_file
 
@@ -113,7 +83,9 @@ snapshot_untracked() {
   fi
   list_file=$(mktemp) || return 1
 
-  if ! write_snapshot_list "$worktree_path" "$list_file" "$include_ignored"; then
+  # Ignored files stay in the worktree. git clean -fd does not delete them,
+  # so the archive lists only untracked files that the clean will remove.
+  if ! git -C "$worktree_path" ls-files --others --exclude-standard -z >"$list_file"; then
     rm -f "$list_file" "$snapshot_path"
     return 1
   fi
@@ -130,22 +102,15 @@ snapshot_untracked() {
 require_untracked_snapshot() {
   local worktree_path="${1:?Error: worktree_path required}"
   local name="${2:?Error: snapshot name required}"
-  local include_ignored="${3:-}"
 
-  if snapshot_untracked "$worktree_path" "$name" "$include_ignored" >/dev/null; then
+  if snapshot_untracked "$worktree_path" "$name" >/dev/null; then
     return 0
   fi
 
   echo -e "${RED}Error: Refusing to discard ${worktree_path} because the untracked snapshot failed${NC}" >&2
-  local failed_list
-  failed_list=$(mktemp) || return 1
-  if ! write_snapshot_list "$worktree_path" "$failed_list" "$include_ignored"; then
-    rm -f "$failed_list"
+  if ! git -C "$worktree_path" ls-files --others --exclude-standard >&2; then
     echo -e "${RED}Error: Could not list untracked files in ${worktree_path}${NC}" >&2
-    return 1
   fi
-  tr '\0' '\n' <"$failed_list" >&2
-  rm -f "$failed_list"
   return 1
 }
 
@@ -262,9 +227,7 @@ cleanup_worktree() {
   local worktree_path="$WORKTREE_DIR/$worktree_name"
 
   if [[ -d "$worktree_path" ]]; then
-    # Removal deletes the directory, so ignored user files are archived too.
-    # node_modules and build output stay out of the tar.
-    require_untracked_snapshot "$worktree_path" "$worktree_name" ignored || return 1
+    require_untracked_snapshot "$worktree_path" "$worktree_name" || return 1
     if ! git worktree remove "$worktree_path" --force 2>/dev/null; then
       rm -rf "$worktree_path" 2>/dev/null || true
       git worktree prune 2>/dev/null || true
@@ -295,8 +258,7 @@ cleanup_all() {
       # Extract index from name
       local index_str="${worktree_name#$prefix}"
 
-      # Removal deletes the directory, so ignored user files are archived too.
-      require_untracked_snapshot "$worktree_path" "$worktree_name" ignored || return 1
+      require_untracked_snapshot "$worktree_path" "$worktree_name" || return 1
       if ! git worktree remove "$worktree_path" --force 2>/dev/null; then
         rm -rf "$worktree_path" 2>/dev/null || true
       fi

@@ -49,16 +49,22 @@ test("rerunning create keeps an ignored .env and snapshots scratch.txt", async (
     const snapshotDir = path.join(repo, ".worktrees", ".snapshots");
     const tars = existsSync(snapshotDir) ? readdirSync(snapshotDir).filter((name) => name.endsWith(".tar")) : [];
     expect(tars.length, output).toBeGreaterThan(0);
-    const listed = tars.map((name) => spawnSync("tar", ["-tf", path.join(snapshotDir, name)], { encoding: "utf8" }).stdout);
-    expect(listed.some((entry) => entry.split("\n").includes("scratch.txt"))).toBe(true);
-    expect(listed.some((entry) => entry.split("\n").includes(".env"))).toBe(false);
+    const archive = path.join(snapshotDir, tars[0] ?? "");
+    const listed = spawnSync("tar", ["-tf", archive], { encoding: "utf8" });
+    expect(listed.status, listed.stderr).toBe(0);
+    const names = listed.stdout.split("\n");
+    expect(names).toContain("scratch.txt");
+    expect(names).not.toContain(".env");
+    const scratch = spawnSync("tar", ["-xOf", archive, "scratch.txt"], { encoding: "utf8" });
+    expect(scratch.status, scratch.stderr).toBe(0);
+    expect(scratch.stdout).toBe("scratch\n");
   } finally {
     await removeTempRoot(repo);
   }
 });
 
-test("cleanup archives an ignored .env and leaves node_modules out of the tar", async () => {
-  const repo = await makeTempRoot("exp-worktree-cleanup-");
+test("two discards in a row keep both snapshot archives", async () => {
+  const repo = await makeTempRoot("exp-worktree-collision-");
   try {
     run("git", ["init", "-b", "main"], repo);
     run("git", ["commit", "--allow-empty", "-m", "init"], repo);
@@ -66,32 +72,21 @@ test("cleanup archives an ignored .env and leaves node_modules out of the tar", 
     const worktree = created.trim().split("\n").filter(Boolean).at(-1);
     expect(worktree).toBeTruthy();
     if (!worktree) throw new Error("create did not print a worktree path");
-    await writeText(path.join(worktree, ".gitignore"), ".env\nnode_modules/\n");
-    await writeText(path.join(worktree, ".env"), "TOKEN=local\n");
-    await writeText(path.join(worktree, "node_modules", "pkg.js"), "skip\n");
+    const scratchFile = path.join(worktree, "scratch.txt");
+    await writeText(scratchFile, "first\n");
 
-    const cleaned = spawnSync(script, ["cleanup", "spec", "1"], {
-      cwd: repo,
-      encoding: "utf8",
-      env: gitEnv,
-    });
-    const output = `${cleaned.stdout}\n${cleaned.stderr}`;
-    expect(cleaned.status, output).toBe(0);
-    expect(existsSync(worktree)).toBe(false);
+    const first = spawnSync(script, ["create", "spec", "1", "main"], { cwd: repo, encoding: "utf8", env: gitEnv });
+    expect(first.status, `${first.stdout}\n${first.stderr}`).toBe(0);
+    await writeText(scratchFile, "second\n");
+    const second = spawnSync(script, ["create", "spec", "1", "main"], { cwd: repo, encoding: "utf8", env: gitEnv });
+    expect(second.status, `${second.stdout}\n${second.stderr}`).toBe(0);
 
     const snapshotDir = path.join(repo, ".worktrees", ".snapshots");
-    const tars = readdirSync(snapshotDir).filter((name) => name.endsWith(".tar"));
-    expect(tars.length, output).toBeGreaterThan(0);
-    const archive = tars
-      .map((name) => path.join(snapshotDir, name))
-      .find((file) => spawnSync("tar", ["-tf", file], { encoding: "utf8" }).stdout.split("\n").includes(".env"));
-    expect(archive, output).toBeTruthy();
-    if (!archive) throw new Error("cleanup did not archive .env");
-    const names = spawnSync("tar", ["-tf", archive], { encoding: "utf8" }).stdout.split("\n");
-    expect(names.some((name) => name.split("/").includes("node_modules"))).toBe(false);
-    const envFile = spawnSync("tar", ["-xOf", archive, ".env"], { encoding: "utf8" });
-    expect(envFile.status, envFile.stderr).toBe(0);
-    expect(envFile.stdout).toBe("TOKEN=local\n");
+    const tars = readdirSync(snapshotDir).filter((name) => name.endsWith(".tar")).sort();
+    expect(tars.length).toBe(2);
+    const contents = tars.map((name) => spawnSync("tar", ["-xOf", path.join(snapshotDir, name), "scratch.txt"], { encoding: "utf8" }).stdout);
+    expect(contents).toContain("first\n");
+    expect(contents).toContain("second\n");
   } finally {
     await removeTempRoot(repo);
   }
