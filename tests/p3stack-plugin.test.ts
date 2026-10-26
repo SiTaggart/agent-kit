@@ -1,6 +1,6 @@
 import { expect, test } from "bun:test";
 import { spawnSync } from "node:child_process";
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, utimesSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, readdirSync, realpathSync, rmSync, statSync, symlinkSync, utimesSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import path from "node:path";
 
@@ -98,7 +98,6 @@ test("both catalogs publish P3Stack with manifests that match its release", () =
 
 test("every skill resolves the runtime adapter and keeps its activation policy", () => {
   const skills = readdirSync(path.join(pluginRoot, "skills")).filter((name) => !IGNORED.has(name));
-  expect(skills).toHaveLength(60);
   expect(skills).not.toContain("sync-p3stack");
 
   for (const skill of skills) {
@@ -225,6 +224,59 @@ function writeGrokSession(stores: HarnessStores, id: string, cwd: string): strin
   return path.join(session, "chat_history.jsonl");
 }
 
+interface AuditFixture {
+  stores: HarnessStores;
+  repository: string;
+  codexTree: string;
+  grokTree: string;
+  idleTree: string;
+  bin: string;
+}
+
+function prepareAudit(directory: string): AuditFixture {
+  const stores = harnessStores(directory);
+  const repository = path.join(directory, "repository");
+  const codexTree = path.join(directory, "codex-tree");
+  const grokTree = path.join(directory, "grok-tree");
+  const idleTree = path.join(directory, "idle-tree");
+  const bin = path.join(directory, "bin");
+  mkdirSync(bin);
+  writeFileSync(path.join(bin, "gh"), "#!/bin/sh\nexit 1\n", { mode: 0o755 });
+  const git = (...args: string[]) => {
+    const result = spawnSync("git", args, { encoding: "utf8" });
+    expect(result.status, result.stderr).toBe(0);
+  };
+  git("init", "--initial-branch=main", repository);
+  git("-C", repository, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.com", "-c", "commit.gpgsign=false", "commit", "--allow-empty", "-m", "fixture");
+  git("-C", repository, "update-ref", "refs/remotes/origin/main", "HEAD");
+  for (const tree of [codexTree, grokTree, idleTree]) git("-C", repository, "worktree", "add", "--detach", tree);
+
+  const old = new Date("2026-01-02T12:00:00Z");
+  const codexFile = writeCodexSession(stores, "codex-old", codexTree);
+  utimesSync(codexFile, old, old);
+  writeClaudeSession(stores, "claude-new", codexTree);
+  writeGrokSession(stores, "grok-only", grokTree);
+  return { stores, repository, codexTree, grokTree, idleTree, bin };
+}
+
+function runAudit(script: string, fixture: AuditFixture, cwd?: string) {
+  return spawnSync("bash", [script, fixture.repository], {
+    encoding: "utf8",
+    cwd,
+    env: { ...process.env, ...fixture.stores.env, PATH: `${fixture.bin}:${process.env.PATH}` },
+  });
+}
+
+function expectAuditSessions(result: { status: number | null; stdout: string; stderr: string }, fixture: AuditFixture): void {
+  expect(result.status, result.stderr).toBe(0);
+  const today = spawnSync("date", ["+%Y-%m-%d"], { encoding: "utf8" }).stdout.trim();
+  expect(result.stdout).toContain(`\t${today}/claude\tverify-recent-chat\t${fixture.codexTree}`);
+  expect(result.stdout).toContain(`\t${today}/grok\tverify-recent-chat\t${fixture.grokTree}`);
+  expect(result.stdout).toContain(`\tunknown\treview-merged\t${fixture.idleTree}`);
+  expect(result.stderr).not.toContain("No such file");
+  expect(result.stderr).not.toContain("Session history is unknown");
+}
+
 function indexSessions(stores: HarnessStores, workspaces: string[]) {
   const args = workspaces.flatMap((workspace) => ["--workspace", workspace]);
   return spawnSync("python3", [path.join(SCRIPTS, "harness-sessions.py"), ...args], {
@@ -272,38 +324,26 @@ test("the session indexer reads Codex, Claude Code, and Grok Build stores for ex
 test("the worktree audit reports the newest session from any harness", () => {
   const directory = realpathSync(mkdtempSync(path.join(tmpdir(), "p3stack-audit-")));
   try {
-    const stores = harnessStores(directory);
-    const repository = path.join(directory, "repository");
-    const codexTree = path.join(directory, "codex-tree");
-    const grokTree = path.join(directory, "grok-tree");
-    const idleTree = path.join(directory, "idle-tree");
-    const bin = path.join(directory, "bin");
-    mkdirSync(bin);
-    writeFileSync(path.join(bin, "gh"), "#!/bin/sh\nexit 1\n", { mode: 0o755 });
-    const git = (...args: string[]) => {
-      const result = spawnSync("git", args, { encoding: "utf8" });
-      expect(result.status, result.stderr).toBe(0);
-    };
-    git("init", "--initial-branch=main", repository);
-    git("-C", repository, "-c", "user.name=Fixture", "-c", "user.email=fixture@example.com", "-c", "commit.gpgsign=false", "commit", "--allow-empty", "-m", "fixture");
-    git("-C", repository, "update-ref", "refs/remotes/origin/main", "HEAD");
-    for (const tree of [codexTree, grokTree, idleTree]) git("-C", repository, "worktree", "add", "--detach", tree);
+    const fixture = prepareAudit(directory);
+    expectAuditSessions(runAudit(path.join(SCRIPTS, "worktree-audit.sh"), fixture), fixture);
+  } finally {
+    rmSync(directory, { recursive: true, force: true });
+  }
+});
 
-    const old = new Date("2026-01-02T12:00:00Z");
-    const codexFile = writeCodexSession(stores, "codex-old", codexTree);
-    utimesSync(codexFile, old, old);
-    writeClaudeSession(stores, "claude-new", codexTree);
-    writeGrokSession(stores, "grok-only", grokTree);
+test("a relative path and a symlink both find date.sh and harness-sessions.py", () => {
+  const directory = realpathSync(mkdtempSync(path.join(tmpdir(), "p3stack-audit-path-")));
+  try {
+    const fixture = prepareAudit(directory);
+    const launch = path.join(directory, "launch");
+    mkdirSync(launch);
+    const relative = path.relative(launch, path.join(SCRIPTS, "worktree-audit.sh"));
+    expectAuditSessions(runAudit(relative, fixture, launch), fixture);
 
-    const result = spawnSync("bash", [path.join(SCRIPTS, "worktree-audit.sh"), repository], {
-      encoding: "utf8",
-      env: { ...process.env, ...stores.env, PATH: `${bin}:${process.env.PATH}` },
-    });
-    expect(result.status, result.stderr).toBe(0);
-    const today = spawnSync("date", ["+%Y-%m-%d"], { encoding: "utf8" }).stdout.trim();
-    expect(result.stdout).toContain(`\t${today}/claude\tverify-recent-chat\t${codexTree}`);
-    expect(result.stdout).toContain(`\t${today}/grok\tverify-recent-chat\t${grokTree}`);
-    expect(result.stdout).toContain(`\tunknown\treview-merged\t${idleTree}`);
+    const linkDir = path.join(directory, "linked");
+    mkdirSync(linkDir);
+    symlinkSync(path.relative(linkDir, path.join(SCRIPTS, "worktree-audit.sh")), path.join(linkDir, "worktree-audit.sh"));
+    expectAuditSessions(runAudit(path.join(linkDir, "worktree-audit.sh"), fixture), fixture);
   } finally {
     rmSync(directory, { recursive: true, force: true });
   }

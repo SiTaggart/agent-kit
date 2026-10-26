@@ -1,0 +1,58 @@
+#!/bin/sh
+# BSD date stand-in. --version and -d fail. -r EPOCH honors +%Y-%m-%d.
+set -eu
+
+format=
+epoch=
+saw_r=0
+
+die() {
+	printf '%s\n' "$1" >&2
+	exit 1
+}
+
+while [ $# -gt 0 ]; do
+	arg=$1
+	shift
+	case "$arg" in
+	--version | --date | --reference | --date=* | --reference=*)
+		die "date: illegal option -- ${arg}"
+		;;
+	+*)
+		format=$arg
+		;;
+	-*)
+		flags=${arg#-}
+		while [ -n "$flags" ]; do
+			c=$(printf '%s' "$flags" | cut -c1)
+			flags=$(printf '%s' "$flags" | cut -c2-)
+			case "$c" in
+			u) ;;
+			r)
+				saw_r=1
+				if [ -n "$flags" ]; then
+					epoch=$flags
+					flags=
+				else
+					[ $# -gt 0 ] || die "date: option requires an argument -- r"
+					epoch=$1
+					shift
+				fi
+				;;
+			*)
+				die "date: illegal option -- $c"
+				;;
+			esac
+		done
+		;;
+	*)
+		die "date: unexpected argument $arg"
+		;;
+	esac
+done
+
+[ "$saw_r" -eq 1 ] || die "date: illegal option -- d"
+if [ "$format" = "+%Y-%m-%d" ]; then
+	exec bun -e 'const n = Number(process.argv[1]); if (!Number.isFinite(n)) process.exit(2); process.stdout.write(new Date(n * 1000).toISOString().slice(0, 10) + "\n")' "$epoch"
+fi
+printf '%s\n' "1999/01/01"

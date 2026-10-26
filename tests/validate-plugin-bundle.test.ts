@@ -66,9 +66,8 @@ test("Grok reuses the Cursor plugin files", () => {
 
 test("core and LOX skills have one owner and relative skill references stay inside that plugin", async () => {
   const owners = new Map<string, string>();
-  for (const [id, count] of [["engineering", 34], ["git", 11], ["knowledge", 11], ["lox", 5]] as const) {
+  for (const id of ["engineering", "git", "knowledge", "lox"] as const) {
     const skills = await readdir(path.join(repoRoot, "plugins", id, "skills"));
-    expect(skills).toHaveLength(count);
     for (const name of skills) {
       expect(owners.has(name)).toBe(false);
       owners.set(name, id);

@@ -1,0 +1,83 @@
+#!/bin/sh
+# BusyBox date stand-in. --version fails. -d @EPOCH works. -r is a missing file.
+set -eu
+
+format=
+spec=
+
+die() {
+	printf '%s\n' "$1" >&2
+	exit 1
+}
+
+while [ $# -gt 0 ]; do
+	arg=$1
+	shift
+	case "$arg" in
+	--version)
+		die "date: unrecognized option '--version'"
+		;;
+	--date)
+		[ $# -gt 0 ] || die "date: option requires an argument -- date"
+		spec=$1
+		shift
+		;;
+	--date=*)
+		spec=${arg#--date=}
+		;;
+	--reference)
+		die "date: can't stat '${1:-}'"
+		;;
+	--reference=*)
+		die "date: can't stat '${arg#--reference=}'"
+		;;
+	+*)
+		format=$arg
+		;;
+	-*)
+		flags=${arg#-}
+		while [ -n "$flags" ]; do
+			c=$(printf '%s' "$flags" | cut -c1)
+			flags=$(printf '%s' "$flags" | cut -c2-)
+			case "$c" in
+			u) ;;
+			r)
+				if [ -n "$flags" ]; then
+					target=$flags
+				else
+					target=${1:-}
+					[ $# -gt 0 ] && shift
+				fi
+				die "date: can't stat '${target}'"
+				;;
+			d)
+				if [ -n "$flags" ]; then
+					spec=$flags
+					flags=
+				else
+					[ $# -gt 0 ] || die "date: option requires an argument -- d"
+					spec=$1
+					shift
+				fi
+				;;
+			*)
+				die "date: invalid option -- '$c'"
+				;;
+			esac
+		done
+		;;
+	*)
+		die "date: unexpected argument $arg"
+		;;
+	esac
+done
+
+[ -n "$spec" ] || die "date: missing operand"
+case "$spec" in
+@*) epoch=${spec#@} ;;
+*) die "date: invalid date '$spec'" ;;
+esac
+if [ "$format" = "+%Y-%m-%d" ]; then
+	exec bun -e 'const n = Number(process.argv[1]); if (!Number.isFinite(n)) process.exit(2); process.stdout.write(new Date(n * 1000).toISOString().slice(0, 10) + "\n")' "$epoch"
+fi
+printf '%s\n' "1999/01/01"
