@@ -27,6 +27,35 @@ test("a fixture README naming /nope fails validation", async () => {
   }
 });
 
+test("frontmatter name accepts quotes, escapes, and trailing comments", async () => {
+  const root = await makeTempRoot("command-frontmatter-");
+  try {
+    await writeText(
+      path.join(root, "plugins/demo/skills/plain-skill/SKILL.md"),
+      "---\nname: \"plain-skill\" # trailing comment\n---\n",
+    );
+    await writeText(
+      path.join(root, "plugins/demo/skills/a\"b/SKILL.md"),
+      "---\nname: \"a\\\"b\"\n---\n",
+    );
+    await writeText(
+      path.join(root, "plugins/demo/skills/mismatch-skill/SKILL.md"),
+      "---\nname: other # comment\n---\n",
+    );
+
+    const { inspectCommandIndex } = await import("../src/validate");
+    const report = await inspectCommandIndex(root);
+    const failures = report.failures.filter((failure) => failure.message.includes("Frontmatter name"));
+    expect(failures.map((failure) => failure.path)).toEqual([
+      "plugins/demo/skills/mismatch-skill/SKILL.md",
+    ]);
+    expect(failures[0]?.message).toContain(JSON.stringify("other"));
+    expect(failures[0]?.message).not.toContain("#");
+  } finally {
+    await removeTempRoot(root);
+  }
+});
+
 test("command index accepts this repo", async () => {
   const { inspectCommandIndex } = await import("../src/validate");
   expect(typeof inspectCommandIndex).toBe("function");

@@ -188,12 +188,12 @@ function frontmatterName(text: string): string | undefined {
   const end = text.indexOf("\n---", 3);
   if (end === -1) return undefined;
   const block = text.slice(text.indexOf("\n") + 1, end);
-  for (const line of block.split(/\r?\n/)) {
-    const match = /^name:\s*(.*?)\s*$/.exec(line);
-    if (!match) continue;
-    return (match[1] ?? "").replace(/^['"]|['"]$/g, "");
+  try {
+    const name = asRecord(Bun.YAML.parse(block))?.name;
+    return typeof name === "string" ? name : undefined;
+  } catch {
+    return undefined;
   }
-  return undefined;
 }
 
 export function namesInstructionFile(value: string): boolean {
