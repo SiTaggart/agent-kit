@@ -25,6 +25,19 @@ done
 
 repo="${1:-$(git rev-parse --show-toplevel 2>/dev/null)}"
 [ -z "$repo" ] && { echo "not in a git repo; pass a repo path" >&2; exit 1; }
+
+# Follow the symlink chain. readlink has no portable -f.
+script_source=${BASH_SOURCE[0]}
+while [ -L "$script_source" ]; do
+	script_link_dir=$(cd "$(dirname "$script_source")" && pwd)
+	script_source=$(readlink "$script_source")
+	case "$script_source" in
+	/*) ;;
+	*) script_source="$script_link_dir/$script_source" ;;
+	esac
+done
+script_dir=$(cd "$(dirname "$script_source")" && pwd)
+
 cd "$repo" || exit 1
 git rev-parse --git-dir >/dev/null 2>&1 || { echo "error: not a git repo: $repo" >&2; exit 1; }
 
@@ -69,7 +82,6 @@ session_args=()
 while IFS= read -r workspace; do
     session_args+=(--workspace "$workspace")
 done < <(git worktree list --porcelain | sed -n 's/^worktree //p')
-script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
 . "$script_dir/lib/date.sh"
 if ! python3 "$script_dir/harness-sessions.py" "${session_args[@]}" > "$session_index"; then
     printf '{"sessions":[],"unavailable":[]}\n' > "$session_index"

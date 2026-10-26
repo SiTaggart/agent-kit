@@ -63,8 +63,11 @@ function expectUtcDay(pathPrefix?: string): void {
   const epoch = 1_700_000_000;
   const expected = new Date(epoch * 1000).toISOString().slice(0, 10);
   const script = path.join(repoRoot, dateCopies[0] ?? "");
-  const env = { ...process.env, TZ: "UTC" };
-  if (pathPrefix) env.PATH = `${pathPrefix}${path.delimiter}${env.PATH ?? ""}`;
+  const env = {
+    ...process.env,
+    TZ: "UTC",
+    ...(pathPrefix ? { PATH: `${pathPrefix}${path.delimiter}${process.env.PATH ?? ""}` } : {}),
+  };
   const actual = spawnSync(
     "bash",
     ["-c", 'source "$1" && epoch_to_iso "$2"', "bash", script, String(epoch)],
@@ -75,7 +78,7 @@ function expectUtcDay(pathPrefix?: string): void {
 }
 
 function flagsEpochDate(line: string): boolean {
-  return /date\s+-[rd]\b/.test(line);
+  return /\bdate\b[^\n|;]*\s(-[a-zA-Z]*[rd]\b|--date\b|--reference\b)/.test(line);
 }
 
 async function pluginScripts(directory: string): Promise<string[]> {

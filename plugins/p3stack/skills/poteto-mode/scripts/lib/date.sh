@@ -1,8 +1,4 @@
-# GNU date rejects -r for an epoch. BSD date rejects -d @.
+# GNU and BusyBox take -d @epoch. BSD date takes -r and rejects -d.
 epoch_to_iso() {
-	if date --version >/dev/null 2>&1; then
-		date -d "@$1" '+%Y-%m-%d'
-	else
-		date -r "$1" '+%Y-%m-%d'
-	fi
+	date -d "@$1" '+%Y-%m-%d' 2>/dev/null || date -r "$1" '+%Y-%m-%d'
 }
