@@ -85,10 +85,10 @@ test("core and LOX skills have one owner and relative skill references stay insi
   }
 });
 
-test("LOX skills require explicit invocation and resolve inside the plugin", async () => {
+test("LOX exposes only the selected skills, requires explicit invocation, and resolves its own workflow", async () => {
   const pluginRoot = path.join(repoRoot, "plugins/lox");
-  const names = (await readdir(path.join(pluginRoot, "skills"))).sort();
-  expect(names.length).toBeGreaterThan(0);
+  const names = ["adversarial-code-reviewing", "auto-review", "drafting-plans", "simplicity-review", "writing-pr-descriptions"];
+  expect((await readdir(path.join(pluginRoot, "skills"))).sort()).toEqual(names);
 
   for (const adapter of [HARNESSES.codex, HARNESSES.claude]) {
     const manifest = JSON.parse(await readText(path.join(pluginRoot, adapter.manifestPath)));
