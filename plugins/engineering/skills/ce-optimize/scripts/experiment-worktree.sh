@@ -71,15 +71,20 @@ snapshot_untracked() {
   local worktree_path="${1:?Error: worktree_path required}"
   local name="${2:?Error: snapshot name required}"
   local snapshot_dir="$WORKTREE_DIR/.snapshots"
-  local ts snapshot_path list_file
+  local reserved snapshot_path list_file
 
-  ts=$(date -u +%Y%m%dT%H%M%S%N)
-  snapshot_path="$snapshot_dir/${name}-${ts}.tar"
   mkdir -p "$snapshot_dir"
-  list_file=$(mktemp)
+  # BSD date leaves %N literal, so a timestamp can collide within one second.
+  reserved=$(mktemp "$snapshot_dir/${name}.XXXXXX") || return 1
+  snapshot_path="${reserved}.tar"
+  if ! mv "$reserved" "$snapshot_path"; then
+    rm -f "$reserved"
+    return 1
+  fi
+  list_file=$(mktemp) || return 1
 
   if ! git -C "$worktree_path" ls-files --others --exclude-standard -z >"$list_file"; then
-    rm -f "$list_file"
+    rm -f "$list_file" "$snapshot_path"
     return 1
   fi
 
@@ -124,7 +129,9 @@ reset_worktree_to_base() {
 
   echo -e "${YELLOW}Resetting existing experiment worktree to base: $branch_name -> $base_branch${NC}" >&2
   git -C "$worktree_path" reset --hard "$base_branch" >/dev/null
-  git -C "$worktree_path" clean -fdx >/dev/null
+  # Ignored files stay. The snapshot does not include them, and dependency
+  # trees would make the archive unbounded. The reset keeps user work.
+  git -C "$worktree_path" clean -fd >/dev/null
 }
 
 # Create an experiment worktree
