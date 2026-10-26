@@ -20,13 +20,13 @@ $poteto-mode read this thread. restate the underlying issue in your own words, i
 
 A misreading shows up in the restatement, where it costs one message to correct. Keep your own theory to yourself until the agent has stated its own. `$in-your-own-words` asks for the restatement alone, with no playbook.
 
-## Aim a task before it starts
+## Sharpen a prompt before you send it
 
 ```text
 $sharpen write the onboarding doc for the new billing service.
 ```
 
-The agent asks how an expert would do the task, what you're really after, and whether the ask says too much or too little. It keeps one outside check that the result is right, then does the work.
+The agent names what an expert would do that you didn't ask for, the raw material they'd start from, their methods and tools, and an outside check that the result is right. It hands back your prompt rewritten to ask for that and doesn't do the task. Send the rewrite when it reads right.
 
 ## Prototype before you pick
 
@@ -157,6 +157,8 @@ $ketchup
 ```
 
 [`$ketchup`](../../skills/ketchup/SKILL.md) tells you in plain words what changed since your last message, then lists each call waiting on you with its pick, evidence, and risk. It changes nothing while it reports.
+
+To watch the catch-up instead, run [`$ketchup-video`](../../skills/ketchup-video/SKILL.md). It shows what happened in a short silent video of slides, and lists the calls waiting on you as text under it.
 
 ## The pitfalls
 

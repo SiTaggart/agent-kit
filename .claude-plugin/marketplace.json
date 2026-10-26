@@ -34,7 +34,7 @@
     {
       "name": "p3stack",
       "source": "./plugins/p3stack",
-      "version": "0.15.28",
+      "version": "0.15.32",
       "description": "PStack workflows with cross-provider model panels for T3 Code."
     },
     {

@@ -42,6 +42,8 @@ Present the synthesizer's full Accepted / Rejected / Backlog output and wait for
 
 List backlog items locally. File tickets only if the user has authorized publication to that tracker.
 
+Never edit a skill in an installed plugin cache. Before approval, show its destination. Project skills go in `.claude/skills/<skill>/` for Claude Code and `.agents/skills/<skill>/` for Codex. Personal skills go in `~/.claude/skills/<skill>/` or `~/.agents/skills/<skill>/`. After approval, copy the skill folder there and edit the copy. Never open a PR or push.
+
 Follow each approved row's Routing exactly:
 
 - Trivial existing-skill edit (a one-line bullet, a tightened sentence, a stale fact corrected): parent does directly.
