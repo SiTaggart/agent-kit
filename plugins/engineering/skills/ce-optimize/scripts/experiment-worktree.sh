@@ -67,6 +67,46 @@ is_branch_checked_out() {
   '
 }
 
+snapshot_untracked() {
+  local worktree_path="${1:?Error: worktree_path required}"
+  local name="${2:?Error: snapshot name required}"
+  local snapshot_dir="$WORKTREE_DIR/.snapshots"
+  local ts snapshot_path list_file
+
+  ts=$(date -u +%Y%m%dT%H%M%S%N)
+  snapshot_path="$snapshot_dir/${name}-${ts}.tar"
+  mkdir -p "$snapshot_dir"
+  list_file=$(mktemp)
+
+  if ! git -C "$worktree_path" ls-files --others --exclude-standard -z >"$list_file"; then
+    rm -f "$list_file"
+    return 1
+  fi
+
+  if ! tar -C "$worktree_path" --null -T "$list_file" -cf "$snapshot_path"; then
+    rm -f "$list_file" "$snapshot_path"
+    return 1
+  fi
+
+  rm -f "$list_file"
+  printf '%s\n' "$snapshot_path"
+}
+
+require_untracked_snapshot() {
+  local worktree_path="${1:?Error: worktree_path required}"
+  local name="${2:?Error: snapshot name required}"
+
+  if snapshot_untracked "$worktree_path" "$name" >/dev/null; then
+    return 0
+  fi
+
+  echo -e "${RED}Error: Refusing to discard ${worktree_path} because the untracked snapshot failed${NC}" >&2
+  if ! git -C "$worktree_path" ls-files --others --exclude-standard >&2; then
+    echo -e "${RED}Error: Could not list untracked files in ${worktree_path}${NC}" >&2
+  fi
+  return 1
+}
+
 reset_worktree_to_base() {
   local worktree_path="${1:?Error: worktree_path required}"
   local branch_name="${2:?Error: branch_name required}"
@@ -79,6 +119,8 @@ reset_worktree_to_base() {
     echo -e "${RED}Clean up the stale worktree before rerunning this experiment.${NC}" >&2
     return 1
   fi
+
+  require_untracked_snapshot "$worktree_path" "$(basename "$worktree_path")" || return 1
 
   echo -e "${YELLOW}Resetting existing experiment worktree to base: $branch_name -> $base_branch${NC}" >&2
   git -C "$worktree_path" reset --hard "$base_branch" >/dev/null
@@ -176,11 +218,11 @@ cleanup_worktree() {
   local worktree_path="$WORKTREE_DIR/$worktree_name"
 
   if [[ -d "$worktree_path" ]]; then
-    git worktree remove "$worktree_path" --force 2>/dev/null || {
-      # If worktree remove fails, try manual cleanup
+    require_untracked_snapshot "$worktree_path" "$worktree_name" || return 1
+    if ! git worktree remove "$worktree_path" --force 2>/dev/null; then
       rm -rf "$worktree_path" 2>/dev/null || true
       git worktree prune 2>/dev/null || true
-    }
+    fi
   fi
 
   # Delete the experiment branch
@@ -207,9 +249,10 @@ cleanup_all() {
       # Extract index from name
       local index_str="${worktree_name#$prefix}"
 
-      git worktree remove "$worktree_path" --force 2>/dev/null || {
+      require_untracked_snapshot "$worktree_path" "$worktree_name" || return 1
+      if ! git worktree remove "$worktree_path" --force 2>/dev/null; then
         rm -rf "$worktree_path" 2>/dev/null || true
-      }
+      fi
 
       # Delete the branch
       local branch_name

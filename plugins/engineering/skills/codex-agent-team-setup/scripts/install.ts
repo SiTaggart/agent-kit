@@ -149,56 +149,67 @@ async function writeLedger(ledgerPath: string, ledger: Ledger): Promise<void> {
   await atomicWrite(ledgerPath, `${JSON.stringify(ledger, null, 2)}\n`);
 }
 
-export async function planProfiles(options: InstallOptions): Promise<readonly ProfileAction[]> {
+interface PlannedProfile {
+  readonly template: Template;
+  readonly action: ProfileAction;
+}
+
+async function classifyProfile(paths: InstallPaths, ledger: Ledger, template: Template): Promise<ProfileAction> {
+  const targetPath = path.join(paths.agentsDir, `${template.name}.toml`);
+  const installed = await readOptional(targetPath);
+  if (installed === null) {
+    return { name: template.name, targetPath, kind: "create", detail: "profile is not installed" };
+  }
+
+  const installedChecksum = checksum(installed);
+  if (installedChecksum === template.checksum) {
+    return { name: template.name, targetPath, kind: "unchanged", detail: "profile matches the plugin" };
+  }
+
+  if (installedChecksum === ledger.profiles[template.name]?.checksum) {
+    return { name: template.name, targetPath, kind: "update", detail: "previously managed profile has an update" };
+  }
+
+  return {
+    name: template.name,
+    targetPath,
+    kind: "conflict",
+    detail: "profile is unmanaged or was modified locally",
+  };
+}
+
+async function loadPlan(options: InstallOptions): Promise<readonly PlannedProfile[]> {
   const paths = resolvePaths(options);
   const [templates, ledger] = await Promise.all([loadTemplates(paths.assetsDir), readLedger(paths.ledgerPath)]);
+  return await Promise.all(templates.map(async (template) => ({
+    template,
+    action: await classifyProfile(paths, ledger, template),
+  })));
+}
 
-  return await Promise.all(
-    templates.map(async (template): Promise<ProfileAction> => {
-      const targetPath = path.join(paths.agentsDir, `${template.name}.toml`);
-      const installed = await readOptional(targetPath);
-      if (installed === null) {
-        return { name: template.name, targetPath, kind: "create", detail: "profile is not installed" };
-      }
-
-      const installedChecksum = checksum(installed);
-      if (installedChecksum === template.checksum) {
-        return { name: template.name, targetPath, kind: "unchanged", detail: "profile matches the plugin" };
-      }
-
-      if (installedChecksum === ledger.profiles[template.name]?.checksum) {
-        return { name: template.name, targetPath, kind: "update", detail: "previously managed profile has an update" };
-      }
-
-      return {
-        name: template.name,
-        targetPath,
-        kind: "conflict",
-        detail: "profile is unmanaged or was modified locally",
-      };
-    }),
-  );
+export async function planProfiles(options: InstallOptions): Promise<readonly ProfileAction[]> {
+  const plan = await loadPlan(options);
+  return plan.map((entry) => entry.action);
 }
 
 export async function applyProfiles(options: InstallOptions): Promise<readonly ProfileAction[]> {
   const paths = resolvePaths(options);
-  const [actions, templates] = await Promise.all([planProfiles(options), loadTemplates(paths.assetsDir)]);
-  const conflicts = actions.filter((action) => action.kind === "conflict");
+  const plan = await loadPlan(options);
+  const conflicts = plan.filter((entry) => entry.action.kind === "conflict");
   if (conflicts.length > 0) {
-    throw new Error(`Refusing to overwrite conflicting profiles: ${conflicts.map((action) => action.name).join(", ")}`);
+    throw new Error(`Refusing to overwrite conflicting profiles: ${conflicts.map((entry) => entry.action.name).join(", ")}`);
   }
 
   await mkdir(paths.agentsDir, { recursive: true });
   const profiles: Partial<Record<ProfileName, LedgerProfile>> = {};
-  for (const template of templates) {
-    const action = actions.find((candidate) => candidate.name === template.name);
-    if (action?.kind === "create" || action?.kind === "update") {
-      await atomicWrite(action.targetPath, template.content);
+  for (const entry of plan) {
+    if (entry.action.kind === "create" || entry.action.kind === "update") {
+      await atomicWrite(entry.action.targetPath, entry.template.content);
     }
-    profiles[template.name] = { checksum: template.checksum };
+    profiles[entry.template.name] = { checksum: entry.template.checksum };
   }
   await writeLedger(paths.ledgerPath, { version: LEDGER_VERSION, profiles });
-  return actions;
+  return plan.map((entry) => entry.action);
 }
 
 export async function configIssues(options: InstallOptions): Promise<readonly string[]> {
