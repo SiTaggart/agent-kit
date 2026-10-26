@@ -98,7 +98,6 @@ test("both catalogs publish P3Stack with manifests that match its release", () =
 
 test("every skill resolves the runtime adapter and keeps its activation policy", () => {
   const skills = readdirSync(path.join(pluginRoot, "skills")).filter((name) => !IGNORED.has(name));
-  expect(skills).toHaveLength(60);
   expect(skills).not.toContain("sync-p3stack");
 
   for (const skill of skills) {

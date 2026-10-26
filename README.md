@@ -5,12 +5,24 @@ switch command safeguards on or off separately.
 
 ## Plugins
 
-- **[Engineering](plugins/engineering/README.md)** — 33 skills for project
+<!-- counts:start -->
+- design-guide: 1 skill
+- engineering: 34 skills
+- git: 11 skills
+- hooks: 0 skills
+- knowledge: 11 skills
+- lox: 5 skills
+- p3stack: 60 skills
+<!-- counts:end -->
+
+Run `bun run gen:counts` to rewrite the list from `plugins/*/skills/*/SKILL.md`.
+
+- **[Engineering](plugins/engineering/README.md)** — skills for project
   control, planning, implementation, code review, debugging, and code taste.
   These workflows stay together because they share guidance and agent personas.
-- **[Git](plugins/git/README.md)** — 10 skills for commits, PRs, worktrees,
+- **[Git](plugins/git/README.md)** — skills for commits, PRs, worktrees,
   history, and feedback.
-- **[Knowledge](plugins/knowledge/README.md)** — 11 skills for Obsidian, QMD,
+- **[Knowledge](plugins/knowledge/README.md)** — skills for Obsidian, QMD,
   session research, and retained learnings.
 - **[Hooks](plugins/hooks/README.md)** — independently switchable command
   safeguards. Contains no skills.
@@ -19,7 +31,7 @@ switch command safeguards on or off separately.
   companions, and guide. It delegates each role to a Claude, Codex, or Grok
   model through T3 orchestration. See its README for requirements and
   attribution.
-- **[LOX](plugins/lox/README.md)** — five explicitly invoked skills for PR
+- **[LOX](plugins/lox/README.md)** — explicitly invoked skills for PR
   descriptions, simplicity review, plans, adversarial review, and a local
   review/fix loop. Packaged separately for side-by-side trials.
 

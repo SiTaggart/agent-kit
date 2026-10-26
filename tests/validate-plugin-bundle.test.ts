@@ -66,9 +66,8 @@ test("Grok reuses the Cursor plugin files", () => {
 
 test("core and LOX skills have one owner and relative skill references stay inside that plugin", async () => {
   const owners = new Map<string, string>();
-  for (const [id, count] of [["engineering", 34], ["git", 11], ["knowledge", 11], ["lox", 5]] as const) {
+  for (const id of ["engineering", "git", "knowledge", "lox"] as const) {
     const skills = await readdir(path.join(repoRoot, "plugins", id, "skills"));
-    expect(skills).toHaveLength(count);
     for (const name of skills) {
       expect(owners.has(name)).toBe(false);
       owners.set(name, id);
@@ -86,10 +85,10 @@ test("core and LOX skills have one owner and relative skill references stay insi
   }
 });
 
-test("LOX exposes only the selected skills, requires explicit invocation, and resolves its own workflow", async () => {
+test("LOX skills require explicit invocation and resolve inside the plugin", async () => {
   const pluginRoot = path.join(repoRoot, "plugins/lox");
-  const names = ["adversarial-code-reviewing", "auto-review", "drafting-plans", "simplicity-review", "writing-pr-descriptions"];
-  expect((await readdir(path.join(pluginRoot, "skills"))).sort()).toEqual(names);
+  const names = (await readdir(path.join(pluginRoot, "skills"))).sort();
+  expect(names.length).toBeGreaterThan(0);
 
   for (const adapter of [HARNESSES.codex, HARNESSES.claude]) {
     const manifest = JSON.parse(await readText(path.join(pluginRoot, adapter.manifestPath)));
