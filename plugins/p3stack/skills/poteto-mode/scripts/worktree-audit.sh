@@ -70,6 +70,7 @@ while IFS= read -r workspace; do
     session_args+=(--workspace "$workspace")
 done < <(git worktree list --porcelain | sed -n 's/^worktree //p')
 script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+. "$script_dir/lib/date.sh"
 if ! python3 "$script_dir/harness-sessions.py" "${session_args[@]}" > "$session_index"; then
     printf '{"sessions":[],"unavailable":[]}\n' > "$session_index"
     echo "Session history is unknown; verify worktree usage separately." >&2
@@ -116,8 +117,7 @@ git worktree list --porcelain | sed -n 's/^worktree //p' | while IFS= read -r wt
 		'[.sessions[] | select(.workspace==$wt)] | max_by(.mtime) // empty | "\(.mtime | floor) \(.harness)"' "$session_index")
 	if [ -n "$newest" ]; then
 		last_ts=${newest%% *}
-		# BSD date reads an epoch with -r; GNU date reads it with -d @.
-		day=$(date -r "$last_ts" '+%Y-%m-%d' 2>/dev/null || date -d "@$last_ts" '+%Y-%m-%d')
+		day=$(epoch_to_iso "$last_ts")
 		last="$day/${newest#* }"
 	fi
 	recent=$([ "$last_ts" -gt 0 ] 2>/dev/null && [ $(( (now - last_ts) / 86400 )) -le 4 ] && echo yes || echo no)
