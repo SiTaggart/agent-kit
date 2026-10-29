@@ -123,12 +123,60 @@ function script(name, scriptArgs, about, { okExits = [0] } = {}) {
 const KEYWORD =
   /^(SPECIFICATION|INIT|NEXT|CONSTANTS?|INVARIANTS?|PROPERTY|PROPERTIES|SYMMETRY|VIEW|CONSTRAINTS?|ACTION_CONSTRAINTS?|CHECK_DEADLOCK|POSTCONDITION|ALIAS)$/;
 
-function splitRules(cfg) {
-  const words = cfg
-    .replace(/\(\*[^]*?\*\)/g, " ")
-    .replace(/\\\*.*/g, " ")
-    .split(/\s+/)
-    .filter(Boolean);
+function configTokens(cfg) {
+  const tokens = [];
+  let word = "";
+  const flush = () => {
+    if (word) tokens.push(word);
+    word = "";
+  };
+  let i = 0;
+  while (i < cfg.length) {
+    const c = cfg[i];
+    if (c === '"') {
+      const start = i;
+      i++;
+      while (i < cfg.length) {
+        if (cfg[i] === "\\") {
+          i += 2;
+          continue;
+        }
+        if (cfg[i] === '"') {
+          i++;
+          break;
+        }
+        i++;
+      }
+      word += cfg.slice(start, i);
+      continue;
+    }
+    if (c === "(" && cfg[i + 1] === "*") {
+      flush();
+      i += 2;
+      while (i < cfg.length && !(cfg[i] === "*" && cfg[i + 1] === ")")) i++;
+      i += i < cfg.length ? 2 : 0;
+      continue;
+    }
+    if (c === "\\" && cfg[i + 1] === "*") {
+      flush();
+      const nl = cfg.indexOf("\n", i);
+      i = nl === -1 ? cfg.length : nl;
+      continue;
+    }
+    if (/\s/.test(c)) {
+      flush();
+      i++;
+      continue;
+    }
+    word += c;
+    i++;
+  }
+  flush();
+  return tokens;
+}
+
+export function splitRules(cfg) {
+  const words = configTokens(cfg);
   const kept = [];
   const rules = [];
   const properties = [];
@@ -580,17 +628,36 @@ const published = (work, out) => (file) => rel(path.join(out, path.relative(work
 
 const OWN =
   /^((chart|bug-\d+(-developer|-layered)?)\.(mmd|png)|stories\.md|summary\.json|tlc|\.DS_Store)$/;
+const TLC_FILE =
+  /^(regions-(?:proof|all)\.mmd|.+_rules\.tla|.+\.(?:cfg|out|dot)|\.DS_Store)$/;
+const TLC_DIR = /^(fixed|against)$/;
 
 function foreign(dir) {
   try {
-    return fs
-      .readdirSync(dir)
-      .filter((f) => !OWN.test(f))
-      .sort();
+    return foreignIn(dir, "").sort();
   } catch (e) {
     if (e.code === "ENOENT") return [];
     throw new CannotFinish(`cannot use ${rel(dir)} as the output folder: ${e.message}`);
   }
+}
+
+function foreignIn(dir, prefix) {
+  const found = [];
+  const inTlc = prefix === "tlc" || prefix.startsWith(`tlc${path.sep}`);
+  for (const entry of fs.readdirSync(dir, { withFileTypes: true })) {
+    const at = prefix ? path.join(prefix, entry.name) : entry.name;
+    if (entry.isDirectory() && !prefix && entry.name === "tlc") {
+      found.push(...foreignIn(path.join(dir, entry.name), at));
+      continue;
+    }
+    if (entry.isDirectory() && prefix === "tlc" && TLC_DIR.test(entry.name)) {
+      found.push(...foreignIn(path.join(dir, entry.name), at));
+      continue;
+    }
+    const owned = inTlc ? entry.isFile() && TLC_FILE.test(entry.name) : OWN.test(entry.name);
+    if (!owned) found.push(at);
+  }
+  return found;
 }
 
 function refuseForeign(out, files = foreign(out)) {
@@ -889,15 +956,17 @@ async function fromChart(input, { "expect-broken": expected, ...flags }, rendere
   });
 }
 
-try {
-  const { help, command, input, flags } = parseArgs(process.argv.slice(2));
-  if (help) {
-    console.log(help);
-    process.exit(0);
+if (process.argv[1] && path.resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+  try {
+    const { help, command, input, flags } = parseArgs(process.argv.slice(2));
+    if (help) {
+      console.log(help);
+      process.exit(0);
+    }
+    process.exit(await COMMANDS[command].run(input, flags, await rendererFor(command, flags)));
+  } catch (e) {
+    if (!(e instanceof CannotFinish)) throw e;
+    console.error(e.message);
+    process.exit(2);
   }
-  process.exit(await COMMANDS[command].run(input, flags, await rendererFor(command, flags)));
-} catch (e) {
-  if (!(e instanceof CannotFinish)) throw e;
-  console.error(e.message);
-  process.exit(2);
 }

@@ -26,6 +26,12 @@ const { regions, nevers } = parseMermaid(fs.readFileSync(args.chart, "utf8"));
 
 const RESERVED = new Set(["vars", "Init", "Next", "Spec", "TypeOK", "Settled"]);
 const taken = new Set(RESERVED);
+function claim(id) {
+  let unique = id;
+  for (let n = 2; taken.has(unique); n++) unique = `${id}${n}`;
+  taken.add(unique);
+  return unique;
+}
 function ident(words, lower) {
   const parts = words
     .normalize("NFKD")
@@ -38,10 +44,7 @@ function ident(words, lower) {
       .map((p, i) => (lower && i === 0 ? p[0].toLowerCase() : p[0].toUpperCase()) + p.slice(1))
       .join("") || "Step";
   if (/^[0-9]/.test(id)) id = `${lower ? "r" : "S"}${id}`;
-  let unique = id;
-  for (let n = 2; taken.has(unique); n++) unique = `${id}${n}`;
-  taken.add(unique);
-  return unique;
+  return claim(id);
 }
 const str = (s) => `"${s.replaceAll("\\", "\\\\").replaceAll('"', '\\"')}"`;
 const set = (xs) => `{${[...xs].map(str).join(", ")}}`;
@@ -96,10 +99,12 @@ out.push("");
 out.push(`VARIABLES ${vars.map((x) => x.v).join(", ")}`);
 out.push(`vars == <<${vars.map((x) => x.v).join(", ")}>>`);
 out.push("");
-for (const x of vars)
-  out.push(`\\* Region ${x.name}`, `${x.v}States == ${set([...x.states].sort())}`);
+for (const x of vars) {
+  x.statesName = claim(`${x.v}States`);
+  out.push(`\\* Region ${x.name}`, `${x.statesName} == ${set([...x.states].sort())}`);
+}
 out.push("");
-out.push("TypeOK ==", ...conjuncts(vars.map((x) => `${x.v} \\in ${x.v}States`)));
+out.push("TypeOK ==", ...conjuncts(vars.map((x) => `${x.v} \\in ${x.statesName}`)));
 out.push("");
 out.push(
   "Init ==",

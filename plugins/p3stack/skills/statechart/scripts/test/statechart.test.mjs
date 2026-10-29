@@ -1034,6 +1034,34 @@ test("chart-to-tla writes one action per label and one invariant per never line"
   assert.match(r.stderr, /rules TypeOK NeverSyncedWhileOffline/);
 });
 
+test("chart-to-tla gives a region and its states helper different names", () => {
+  const dir = mkdtempSync(join(tmpdir(), "statechart-"));
+  writeFileSync(
+    join(dir, "c.mmd"),
+    `stateDiagram-v2
+  state "App" as App {
+    state "Connection" as Connection {
+      [*] --> Online
+      Online --> Offline : drop
+    }
+    --
+    state "Connection states" as States {
+      [*] --> A
+      A --> B : go
+    }
+  }
+  [*] --> App
+`,
+  );
+  const r = node("chart-to-tla.mjs", ["c.mmd", "--module", "C"], dir);
+  assert.equal(r.status, 0, r.stderr);
+  const spec = readFileSync(join(dir, "C.tla"), "utf8");
+  assert.match(spec, /^VARIABLES connection, connectionStates$/m);
+  assert.match(spec, /^connectionStates2 == \{"Offline", "Online"\}$/m);
+  assert.match(spec, /^ {4}\/\\ connection \\in connectionStates2$/m);
+  assert.doesNotMatch(spec, /^connectionStates == /m);
+});
+
 test("chart-to-tla refuses a never line that names no state", () => {
   const dir = mkdtempSync(join(tmpdir(), "statechart-"));
   writeFileSync(
@@ -1534,6 +1562,35 @@ test("statechart.mjs does not use an output folder that has files that it did no
   ]);
   assert.deepEqual(readdirSync(out).sort(), [".DS_Store", "chart.mmd", "notes.md", "tlc"]);
   assert.equal(readFileSync(join(out, "chart.mmd"), "utf8"), "kept\n");
+});
+
+test("the config TLC checks keeps the spaces inside a quoted constant", async () => {
+  const { splitRules } = await import("../statechart.mjs");
+  const { cfgWithoutRules, rules } = splitRules(
+    'SPECIFICATION Spec\nCONSTANT Text = "a  b"\nINVARIANT TypeOK\n',
+  );
+  assert.match(cfgWithoutRules, /CONSTANT Text = "a  b"/);
+  assert.deepEqual(rules, ["TypeOK"]);
+});
+
+test("statechart.mjs does not replace an output folder when tlc holds a file it did not write", () => {
+  const dir = mkdtempSync(join(tmpdir(), "statechart-"));
+  writeFileSync(join(dir, "tla2tools.jar"), "");
+  writeFileSync(join(dir, "Pay.tla"), "---- MODULE Pay ----\n====\n");
+  writeFileSync(join(dir, "Pay.cfg"), "SPECIFICATION Spec\n");
+  const out = join(dir, "Pay-statechart");
+  mkdirSync(join(out, "tlc"), { recursive: true });
+  writeFileSync(join(out, "chart.mmd"), "kept\n");
+  writeFileSync(join(out, "tlc", "notes.md"), "mine\n");
+  const notes = node("statechart.mjs", ["from-spec", "Pay.tla"], dir, {
+    TLA2TOOLS: join(dir, "tla2tools.jar"),
+  });
+  assert.equal(notes.status, 2);
+  assert.equal(
+    notes.stderr,
+    `Pay-statechart has a file that this command did not write: ${join("tlc", "notes.md")}. A run puts its files in place of the whole output folder, so pass --out with a new folder.\n`,
+  );
+  assert.equal(readFileSync(join(out, "tlc", "notes.md"), "utf8"), "mine\n");
 });
 
 test("statechart.mjs exits 2 and names a helper script that cannot start", () => {
