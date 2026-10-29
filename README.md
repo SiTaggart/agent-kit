@@ -108,6 +108,12 @@ marketplace, then enable the selected plugins on the project. Private
 marketplaces require Teams. Grok Bot in Cursor uses the same manifests.
 Prefer project scope; an account-wide install applies to every cloud agent.
 
+## Personal guidance
+
+Simon’s versioned personal guidance lives in [personal/AGENTS.md](personal/AGENTS.md).
+See [personal/README.md](personal/README.md) for the one-time symlink setup and
+the Git workflow for syncing it between machines. This is separate from plugin installation.
+
 ## Migrate from the combined plugin
 
 The marketplace is still named `agent-kit`. The old `agent-kit@agent-kit`
@@ -144,7 +150,9 @@ plugins/
   design-guide/                  Design guidance MCP server and skill
 src/                             Marketplace validation CLI
 tests/                           Plugin and script checks
-AGENTS.md                        Repository contributor instructions
+personal/AGENTS.md               Versioned personal guidance
+personal/README.md               Personal guidance setup and sync
+AGENTS.md                        Repository-specific instructions
 ```
 
 Each plugin owns its files. Marketplace sources resolve from the repository
