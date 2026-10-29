@@ -12,7 +12,7 @@ switch command safeguards on or off separately.
 - hooks: 0 skills
 - knowledge: 11 skills
 - lox: 5 skills
-- p3stack: 60 skills
+- p3stack: 62 skills
 <!-- counts:end -->
 
 Run `bun run gen:counts` to rewrite the list from `plugins/*/skills/*/SKILL.md`.

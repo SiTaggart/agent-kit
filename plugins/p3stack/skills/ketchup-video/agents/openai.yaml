@@ -1,0 +1,5 @@
+interface:
+  display_name: Ketchup video
+  short_description: 'PStack: Ketchup video'
+policy:
+  allow_implicit_invocation: false

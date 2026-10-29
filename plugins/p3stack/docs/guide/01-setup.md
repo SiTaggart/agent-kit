@@ -13,6 +13,8 @@ Claude Code:
 /plugin install p3stack@agent-kit
 ```
 
+Claude Code leaves auto-update off for third-party marketplaces, so P3Stack stays on the version you installed. To turn it on, run `/plugin`, open the Marketplaces tab, select `agent-kit`, and choose Enable auto-update. To update once, run `claude plugin update p3stack@agent-kit`.
+
 Codex:
 
 ```bash

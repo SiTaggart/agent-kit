@@ -1,0 +1,3 @@
+# statechart.test.mjs is a Node test. Bun runs it and fails assertions that expect Node's spawn errors and stack text. node --test runs the file from the test script.
+[test]
+pathIgnorePatterns = ["plugins/p3stack/skills/statechart/**"]

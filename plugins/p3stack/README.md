@@ -1,6 +1,6 @@
 # p3stack
 
-> T3 Code port of Lauren Tan's upstream PStack, pinned to `d457567332aa6989e753ea289f30ea2bfbc80bc0` (v0.15.28). It carries the upstream skills, principles, playbooks, personas, and guide. [RUNTIME.md](./RUNTIME.md) maps PStack to T3 Code orchestration. This package stops at merge-ready. The user merges.
+> T3 Code port of Lauren Tan's upstream PStack, pinned to `e73df471cd4bd918367e99f3dd9c51bd53ddf5f0` (v0.15.32). It carries the upstream skills, principles, playbooks, personas, and guide. [RUNTIME.md](./RUNTIME.md) maps PStack to T3 Code orchestration. This package stops at merge-ready. The user merges.
 
 PStack makes an agent work like a careful engineering team. P3Stack keeps that system, and lets each role use the best model from any provider. The coordinator runs in a Claude Code or Codex thread in T3 Code. Delegates run on Claude, Codex, or Muse through T3's `delegate_task`.
 
@@ -22,6 +22,8 @@ Claude Code:
 /plugin install p3stack@agent-kit
 /p3stack:setup-pstack
 ```
+
+Claude Code leaves auto-update off for third-party marketplaces, so P3Stack stays on the version you installed. To turn it on, run `/plugin`, open the Marketplaces tab, select `agent-kit`, and choose Enable auto-update. To update once, run `claude plugin update p3stack@agent-kit`.
 
 Codex:
 

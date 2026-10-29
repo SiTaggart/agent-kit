@@ -1,0 +1,5 @@
+interface:
+  display_name: Statechart
+  short_description: 'PStack: Statechart'
+policy:
+  allow_implicit_invocation: false
