@@ -1,3 +1,4 @@
+import { readdir } from "fs/promises";
 import path from "path";
 import { pathExists, readText } from "./fs";
 import { HARNESSES, MARKETPLACE_ID, PLUGIN_IDS, RETIRED_PATHS, type HarnessAdapter, type PluginId } from "./plugin-bundle";
@@ -74,6 +75,125 @@ export async function validatePluginBundle(root: string): Promise<ValidationRepo
   }
 
   return { ok: failures.length === 0, failures };
+}
+
+const HARNESS_COMMANDS = new Set(["loop", "plugin", "plugins", "review"]);
+const FILESYSTEM_COMMAND_TOKENS = new Set(["tmp"]);
+const COMMAND_NAME = String.raw`[a-z][a-z0-9]*?(?:-[a-z0-9]+)*`;
+
+export async function inspectCommandIndex(root: string): Promise<ValidationReport> {
+  const failures: ValidationFailure[] = [];
+  const skills = new Map<string, string[]>();
+  for (const rel of await skillFiles(root)) {
+    const dir = path.basename(path.dirname(rel));
+    const owners = skills.get(dir) ?? [];
+    owners.push(rel);
+    skills.set(dir, owners);
+    const frontmatter = frontmatterName(await readText(path.join(root, rel)));
+    if (frontmatter !== dir) {
+      failures.push({
+        path: rel,
+        message: `Frontmatter name ${JSON.stringify(frontmatter)} must equal the directory name ${JSON.stringify(dir)}.`,
+      });
+    }
+  }
+
+  for (const rel of await commandSources(root)) {
+    const text = await readText(path.join(root, rel));
+    for (const name of commandNames(text)) {
+      if (HARNESS_COMMANDS.has(name)) continue;
+      const owners = skills.get(name) ?? [];
+      if (owners.length === 1) continue;
+      const message = owners.length === 0
+        ? `Slash command /${name} does not resolve to plugins/*/skills/${name}/SKILL.md.`
+        : `Slash command /${name} resolves to more than one skill: ${owners.join(", ")}.`;
+      failures.push({ path: rel, message });
+    }
+  }
+
+  failures.sort((left, right) => left.path.localeCompare(right.path) || left.message.localeCompare(right.message));
+  return { ok: failures.length === 0, failures };
+}
+
+async function commandSources(root: string): Promise<readonly string[]> {
+  const sources = ["README.md", ...await pluginReadmes(root), ...await skillFiles(root)];
+  const present: string[] = [];
+  for (const rel of sources) {
+    if (await pathExists(path.join(root, rel))) present.push(rel);
+  }
+  return present;
+}
+
+async function pluginReadmes(root: string): Promise<readonly string[]> {
+  const pluginsDir = path.join(root, "plugins");
+  if (!(await pathExists(pluginsDir))) return [];
+  const names = (await readdir(pluginsDir)).sort();
+  const files: string[] = [];
+  for (const name of names) {
+    const rel = `plugins/${name}/README.md`;
+    if (await pathExists(path.join(root, rel))) files.push(rel);
+  }
+  return files;
+}
+
+async function skillFiles(root: string): Promise<readonly string[]> {
+  const pluginsDir = path.join(root, "plugins");
+  if (!(await pathExists(pluginsDir))) return [];
+  const files: string[] = [];
+  for (const plugin of (await readdir(pluginsDir)).sort()) {
+    const skillsDir = path.join(pluginsDir, plugin, "skills");
+    if (!(await pathExists(skillsDir))) continue;
+    for (const skill of (await readdir(skillsDir)).sort()) {
+      const rel = `plugins/${plugin}/skills/${skill}/SKILL.md`;
+      if (await pathExists(path.join(root, rel))) files.push(rel);
+    }
+  }
+  return files;
+}
+
+function commandNames(text: string): readonly string[] {
+  const commandStart = new RegExp(
+    String.raw`^/(?<name>${COMMAND_NAME})(?::(?<skill>${COMMAND_NAME}))?(?:[\s]|$|[.,;:!?])`,
+  );
+  const lineCommand = new RegExp(
+    String.raw`^\s*/(?<name>${COMMAND_NAME})(?::(?<skill>${COMMAND_NAME}))?(?![\w/.-])`,
+    "gm",
+  );
+  const bareCommand = new RegExp(
+    String.raw`(?<![\w./<>'"{}])/(?<name>${COMMAND_NAME})(?::(?<skill>${COMMAND_NAME}))?(?![\w/.-])`,
+    "g",
+  );
+  const found = new Set<string>();
+  for (const match of text.matchAll(/`([^`]*)`/g)) addSpan(found, commandStart, match[1] ?? "");
+  for (const match of text.matchAll(/"([^"\n]*)"/g)) addSpan(found, commandStart, match[1] ?? "");
+  for (const match of text.matchAll(lineCommand)) addName(found, match.groups);
+  for (const match of text.matchAll(bareCommand)) addName(found, match.groups);
+  return [...found].sort();
+}
+
+function addSpan(found: Set<string>, commandStart: RegExp, content: string): void {
+  const text = content.trim();
+  if (/^\/[a-z0-9-]+\//.test(text)) return;
+  addName(found, commandStart.exec(text)?.groups);
+}
+
+function addName(found: Set<string>, groups: { name?: string; skill?: string } | undefined): void {
+  const name = groups?.skill || groups?.name;
+  if (!name || FILESYSTEM_COMMAND_TOKENS.has(name)) return;
+  found.add(name);
+}
+
+function frontmatterName(text: string): string | undefined {
+  if (!text.startsWith("---\n") && !text.startsWith("---\r\n")) return undefined;
+  const end = text.indexOf("\n---", 3);
+  if (end === -1) return undefined;
+  const block = text.slice(text.indexOf("\n") + 1, end);
+  try {
+    const name = asRecord(Bun.YAML.parse(block))?.name;
+    return typeof name === "string" ? name : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export function namesInstructionFile(value: string): boolean {

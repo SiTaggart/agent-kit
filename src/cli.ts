@@ -1,6 +1,6 @@
 #!/usr/bin/env bun
 import path from "path";
-import { validatePluginBundle } from "./validate";
+import { inspectCommandIndex, validatePluginBundle } from "./validate";
 
 type CliCommand = "validate" | "help";
 
@@ -18,9 +18,13 @@ async function main(): Promise<void> {
     return;
   }
 
-  const report = await validatePluginBundle(options.root);
-  if (!report.ok) {
-    for (const failure of report.failures) {
+  const [bundle, commands] = await Promise.all([
+    validatePluginBundle(options.root),
+    inspectCommandIndex(options.root),
+  ]);
+  const failures = [...bundle.failures, ...commands.failures];
+  if (failures.length > 0) {
+    for (const failure of failures) {
       console.error(`${failure.path}: ${failure.message}`);
     }
     process.exitCode = 1;
@@ -65,7 +69,7 @@ function printHelp(): void {
     "Options:",
     "  --root <path>   Marketplace repo root (defaults to cwd)",
     "",
-    "validate   Check manifests, skills/, and hook files.",
+    "validate   Check manifests, skills/, hook files, and slash commands.",
   ].join("\n"));
 }
 
