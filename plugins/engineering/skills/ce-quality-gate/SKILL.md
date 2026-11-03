@@ -73,7 +73,10 @@ exception with the accepted-contract reason — do not turn the gate into the
 main architecture phase.
 
 Use `ce-simplify-code` only when simplification is non-trivial or the user asks
-for it. Do not turn simplification into a mandatory ritual.
+for it. Do not turn simplification into a mandatory ritual. When a late refactor
+changes a signature, a constant, or ownership, run it over the whole branch
+diff, not only the last change. Such a refactor can leave a thin wrapper or a
+one-caller helper in code that was done earlier.
 
 ### 5. Report Proof
 
