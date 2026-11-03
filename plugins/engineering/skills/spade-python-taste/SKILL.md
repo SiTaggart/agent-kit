@@ -33,7 +33,9 @@ all explicit.
   namespace.
 - Match the service-router barrel convention: declare `__all__` in the router
   module, re-export it from `__init__.py`, and keep `logger`, `__all__`, and
-  `router` above loaded constants.
+  `router` above loaded constants. When a dependency only checks access and the
+  handler does not use its value, declare it in `dependencies=` on the router or
+  route. Do not declare it as an unused parameter.
 - Put dependencies in the install extra that imports them at runtime. An optional
   extra must represent a usable deployment.
 - Prefer the simplest supported local mechanism. For adjacent files, start with
@@ -56,7 +58,9 @@ runtime owner and no speculative layer remains.
 - Apply the deletion test to every guard, branch, and fallback: if deleting it
   would not leave the contract unmet or unproven, do not write it. Handle an
   edge case only when a real caller or input can produce it — name that source,
-  or leave the case unhandled with one line in the report.
+  or leave the case unhandled with one line in the report. A trim, clamp, or
+  `+1` that makes up for an index or boundary error is a smell. Fix the index
+  instead.
 - Fix a broken invariant in its shared owner when caller impact is understood. If
   that would materially widen the change, protect the current service at its
   boundary and leave the shared fix explicit and separate.
@@ -70,7 +74,10 @@ does not repeatedly re-parse or re-check the same contract.
 
 - Bound expensive or metered endpoints before exposing them. Choose the applicable
   authentication, timeout, concurrency, rate, input/window, turn/tool, and result
-  limits; explain any meaningful omission.
+  limits; explain any meaningful omission. Apply the bounds at every entry point
+  that reaches the costly call: HTTP route, agent tool, MCP tool, or CLI. Declare
+  each limit once in the shared owner, so the entry points read it and cannot
+  drift apart.
 - Reuse distributed locks and counters when the service runs across workers.
 - Keep an unavoidable mirror of another source of truth together in one module.
   Name the authoritative counterpart in one comment and test the boundary. Prefer
