@@ -49,9 +49,9 @@ No role uses `max` reasoning. If you pick Grok in `setup-pstack`, it always uses
 | hardest tasks | GPT-6 Astra | high |
 | how explainer, why synthesizer | Claude Opus 5.5 | high |
 | reflect tooling; reflect judgment, divergent, synthesizer | GPT-6.1 Sol | high |
-| how explorer, why investigators, swarm workers | Muse Wonder 1.0 | high |
-| arena runners, arena cross-judge pool | Opus 5.5, GPT-6.1 Sol, Muse Wonder 1.0 | high, high, high |
-| architect runners, interrogate reviewers | Fable 5.1, GPT-6 Astra, Muse Wonder 1.0 | high, high, high |
+| how explorer, why investigators, swarm workers | Muse Wonder Full 1.0 | high |
+| arena runners, arena cross-judge pool | Opus 5.5, GPT-6.1 Sol, Muse Wonder Full 1.0 | high, high, high |
+| architect runners, interrogate reviewers | Fable 5.1, GPT-6 Astra, Muse Wonder Full 1.0 | high, high, high |
 
 `setup-pstack` reads the live T3 model catalog and writes your changes to `~/.agents/p3stack-models.json`.
 
