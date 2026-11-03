@@ -74,6 +74,7 @@ get read-only briefs.
 | Stop a subagent | `task_cancel` |
 | Resume or follow-up round | A new `delegate_task` call with the original brief, prior findings, responses, and open objections. Do not use `t3_thread_send` on a `childThreadId`. |
 | Cloud agent, own branch, own worktree | `t3_thread_launch` with `workspaceStrategy` |
+| Cursor Project tracker and Project store | Notes the coordinator keeps under `.ai/` in the consuming repository |
 | `/loop`, poll loops, CI watchers | `watch_pull_request`. End the turn. T3 wakes this thread on checks, comments, or conflicts. |
 | Recurring run, heartbeat | `schedule_task` with a structured `schedule` object |
 | PR and stack bookkeeping | `link_pull_request` for every PR and every stack layer. `list_thread_pull_requests` to read them back. |
@@ -219,8 +220,6 @@ a change.
 Store working artifacts under the consuming project's `.ai/`, unless the user
 names a different location. Keep logs and orchestration state outside the
 installed plugin. Inspect a bundled helper's requirements before you run it.
-The orchestration frontier needs Graphite (`gt`). Do not install it only to run
-a helper.
 
 ## Skill authoring
 
