@@ -1,119 +1,80 @@
 ---
 name: scannable-ui-text
-description: Write or review collections of short UI text that people scan together, such as session titles, activity feeds, dashboard cards, issue summaries, and notifications. Use when neighboring items are hard to distinguish or inconsistent. Not a general prose, documentation, or marketing-copy skill.
+description: Scannable UI text. Use when writing or reviewing neighboring session titles, feed items, dashboard summaries, or notifications. For collections compared in an interface, not narrative prose.
 ---
 
 # Scannable UI text
 
-Make a collection easy to compare without changing what its items mean.
-Judge the strings together in their UI, not only as individual sentences.
+Review the collection as one interface. Optimize for comparison while preserving
+what each item means.
 
-## Establish the reading task
+## 1. Define the comparison
 
-Inspect the requested strings, their source facts, and the UI context available.
-Identify what the reader needs to find or compare: a task, an affected object,
-a change, an outcome, or an exception.
+Identify what the reader needs to distinguish: the task, affected object,
+status, outcome, or exception. Inspect the source facts and existing copy
+conventions. Account for neighboring fields, width, wrapping, and truncation.
+Repeat a badge or column's information only when the string must stand alone.
 
-Use the product's existing copy conventions. Note the visible neighboring
-fields, available width, wrapping, and truncation. Do not repeat information
-already clear from a column or badge unless the string must stand alone.
+Resolve missing facts that could change the meaning before rewriting. For
+missing display details, use a stated assumption and leave visual fit unverified.
 
-When context is missing, state a reasonable assumption and draft the text.
-Ask only when the missing answer could change the meaning. Do not infer that
-a session is active, a task succeeded, or a reported cause is confirmed.
+Proceed when you can name the comparison target, point to each item's source,
+and list the display constraints or stated assumptions.
 
-## Choose a pattern for the collection
+## 2. Rewrite the collection
 
-Use a grammatical shape that fits the reading task. These are options, not
-templates to impose on every screen:
+Choose a common pattern around the comparison target. Use an action and object
+for task names (`Review billing alerts`), actor and event for activity
+(`Mina paused the export`), or an object or status first for triage. Keep
+conventional labels as labels. Omit a repeated actor when the interface supplies it.
 
-- Task titles can use an action and its object: `Review billing alerts`.
-- Activity items can name the actor and event: `Mina paused the export`.
-- Triage items can lead with the affected object or status when that is how
-  readers choose what to inspect.
+Put distinguishing words early. If a shared opening hides the difference,
+change the collection's pattern. For a reader comparing export status,
+`Paused: weekly billing export` is useful. For a reader comparing regions,
+`EU invoice export: paused` puts the useful difference first.
 
-Keep structure, tense, terminology, and detail level consistent where the
-meaning is the same. Use a different status or tense when the facts differ.
-An imperative task title names work; it does not claim the work is underway.
-Use ongoing or completed verbs only when the source establishes that state.
+Keep structure, terminology, and detail level consistent for equivalent facts.
+Vary them to express real differences. Use one term per concept, retaining
+separate states such as paused, blocked, and failed.
 
-Prefer a subject followed by its action for sentences. Omit a repeated actor
-when the UI makes it clear. Keep conventional labels as labels; do not turn
-every noun phrase into a sentence.
+### Preserve evidence
 
-Use the same term for the same concept. Avoid synonym changes for variety.
-Keep different concepts distinct, including paused, blocked, and failed work.
+- Match tense to established state. An imperative title names a task; ongoing
+  and completed verbs require evidence of that state. Keep unknown states unknown.
+- Preserve scope, negation, uncertainty, conditions, counts, and consequential
+  exceptions. Keep `may affect Safari` uncertain and reported defects unconfirmed
+  until verified. Use only supported causes, examples, and outcomes.
+- Express praise, complaints, requests, and mixed feedback with verbs that match
+  their strength. Let the evidence determine sentiment, even on a themed dashboard.
+- Include comparable kinds of detail where available. Allow unequal lengths and
+  absent details when the evidence differs. Keep decision-changing exceptions
+  visible. Move secondary detail only into an existing accessible detail view;
+  otherwise retain it or report the space conflict.
 
-## Put the useful difference early
+For structured strings, preserve keys, interpolation tokens, plural rules,
+links, and accessible labels in the existing format.
 
-Compare neighboring items and find the words that distinguish them. Move those
-words toward the start without making the sentence hard to parse.
+Finish this pass with a revision for each requested item, mapped to its source.
 
-Remove shared filler such as `The report says that`. If a repeated verb hides
-the important difference, choose a more useful structure for the collection.
-Do not sacrifice a necessary qualifier or change the item to force a pattern.
+## 3. Verify and deliver
 
-For example, a status list without separate status badges could change from:
+Compare every revision with its source using the evidence rules above. Then
+read neighboring openings together: check that they reveal the useful difference
+and that shortening has not created duplicates.
 
-- `The weekly billing export has been paused`
-- `The daily billing export has been completed`
+Inspect representative items at their actual displayed width, including the
+longest item and an exception. Check wrapping and truncation. When the UI is
+unavailable, review the strings together and report visual fit as unverified.
+Character counts are a text check, not proof of layout or accessibility.
+For repository edits, run the relevant checks defined by the project.
 
-To:
+Return proposed replacements mapped to the originals, or apply the requested
+edits. Briefly report the common pattern, material exceptions, and unverified
+constraints. Keep changes within the requested strings; propose any needed
+layout change separately.
 
-- `Paused: weekly billing export`
-- `Completed: daily billing export`
-
-If the reader instead searches by export name and status already has a column,
-use that context to choose the text order.
-
-## Preserve the evidence
-
-Treat wording differences as information. Extra detail should help the reader
-understand a real distinction, rather than reflect arbitrary writing choices.
-Do not force equal length or fill absent fields to make items look uniform.
-
-Keep negation, uncertainty, conditions, scope, and consequential exceptions.
-`May affect Safari` must not become `Breaks Safari`. Missing evidence does not
-mean no problem. Do not upgrade a complaint into a confirmed defect or invent
-a cause, count, example, or outcome.
-
-Choose verbs that convey the source's meaning and the screen's purpose. For
-feedback, make praise, complaints, requests, and mixed reactions clear without
-inflating their strength. Do not make all cards sound positive or negative just
-because the dashboard has that theme.
-
-Use the same kinds of detail for comparable cards when the evidence supports
-them. Keep an exception visible when it changes the reader's decision. Move
-secondary detail only to an existing accessible detail view, or propose that
-UI change separately. Do not silently delete it to fit a word budget.
-
-## Check the collection in context
-
-- Compare every revision with its source. Check status, certainty, quantities,
-  sentiment, and any qualifiers before judging style.
-- Read the first few words of neighboring items. Can the reader tell them
-  apart? Check for duplicates introduced by shortening.
-- Inspect representative items at the actual displayed width when possible,
-  including the longest item and an exception. Check wrapping and truncation.
-  A character limit is only a proxy for visual fit, not proof of it.
-- If the UI is unavailable, show the strings together and state that visual
-  fit is unverified. Do not claim a browser or accessibility check ran.
-
-For repository edits, preserve string keys, interpolation tokens, plural
-rules, links, and accessible labels. Follow the existing localization format
-and run relevant checks. If the width cannot preserve the meaning, explain
-the conflict rather than hiding the qualifier or changing the facts.
-
-## Return the useful result
-
-For a review, show proposed replacements with enough mapping to identify each
-original item. For an edit, change only the requested strings and report the
-pattern used, important exceptions, and any unverified UI constraints.
-Keep the explanation shorter than the work it explains.
-
-This skill owns comparison across UI items. Leave document structure and
-general prose editing to the project's writing guidance. It does not require
-another plugin or authorize publishing changes.
+Finish when every requested item has been checked for fidelity and comparison,
+and every remaining display or validation gap is reported.
 
 ## Source
 
