@@ -34,7 +34,8 @@ Keep planning and implementation together:
 
 Use `ce-debug` for failures, `ce-polish` for browser iteration, and
 `ce-simplify-code` for cleanup. TypeScript and React work uses `code-taste`;
-Spade Python work uses `spade-python-taste`.
+Spade Python work uses `spade-python-taste`. Use `scannable-ui-text` to write
+or review neighboring titles, summaries, and other short UI strings.
 
 For one-off work, use `task-lead` in a Codex task. It leads scout, builder,
 and reviewer through verification to a draft pull request, with no project
@@ -84,6 +85,7 @@ not grant permission to install plugins or perform side effects.
 - [repo-research-analyst](skills/repo-research-analyst/SKILL.md)
 - [repoprompt](skills/repoprompt/SKILL.md)
 - [repoprompt-multi-review](skills/repoprompt-multi-review/SKILL.md)
+- [scannable-ui-text](skills/scannable-ui-text/SKILL.md)
 - [spade-python-taste](skills/spade-python-taste/SKILL.md)
 - [task-lead](skills/task-lead/SKILL.md)
 - [typescript-advanced-types](skills/typescript-advanced-types/SKILL.md)

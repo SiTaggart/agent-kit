@@ -1,0 +1,42 @@
+{
+  "skill_name": "scannable-ui-text",
+  "purpose": "Check that UI collections become easier to distinguish while preserving facts, exceptions, and interface contracts.",
+  "non_purpose": "Not a benchmark of general prose quality or a substitute for rendered UI testing.",
+  "evals": [
+    {
+      "id": 1,
+      "name": "session-titles-with-unknown-state",
+      "prompt": "Use scannable-ui-text to rewrite these session titles together: A: 'Looking into how billing alerts are set up'; B: 'A review of billing retries'; C: 'CSV invoice export'. These are task names in a sidebar, not activity reports. No session status is available. Preserve each task's scope. The sidebar starts truncating around 30 characters. Return an ID-to-title mapping and any verification limit. No browser is available.",
+      "expected_behavior": "Uses a coherent task-title pattern with early distinctions between alerts, retries, and invoice export. Does not turn reviewing or investigating into fixing or implementing. Reports that actual visual fit was not checked.",
+      "must_not": "Invent ongoing or completed states, claim fixes, merge tasks, or report rendered validation."
+    },
+    {
+      "id": 2,
+      "name": "mixed-status-and-overlapping-prefixes",
+      "prompt": "Use scannable-ui-text for this incident list. The reader first needs to distinguish an EU invoice export from a US invoice export, then see its status. There are no status badges. A: EU invoice export, failed, confirmed timeout. B: US invoice export, paused by owner, no error. C: APAC invoice export, status unknown because telemetry is missing. Current labels all start 'The invoice export job'. Aim for 36 characters per label, keep the region and status visible, and put a necessary extra fact in a per-item secondary line if needed. These secondary lines are always visible. Return an ID-to-label mapping with secondary lines where useful. Only text review is possible.",
+      "expected_behavior": "Makes regions distinguishable early, preserves failed versus owner-paused versus unknown status, and retains the timeout and telemetry explanation in visible text. Uses the width target without treating character count as proof of pixel fit.",
+      "must_not": "Call paused work failed, call missing telemetry healthy, invent a cause, bury all regions after a shared prefix, or drop a material qualifier merely for equal length."
+    },
+    {
+      "id": 3,
+      "name": "feedback-with-uneven-evidence",
+      "prompt": "Use scannable-ui-text to write three neighboring feedback cards from these facts. A, Search: 12 of 20 respondents like the speed; 3 of those 12 also report stale results. B, Export: 4 respondents report a crash only when exporting more than 10,000 rows; reproduction is pending. C, Sharing: 2 respondents request expiring links; no reason or example was recorded. The cards have room for two sentences plus the title. There is no detail view. Preserve decision-relevant evidence. Return the three cards and a short note about anything you could not verify.",
+      "expected_behavior": "Uses comparable card structure without forcing uniform sentiment or inventing examples. Keeps Search's mixed evidence and overlapping counts, Export's threshold and unconfirmed report, and Sharing's request without an invented rationale.",
+      "must_not": "Flatten Search to pure praise, sum overlapping counts as separate people, assert a confirmed Export defect or cause, invent a Sharing example, or move material facts to a nonexistent detail view."
+    },
+    {
+      "id": 4,
+      "name": "notification-tokens-and-negation",
+      "prompt": "Use scannable-ui-text to revise this JSON notification collection. Return valid JSON with exactly the same keys and interpolation tokens, plus a short explanation outside the JSON. All notifications must stand alone. Data: {\"export_paused\":\"Your export for {projectName} was paused by {actorName}.\",\"export_failed\":\"There was a failure during the export for {projectName}; no files were saved.\",\"export_done\":\"The export for {projectName} completed and saved {fileCount} files.\"}. All states are confirmed. Preserve the actor where supplied, the no-files condition, and the saved-file count. No code or browser is available.",
+      "expected_behavior": "Returns parseable JSON with unchanged keys and per-key tokens. Makes states easy to scan while preserving the actor, no-files condition, and saved count. Does not claim localization or browser checks ran.",
+      "must_not": "Rename keys, change or lose tokens, remove negation, add unknown actors, or make failure sound like a partial save."
+    },
+    {
+      "id": 5,
+      "name": "leave-general-prose-outside-scope",
+      "prompt": "Fix the typo in this README sentence and change nothing else: 'The client conects to the server and retries after a timeout.'",
+      "expected_behavior": "Returns the sentence with 'connects' corrected. Does not invoke a UI-collection workflow or impose a title or dashboard template.",
+      "must_not": "Ask for neighboring UI strings, invent display constraints, or change the meaning or sentence structure."
+    }
+  ]
+}

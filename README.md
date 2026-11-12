@@ -7,7 +7,7 @@ switch command safeguards on or off separately.
 
 <!-- counts:start -->
 - design-guide: 1 skill
-- engineering: 34 skills
+- engineering: 35 skills
 - git: 11 skills
 - hooks: 0 skills
 - knowledge: 11 skills
