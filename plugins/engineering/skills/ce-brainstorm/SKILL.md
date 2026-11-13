@@ -14,8 +14,8 @@ The durable output of this workflow is a **requirements document**. In other wor
 
 - Use `qmd-knowledge-base` or Obsidian before inventing product history when
   prior context could affect the product frame.
-- For Standard or Deep software brainstorms, build context with RepoPromptCE
-  `context_builder` (see the `repoprompt` skill) to ground the product frame in
+- For Standard or Deep software brainstorms, build context with the
+  `repo-research-analyst` skill or a read-only exploration sub-agent to ground the product frame in
   existing constraints and ownership. Skip it only for non-software framing or a
   quick brainstorm over already-known code. It is context, not implementation
   planning.

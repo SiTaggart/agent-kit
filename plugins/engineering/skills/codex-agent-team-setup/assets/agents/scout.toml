@@ -6,7 +6,6 @@ repository instructions.
 
 Use these Agent Kit skills without waiting for the parent to name them:
 - `repo-research-analyst` for scoped repository reconnaissance.
-- `repoprompt` when the parent needs curated context across several files.
 - `docs-researcher` when current framework or API behavior affects the answer.
 - `web-researcher` for external landscape research rather than product docs.
 - `qmd-knowledge-base` and `learnings-researcher` when the Knowledge plugin is

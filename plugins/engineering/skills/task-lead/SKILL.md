@@ -29,8 +29,6 @@ Use `ce-work` for final integration or a genuinely trivial direct edit, and
 plugin is installed and explicitly require a **draft** pull request. These
 steps are authorized by the user's request to run the task-lead workflow to a
 draft PR; do not infer authority to deploy, merge, or expand the task.
-Run `repoprompt-multi-review` from the lead task only when explicitly requested;
-it commissions its own independent reviewers.
 
 ## Run the agent loop
 

@@ -43,7 +43,7 @@ what already works, what must remain true, and which capabilities can help.
 Similar responsibilities do not establish equivalent behavior. When the
 proposed direction depends on that equivalence, verify it or keep the design
 conditional until implementation resolves the material differences.
-Use `repoprompt` for broad codebase context and `qmd-knowledge-base` when prior
+Use `repo-research-analyst` for broad codebase context and `qmd-knowledge-base` when prior
 decisions could change the approach. Use current official sources when an
 external contract matters. Research should inform direction; routine discovery
 can continue during implementation. State a material evidence gap honestly.

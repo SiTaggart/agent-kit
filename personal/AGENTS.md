@@ -23,8 +23,9 @@ This machine has context tools that see more than the checkout in front of you.
 
 - **qmd** — search over ~12k local markdown docs: wikis, specs, past decisions, and session retros. For non-trivial work, run the `qmd-knowledge-base` preflight after identifying the repository and product area. Search when prior decisions, product intent, ownership, conventions, expected behavior, or known failures could change the correct solution; uncertainty is enough. Mechanical work fully defined by live source can proceed without it.
   When QMD MCP tools are available, you must use them for status, search, and document retrieval. Use the CLI only when MCP tools are unavailable. A CLI failure does not mean QMD is unavailable.
-- **RepoPromptCE** — token-efficient codebase exploration: `file_search`, `get_file_tree`, `read_file`, `get_code_structure`, `context_builder`, and `manage_selection`. Beats `rg` plus file reads whenever the task spans more than a couple of already-known files. `context_builder` can build full implementation context for a task on its own. CLI fallback: `rpce-cli`.
 - `rg` **and direct reads** — right for exact, small, already-located scopes.
+- **LSP tools** — use go-to-definition and find-references when the harness provides them. They are more accurate than text search for callers, implementations, and type contracts.
+- **Exploration sub-agent** — when the task spans many files or an unfamiliar area, send a read-only sub-agent (Claude `Explore`, Codex `scout`) or use the `repo-research-analyst` skill. The main context keeps the conclusions and file paths, not the file dumps.
 - **Repository agent configuration** — when `docs/agents/` exists, read its configuration files before using engineering workflow skills.
 
 An answer, plan, or review that rests only on memory of the code is a guess. Ground it on one of these surfaces first, and verify drift-prone details at the live source.
@@ -60,7 +61,7 @@ An answer, plan, or review that rests only on memory of the code is a guess. Gro
 
 ## Phase Skills
 
-- Discover/context: `qmd-knowledge-base`, `ce-sessions`, `ce-slack-research`, `repoprompt`.
+- Discover/context: `qmd-knowledge-base`, `ce-sessions`, `ce-slack-research`, `repo-research-analyst`.
 - Frame: `ce-brainstorm`; `ce-grill` for branchy or strategic ambiguity; `document-review` for requirements docs.
 - Plan: `ce-plan`; `document-review` for markdown plans.
 - Work: `ce-work`, then `ce-quality-gate`; `frontend-design` for UI; `vercel-react-best-practices` for any React/Next change.

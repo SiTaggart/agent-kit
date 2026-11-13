@@ -111,9 +111,9 @@ When intent, conventions, or a historical decision remains unclear after
 reading the diff and live files, use `qmd-knowledge-base`. Keep the current diff,
 working tree, and tests as the review's implementation evidence.
 
-When the review starts cold — a standalone diff or PR with no context built upstream this session — use a RepoPromptCE `context_builder` review-mode pass (see the `repoprompt` skill) to map blast radius and cross-module impact independently. Within a session that already ran brainstorm, plan, or work, reuse that context instead of rebuilding it. Fold the result into the main review; do not mechanically forward findings that lack file/line evidence.
+When the review starts cold — a standalone diff or PR with no context built upstream this session — send a read-only exploration sub-agent to map blast radius and cross-module impact independently. Within a session that already ran brainstorm, plan, or work, reuse that context instead of rebuilding it. Fold the result into the main review; do not mechanically forward findings that lack file/line evidence.
 
-In `deep` mode, use the context-builder for any non-trivial diff unless enough
+In `deep` mode, run that exploration pass for any non-trivial diff unless enough
 equivalent context is already loaded. Inspect callers/importers for changed
 contracts more aggressively, but keep the search tied to real behavior,
 ownership boundaries, public APIs, shared state, or test fixtures touched by the

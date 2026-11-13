@@ -1,4 +1,0 @@
-interface:
-  display_name: "RepoPrompt Multi Review"
-  short_description: "Higher-confidence code review in RepoPrompt"
-  default_prompt: "Use $repoprompt-multi-review to review the current changes in RepoPrompt."

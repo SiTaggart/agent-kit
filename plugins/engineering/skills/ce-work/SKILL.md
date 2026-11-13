@@ -65,8 +65,7 @@ to an absolute path by the parent; run inline when sub-agents are unavailable:
   main work is designing or reshaping a test suite.
 - the `repo-research-analyst` skill for scoped repo reconnaissance (first
   prompt line: `Scope: <comma-separated scopes>` — see its SKILL.md for the
-  scope names); `repoprompt` when the parent needs curated file context to
-  reason directly.
+  scope names).
 - the `docs-researcher` skill when current framework/API behavior materially
   affects the approach.
 - `references/documentation-specialist.md` for substantial documentation

@@ -34,7 +34,6 @@ config_file = "./agents/reviewer.toml"
 const expectedSkillRoutes = {
   scout: [
     "repo-research-analyst",
-    "repoprompt",
     "docs-researcher",
     "web-researcher",
     "qmd-knowledge-base",
@@ -84,7 +83,6 @@ test("installer applies portable profiles and reports healthy status", async () 
       if (name === "reviewer") {
         expect(instructions).toContain("For a later specialist pass, apply only the skill or skills named by the task");
         expect(instructions).toContain("Follow their review-pass and subagent");
-        expect(instructions).not.toContain("`repoprompt-multi-review`");
         expect(instructions).not.toContain("`ce-thermo-nuclear-code-quality-review`");
       }
     }

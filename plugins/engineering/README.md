@@ -83,8 +83,6 @@ not grant permission to install plugins or perform side effects.
 - [prompt-check](skills/prompt-check/SKILL.md)
 - [project-control](skills/project-control/SKILL.md)
 - [repo-research-analyst](skills/repo-research-analyst/SKILL.md)
-- [repoprompt](skills/repoprompt/SKILL.md)
-- [repoprompt-multi-review](skills/repoprompt-multi-review/SKILL.md)
 - [scannable-ui-text](skills/scannable-ui-text/SKILL.md)
 - [spade-python-taste](skills/spade-python-taste/SKILL.md)
 - [task-lead](skills/task-lead/SKILL.md)

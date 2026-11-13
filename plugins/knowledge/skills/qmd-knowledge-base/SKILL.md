@@ -44,7 +44,7 @@ For an unmapped repository:
 
 1. Use the QMD MCP `status` tool to inspect the live collection inventory. Use the CLI only when MCP tools are unavailable.
 2. Select a collection only when its source clearly matches the current project or supplies shared organizational context relevant to the task.
-3. If no collection clearly matches, skip QMD and continue with live files and RepoPromptCE.
+3. If no collection clearly matches, skip QMD and continue with live files.
 
 Never search unrelated Spade or Termpower collections merely because they are available.
 

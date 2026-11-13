@@ -24,8 +24,6 @@ Own the task from repository discovery through a verified draft pull request.
 Follow the repository instructions and use $task-lead for the scout, builder,
 reviewer, verification, and draft pull-request loop. Explicitly require
 `git-commit-push-pr` to create a draft pull request when that skill is used.
-Use `repoprompt-multi-review` only when explicitly requested; it commissions
-its own independent reviewers from this lead task.
 
 When asked for status, return the status envelope below exactly enough that the
 project controller can reconcile it with Linear and GitHub.
