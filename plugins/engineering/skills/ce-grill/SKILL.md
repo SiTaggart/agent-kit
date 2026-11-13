@@ -10,7 +10,7 @@ Interview me relentlessly about every aspect of this plan until every branch of 
 
 Ask the questions one at a time.
 
-If a question can be answered by exploring the codebase, explore the codebase instead. Use `repoprompt` when that codebase question is broad, unfamiliar, or crosses multiple owner boundaries; keep the result as context for sharper questions, not as a plan.
+If a question can be answered by exploring the codebase, explore the codebase instead. Use `repo-research-analyst` or a read-only exploration sub-agent when that codebase question is broad, unfamiliar, or crosses multiple owner boundaries; keep the result as context for sharper questions, not as a plan.
 
 ## Loop Role
 
