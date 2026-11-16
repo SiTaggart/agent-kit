@@ -12,7 +12,7 @@ The two most common design mistakes are taking the agent's first design and poli
 $architect design the import pipeline before writing any code. i care most about how callers use it.
 ```
 
-[`$architect`](../../skills/architect/SKILL.md) grounds itself first, running `$how` over the code the design touches and `$why` when it moves ownership or layers. Then it runs `$arena` to produce competing design sketches, with the caller's usage written first in each, followed by types, signatures, and a module map.
+[`$architect`](../../skills/architect/SKILL.md) grounds itself first, tracing the code the design touches and running `$why` when it moves ownership or layers. Then it runs `$arena` to produce competing design sketches, with the caller's usage written first in each, followed by types, signatures, and a module map.
 
 If implementation is already authorized, it proceeds from the synthesized design into that work. A design-only request stops at the design. To request a checkpoint explicitly, say so:
 

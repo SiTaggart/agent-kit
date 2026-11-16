@@ -47,7 +47,7 @@ Installing changes nothing until the user invokes a skill. Only `$setup-pstack` 
 
 If cost is the worry, say where the tokens go and how to spend fewer. pstack spends extra tokens on subagents and review panels. Rerun `$setup-pstack` and pick a smaller budget or cheaper models. A role set to `auto` or `inherit-parent` runs on the parent conversation's model, which saves tokens when that model is cheaper. A shorter panel list runs fewer subagents, one for each entry. Save `$poteto-mode` for work that needs rigor.
 
-This is a port of pstack. Workflow skills such as `$poteto-mode`, `$how`, `$why`, and `$teach` spawn subagents with per-role models, as RUNTIME.md defines. Upstream Cursor features, such as Custom Modes, cloud subagents, and `/loop`, map to the host adapter's equivalents, or the adapter reports them as unavailable. Cursor users can use the native upstream plugin.
+This is a port of pstack. Workflow skills such as `$poteto-mode`, `$how`, and `$teach` spawn subagents, some with per-role models, as RUNTIME.md defines. Upstream Cursor features, such as Custom Modes, cloud subagents, and `/loop`, map to the host adapter's equivalents, or the adapter reports them as unavailable. Cursor users can use the native upstream plugin.
 
 ## Start a task with `$poteto-mode`
 
