@@ -118,7 +118,7 @@ Ask the user with the host's question tool. Plain chat is the fallback.
   - After each writer returns, run `git status --porcelain` in the coordinator
     checkout. A change that the coordinator did not make means that the writer
     failed its brief. Do not use its result until you resolve the change.
-  - For long lanes that own a branch or a PR, such as orchestrate and autopilot
+  - For long lanes that own a branch or a PR, such as autopilot
     tracks, use `t3_thread_launch`. Commit the base first, because uncommitted
     changes are not copied. Send
     `{"type":"worktree","baseRef":...,"branch":...,"startFromOrigin":false}` as
