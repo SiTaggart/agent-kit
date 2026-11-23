@@ -58,7 +58,13 @@ test("blocks commit operations on main", async () => {
 
 test.each([
   "rm -rf build",
+  "rm -Rf build",
+  "rm -fr build",
   "rm -r build",
+  "rm --recursive build",
+  "rm -f -r build",
+  "rm --force -r build",
+  'rm -"r"f build',
   "find . -delete",
   "truncate -s 0 data.db",
   "git reset --hard HEAD",
@@ -75,6 +81,7 @@ test.each([
   "kubectl delete pods --all",
   "chmod -R 000 .",
   "sudo chown -R root /tmp/example",
+  "chown --reference=other -R /tmp/example",
   "dd if=/dev/zero of=/dev/disk1",
   "mkfs.ext4 /dev/disk1",
   "diskutil eraseDisk APFS Empty /dev/disk4",
@@ -87,6 +94,24 @@ test.each([
 
     expect(result.exitCode).toBe(2);
     expect(result.stderr).toContain("Blocked:");
+  },
+);
+
+test.each([
+  'orca worktree rm --worktree "path:/tmp/x"',
+  'orca worktree rm --worktree "path:/tmp/x" --force',
+  "git worktree remove build",
+  "rm file.txt",
+  "rm -f file.txt",
+  "chown --reference=other file.txt",
+])(
+  "allows non-recursive command: %s",
+  async (command) => {
+    const result = await runHook({
+      input: JSON.stringify({ tool_input: { command } }),
+    });
+
+    expect(result.exitCode).toBe(0);
   },
 );
 

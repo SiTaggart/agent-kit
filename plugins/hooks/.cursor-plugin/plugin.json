@@ -1,6 +1,6 @@
 {
   "name": "hooks",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "description": "Independently switchable shell command safeguards.",
   "author": {
     "name": "Simon Taggart",

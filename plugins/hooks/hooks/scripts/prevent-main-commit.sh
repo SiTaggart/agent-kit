@@ -37,7 +37,11 @@ if [ -z "$command" ]; then
   exit 0
 fi
 
-if echo "$command" | grep -qE '\brm[[:space:]]+(-[^[:space:];|&]*[rR][^[:space:];|&]*|--recursive)([[:space:];|&]|$)|\bfind\b[^;|&]*[[:space:]]-delete([[:space:];|&]|$)|\btruncate[[:space:]]'; then
+# Find a recursive flag in any argument of the same command segment.
+# A short-flag cluster has one leading dash, so long options such as --worktree do not match.
+recursive_flag='[[:space:]]([^;|&]*[[:space:]])?(-[^-[:space:];|&]*[rR][^[:space:];|&]*|--recursive)([[:space:];|&]|$)'
+
+if echo "$command" | grep -qE "\\brm${recursive_flag}"'|\bfind\b[^;|&]*[[:space:]]-delete([[:space:];|&]|$)|\btruncate[[:space:]]'; then
   echo "Blocked: Destructive filesystem command is disabled for coding agents." >&2
   exit 2
 fi
@@ -52,7 +56,7 @@ if echo "$command" | grep -qE '\b(terraform|pulumi|cdk)[[:space:]]+destroy\b|\bd
   exit 2
 fi
 
-if echo "$command" | grep -qE '\b(chmod|chown)[[:space:]]+-[^[:space:];|&]*[rR]\b|(^|[;&|][[:space:]]*)(sudo[[:space:]]+)?(dd|mkfs(\.[^[:space:]]+)?|diskutil[[:space:]]+(eraseDisk|partitionDisk))\b'; then
+if echo "$command" | grep -qE "\\b(chmod|chown)${recursive_flag}"'|(^|[;&|][[:space:]]*)(sudo[[:space:]]+)?(dd|mkfs(\.[^[:space:]]+)?|diskutil[[:space:]]+(eraseDisk|partitionDisk))\b'; then
   echo "Blocked: Destructive system command is disabled for coding agents." >&2
   exit 2
 fi
