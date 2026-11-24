@@ -10,7 +10,7 @@ switch command safeguards on or off separately.
 - engineering: 33 skills
 - git: 11 skills
 - hooks: 0 skills
-- knowledge: 11 skills
+- knowledge: 12 skills
 - lox: 5 skills
 - p3stack: 62 skills
 <!-- counts:end -->
@@ -22,8 +22,8 @@ Run `bun run gen:counts` to rewrite the list from `plugins/*/skills/*/SKILL.md`.
   These workflows stay together because they share guidance and agent personas.
 - **[Git](plugins/git/README.md)** — skills for commits, PRs, worktrees,
   history, and feedback.
-- **[Knowledge](plugins/knowledge/README.md)** — skills for Obsidian, QMD,
-  session research, and retained learnings.
+- **[Knowledge](plugins/knowledge/README.md)** — skills for Markdown wiki
+  maintenance, Obsidian, QMD, session research, and retained learnings.
 - **[Hooks](plugins/hooks/README.md)** — independently switchable command
   safeguards. Contains no skills.
 - **[P3Stack for T3 Code](plugins/p3stack/README.md)** — a pinned

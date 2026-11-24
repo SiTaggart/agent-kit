@@ -1,6 +1,6 @@
 # Knowledge
 
-Obsidian, QMD, session research, and retained learnings.
+Markdown wiki maintenance, Obsidian, QMD, session research, and retained learnings.
 
 Part of the [Agent Kit marketplace](../../README.md). Supports Claude Code,
 Codex, Cursor, and Grok. This plugin contains skills only; command safeguards
@@ -26,6 +26,10 @@ In Cursor, enable `knowledge` from the private marketplace on the project.
 Grok Bot in Cursor uses the same plugin. Prefer project scope.
 
 ## Workflows
+
+Use `llm-wiki` to maintain an existing Markdown wiki within its schema and
+write boundaries. Codex lists it as `knowledge:llm-wiki`. It works with local
+files and requires only standard file tools.
 
 Use `qmd-knowledge-base` for indexed context and `obsidian-vault` for vault
 operations. Use `ce-sessions` to inspect prior agent work and
@@ -53,6 +57,7 @@ does not install those tools or grant access to them.
 - [ce-slack-research](skills/ce-slack-research/SKILL.md)
 - [chronicle](skills/chronicle/SKILL.md)
 - [learnings-researcher](skills/learnings-researcher/SKILL.md)
+- [llm-wiki](skills/llm-wiki/SKILL.md)
 - [obsidian-vault](skills/obsidian-vault/SKILL.md)
 - [qmd-knowledge-base](skills/qmd-knowledge-base/SKILL.md)
 
@@ -66,4 +71,4 @@ Run the [repository checks](../../README.md#validate) from the repository root.
 
 ## License
 
-MIT.
+MIT. The `llm-wiki` adaptation includes its [upstream license](skills/llm-wiki/LICENSE).
