@@ -23,8 +23,8 @@
     {
       "name": "knowledge",
       "source": "./plugins/knowledge",
-      "version": "0.2.1",
-      "description": "Obsidian, QMD, session research, and retained learnings."
+      "version": "0.2.3",
+      "description": "Markdown wiki maintenance, Obsidian, QMD, session research, and retained learnings."
     },
     {
       "name": "hooks",
